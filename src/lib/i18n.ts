@@ -1,20 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {},
-    lng: "th",
-    fallbackLng: "th",
-    interpolation: {
-      escapeValue: false,
-    },
-    backend: {
-      loadPath: "/locales/{{lng}}.json",
-    },
-  });
-
 // Load translations dynamically
 const loadLanguage = async (lang: string) => {
   try {
@@ -26,7 +12,23 @@ const loadLanguage = async (lang: string) => {
   }
 };
 
-// Load all languages
-["th", "en", "zh"].forEach(loadLanguage);
+// Initialize i18n and load all languages
+export const initializeI18n = async () => {
+  await i18n
+    .use(initReactI18next)
+    .init({
+      resources: {},
+      lng: "th",
+      fallbackLng: "th",
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+
+  // Load all languages
+  await Promise.all(["th", "en", "zh"].map(loadLanguage));
+  
+  return i18n;
+};
 
 export default i18n;
