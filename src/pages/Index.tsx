@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Leaf, Users, BookOpen } from "lucide-react";
+import { ArrowRight, Leaf, Users, BookOpen, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
@@ -11,7 +11,6 @@ import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
 import { useTranslation } from "react-i18next";
-import { User } from "lucide-react";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -180,23 +179,42 @@ const Index = () => {
       {/* Customer Reviews */}
       <section id="reviews" className="py-16 bg-secondary">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">{t("sections.customerReviews")}</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold">{t("sections.customerReviews")}</h2>
+            <Button variant="outline" asChild>
+              <Link to="/reviews">{t("sections.viewAll")}</Link>
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review) => (
+            {reviews.slice(0, 3).map((review) => (
               <Card key={review.id} className="rounded-xl shadow-md hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
+                  <div className="flex items-start gap-3 mb-4">
+                    <img
+                      src={review.avatarUrl}
+                      alt={review.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-border"
+                    />
+                    <div className="flex-1">
                       <h3 className="font-semibold text-foreground">{review.name}</h3>
                       <p className="text-sm text-muted-foreground">
                         {review.age} {currentLanguage === "th" ? "ปี" : currentLanguage === "en" ? "years old" : "岁"} • {review.occupation[currentLanguage]}
                       </p>
+                      <div className="flex gap-1 mt-1">
+                        {[...Array(5)].map((_, index) => (
+                          <Star
+                            key={index}
+                            className={`h-3 w-3 ${
+                              index < review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "fill-muted text-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
                     {review.review[currentLanguage]}
                   </p>
                 </CardContent>
