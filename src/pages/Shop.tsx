@@ -13,8 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 const Shop = () => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("popular");
 
@@ -40,19 +42,19 @@ const Shop = () => {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">สินค้าทั้งหมด</h1>
+        <h1 className="text-4xl font-bold mb-8">{t("shop.title")}</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <Card>
               <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">หมวดหมู่</h2>
+                <h2 className="font-semibold mb-4">{t("shop.categories")}</h2>
                 <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory}>
                   <div className="flex items-center space-x-2 mb-3">
                     <RadioGroupItem value="all" id="all" />
                     <Label htmlFor="all" className="cursor-pointer">
-                      ทั้งหมด
+                      {t("shop.all")}
                     </Label>
                   </div>
                   {categories.map((category) => (
@@ -72,21 +74,21 @@ const Shop = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">
-                แสดง {sortedProducts.length} สินค้า
+                {t("shop.showing")} {sortedProducts.length} {t("shop.products")}
               </p>
               <div className="flex items-center gap-2">
                 <Label htmlFor="sort" className="text-sm">
-                  เรียงตาม:
+                  {t("shop.sortBy")}
                 </Label>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger id="sort" className="w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="popular">ยอดนิยม</SelectItem>
-                    <SelectItem value="rating">คะแนนสูงสุด</SelectItem>
-                    <SelectItem value="price-low">ราคา: ต่ำ - สูง</SelectItem>
-                    <SelectItem value="price-high">ราคา: สูง - ต่ำ</SelectItem>
+                    <SelectItem value="popular">{t("shop.popular")}</SelectItem>
+                    <SelectItem value="rating">{t("shop.rating")}</SelectItem>
+                    <SelectItem value="price-low">{t("shop.priceLow")}</SelectItem>
+                    <SelectItem value="price-high">{t("shop.priceHigh")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -99,7 +101,7 @@ const Shop = () => {
             </div>
 
             <div className="mt-8 text-center text-sm text-muted-foreground">
-              <p>* ภาพสินค้าใช้เพื่อการจำลองเท่านั้น ผลิตภัณฑ์จริงกำลังอยู่ในขั้นตอนการพัฒนา</p>
+              <p>{t("shop.disclaimer")}</p>
             </div>
           </div>
         </div>

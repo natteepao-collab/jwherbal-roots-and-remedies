@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const Cart = () => {
+  const { t } = useTranslation();
   const { items, updateQuantity, removeItem, totalPrice, clearCart } = useCart();
 
   const handleCheckout = () => {
-    toast.success("ระบบชำระเงินกำลังอยู่ในขั้นตอนการพัฒนา");
-    // Simulate checkout - in production, integrate with payment gateway
+    toast.success(t("cart.checkoutInProgress"));
   };
 
   if (items.length === 0) {
@@ -21,10 +22,10 @@ const Cart = () => {
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-16 flex flex-col items-center justify-center">
           <ShoppingBag className="h-24 w-24 text-muted-foreground mb-6" />
-          <h1 className="text-3xl font-bold mb-4">ตะกร้าสินค้าว่างเปล่า</h1>
-          <p className="text-muted-foreground mb-8">เพิ่มสินค้าลงในตะกร้าเพื่อเริ่มช้อปปิ้ง</p>
+          <h1 className="text-3xl font-bold mb-4">{t("cart.empty")}</h1>
+          <p className="text-muted-foreground mb-8">{t("cart.emptyDescription")}</p>
           <Button asChild>
-            <Link to="/shop">เลือกซื้อสินค้า</Link>
+            <Link to="/shop">{t("cart.continueShopping")}</Link>
           </Button>
         </main>
         <Footer />
@@ -37,7 +38,7 @@ const Cart = () => {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">ตะกร้าสินค้า</h1>
+        <h1 className="text-4xl font-bold mb-8">{t("cart.title")}</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}

@@ -83,9 +83,9 @@ const Index = () => {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <BookOpen className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">บทความความรู้</h3>
+                <h3 className="text-xl font-semibold mb-2">{t("features.articles.title")}</h3>
                 <p className="text-muted-foreground">
-                  เรียนรู้เกี่ยวกับสมุนไพรและการดูแลสุขภาพ
+                  {t("features.articles.description")}
                 </p>
               </CardContent>
             </Card>
@@ -97,12 +97,9 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">สินค้าแนะนำ</h2>
-              <p className="text-muted-foreground">ผลิตภัณฑ์สมุนไพรยอดนิยม</p>
-            </div>
+            <h2 className="text-3xl font-bold">{t("sections.featuredProducts")}</h2>
             <Button variant="outline" asChild>
-              <Link to="/shop">ดูทั้งหมด</Link>
+              <Link to="/shop">{t("sections.viewAll")}</Link>
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -111,7 +108,7 @@ const Index = () => {
             ))}
           </div>
           <div className="mt-8 text-center text-sm text-muted-foreground">
-            <p>* ภาพสินค้าใช้เพื่อการจำลองเท่านั้น ผลิตภัณฑ์จริงกำลังอยู่ในขั้นตอนการพัฒนา</p>
+            <p>{t("shop.disclaimer")}</p>
           </div>
         </div>
       </section>
@@ -120,12 +117,9 @@ const Index = () => {
       <section className="py-16 bg-secondary">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">บทความสุขภาพล่าสุด</h2>
-              <p className="text-muted-foreground">ความรู้เกี่ยวกับสมุนไพรและสุขภาพ</p>
-            </div>
+            <h2 className="text-3xl font-bold">{t("sections.latestArticles")}</h2>
             <Button variant="outline" asChild>
-              <Link to="/articles">อ่านทั้งหมด</Link>
+              <Link to="/articles">{t("sections.viewAll")}</Link>
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -138,7 +132,7 @@ const Index = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{article.readTime}</span>
                     <Button variant="link" asChild className="p-0 h-auto">
-                      <Link to={`/articles/${article.id}`}>อ่านต่อ</Link>
+                      <Link to={`/articles/${article.id}`}>{t("articles.readMore")}</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -152,12 +146,9 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">กระทู้ยอดนิยมจากคอมมูนิตี้</h2>
-              <p className="text-muted-foreground">แชร์ประสบการณ์จากคนรักสุขภาพ</p>
-            </div>
+            <h2 className="text-3xl font-bold">{t("sections.communityHighlights")}</h2>
             <Button variant="outline" asChild>
-              <Link to="/community">ดูทั้งหมด</Link>
+              <Link to="/community">{t("sections.viewAll")}</Link>
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

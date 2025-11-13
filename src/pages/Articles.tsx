@@ -6,35 +6,26 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { articles } from "@/data/articles";
+import { useTranslation } from "react-i18next";
 
 const Articles = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>บทความสุขภาพและความรู้เกี่ยวกับสมุนไพร | JWHERBAL</title>
+        <title>{t("articles.title")} | JWHERBAL</title>
         <meta 
           name="description" 
-          content="รวมบทความสุขภาพและความรู้เกี่ยวกับสมุนไพรไทย วิธีใช้สมุนไพร การดูแลสุขภาพ ลดน้ำหนัก เสริมภูมิคุ้มกัน และเคล็ดลับสุขภาพดี" 
+          content={t("articles.description")}
         />
-        <meta 
-          name="keywords" 
-          content="บทความสมุนไพร, สุขภาพ, ความรู้สมุนไพร, ชาสมุนไพร, ลดน้ำหนัก, เสริมภูมิคุ้มกัน" 
-        />
-        <meta property="og:title" content="บทความสุขภาพและความรู้เกี่ยวกับสมุนไพร | JWHERBAL" />
-        <meta 
-          property="og:description" 
-          content="รวมบทความสุขภาพและความรู้เกี่ยวกับสมุนไพรไทย วิธีใช้สมุนไพร การดูแลสุขภาพ" 
-        />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://jwherbal.com/articles" />
       </Helmet>
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">บทความสุขภาพ</h1>
+          <h1 className="text-4xl font-bold mb-4">{t("articles.title")}</h1>
           <p className="text-muted-foreground mb-8">
-            ความรู้และข้อมูลเกี่ยวกับสมุนไพรและการดูแลสุขภาพ
+            {t("articles.description")}
           </p>
 
           <div className="space-y-6">
@@ -69,7 +60,7 @@ const Articles = () => {
                         <span>{article.date}</span>
                       </div>
                       <Button variant="link" asChild className="p-0 h-auto">
-                        <Link to={`/articles/${article.id}`}>อ่านเพิ่มเติม →</Link>
+                        <Link to={`/articles/${article.id}`}>{t("articles.readMore")} →</Link>
                       </Button>
                     </div>
                   </div>
