@@ -5,7 +5,8 @@
     "articles": "Articles",
     "community": "Community",
     "contact": "Contact",
-    "cart": "Cart"
+    "cart": "Cart",
+    "reviews": "Customer Reviews"
   },
   "hero": {
     "title": "Good Health Starts with Natural Herbs",
@@ -31,7 +32,8 @@
     "featuredProducts": "Featured Products",
     "latestArticles": "Latest Articles",
     "communityHighlights": "Community Highlights",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "customerReviews": "Customer Reviews"
   },
   "shop": {
     "title": "All Products",

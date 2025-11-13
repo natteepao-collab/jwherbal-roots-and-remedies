@@ -5,7 +5,8 @@
     "articles": "บทความ",
     "community": "คอมมูนิตี้",
     "contact": "ติดต่อเรา",
-    "cart": "ตะกร้า"
+    "cart": "ตะกร้า",
+    "reviews": "รีวิวจากผู้ใช้จริง"
   },
   "hero": {
     "title": "สุขภาพดี เริ่มจากสมุนไพรใกล้ตัว",
@@ -31,7 +32,8 @@
     "featuredProducts": "สินค้าแนะนำ",
     "latestArticles": "บทความล่าสุด",
     "communityHighlights": "ไฮไลท์จากคอมมูนิตี้",
-    "viewAll": "ดูทั้งหมด"
+    "viewAll": "ดูทั้งหมด",
+    "customerReviews": "รีวิวจากผู้ใช้จริง"
   },
   "shop": {
     "title": "สินค้าทั้งหมด",

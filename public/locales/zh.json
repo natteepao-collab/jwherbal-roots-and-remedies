@@ -5,7 +5,8 @@
     "articles": "文章",
     "community": "社区",
     "contact": "联系我们",
-    "cart": "购物车"
+    "cart": "购物车",
+    "reviews": "用户评价"
   },
   "hero": {
     "title": "健康生活从天然草本开始",
@@ -31,7 +32,8 @@
     "featuredProducts": "推荐商品",
     "latestArticles": "最新文章",
     "communityHighlights": "社区精选",
-    "viewAll": "查看全部"
+    "viewAll": "查看全部",
+    "customerReviews": "用户评价"
   },
   "shop": {
     "title": "全部商品",

@@ -8,14 +8,17 @@ import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
+import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
 import { useTranslation } from "react-i18next";
+import { User } from "lucide-react";
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const featuredProducts = products.slice(0, 4);
   const latestArticles = articles.slice(0, 3);
   const popularPosts = communityPosts.slice(0, 2);
+  const currentLanguage = i18n.language as "th" | "en" | "zh";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -167,6 +170,35 @@ const Index = () => {
                   <Button variant="link" asChild className="p-0 h-auto">
                     <Link to={`/community/${post.id}`}>อ่านกระทู้</Link>
                   </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Customer Reviews */}
+      <section id="reviews" className="py-16 bg-secondary">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">{t("sections.customerReviews")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <Card key={review.id} className="rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">{review.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {review.age} {currentLanguage === "th" ? "ปี" : currentLanguage === "en" ? "years old" : "岁"} • {review.occupation[currentLanguage]}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {review.review[currentLanguage]}
+                  </p>
                 </CardContent>
               </Card>
             ))}
