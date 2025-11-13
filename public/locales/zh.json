@@ -7,6 +7,123 @@
     "contact": "联系我们",
     "cart": "购物车"
   },
+  "hero": {
+    "title": "健康生活从天然草本开始",
+    "subtitle": "优质草本产品，呵护您和家人的健康",
+    "vflowButton": "V Flow - 推荐产品",
+    "shopButton": "浏览商品"
+  },
+  "features": {
+    "natural": {
+      "title": "100% 天然草本",
+      "description": "精选优质草本，安全有保障"
+    },
+    "community": {
+      "title": "社区经验分享",
+      "description": "与健康爱好者讨论和分享经验"
+    },
+    "articles": {
+      "title": "知识文章",
+      "description": "草本健康知识与提示"
+    }
+  },
+  "sections": {
+    "featuredProducts": "推荐商品",
+    "latestArticles": "最新文章",
+    "communityHighlights": "社区精选",
+    "viewAll": "查看全部"
+  },
+  "shop": {
+    "title": "全部商品",
+    "categories": "分类",
+    "all": "全部",
+    "showing": "显示",
+    "products": "商品",
+    "sortBy": "排序：",
+    "popular": "热门",
+    "rating": "评分最高",
+    "priceLow": "价格：低到高",
+    "priceHigh": "价格：高到低",
+    "disclaimer": "* 商品图片仅供参考。实际产品正在开发中"
+  },
+  "cart": {
+    "title": "购物车",
+    "empty": "购物车是空的",
+    "emptyDescription": "添加商品到购物车开始购物",
+    "continueShopping": "继续购物",
+    "orderSummary": "订单摘要",
+    "subtotal": "小计",
+    "shipping": "运费",
+    "shippingFree": "免费",
+    "total": "总计",
+    "checkout": "结账",
+    "clearCart": "清空购物车",
+    "checkoutInProgress": "支付系统正在开发中"
+  },
+  "product": {
+    "addToCart": "加入购物车",
+    "added": "已加入购物车"
+  },
+  "articles": {
+    "title": "健康文章",
+    "description": "关于草本和健康护理的知识和信息",
+    "readMore": "阅读更多"
+  },
+  "contact": {
+    "title": "联系我们",
+    "description": "如有任何问题或疑虑，请随时联系我们",
+    "formTitle": "给我们留言",
+    "name": "姓名",
+    "namePlaceholder": "请输入您的姓名",
+    "email": "电子邮件",
+    "phone": "电话号码",
+    "phonePlaceholder": "08x-xxx-xxxx",
+    "message": "留言",
+    "messagePlaceholder": "在此输入您的留言...",
+    "send": "发送留言",
+    "sent": "留言发送成功。我们会尽快与您联系",
+    "contactInfo": "联系信息",
+    "phoneLabel": "电话",
+    "hours": "周一至周五 9:00-18:00",
+    "emailLabel": "电子邮件",
+    "addressLabel": "地址",
+    "address": "曼谷自然区草本街健康路123/45号 10100",
+    "socialMedia": "社交媒体",
+    "followUs": "关注我们"
+  },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "loginTitle": "登录",
+    "loginDescription": "登录以访问您的账户",
+    "signupTitle": "注册",
+    "signupDescription": "创建新账户开始使用",
+    "email": "电子邮件",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "fullName": "姓名",
+    "forgotPassword": "忘记密码？",
+    "loginButton": "登录",
+    "signupButton": "注册",
+    "loggingIn": "登录中...",
+    "signingUp": "注册中...",
+    "loginSuccess": "登录成功",
+    "signupSuccess": "注册成功",
+    "backToHome": "返回首页"
+  },
+  "footer": {
+    "description": "健康生活从天然草本开始。优质草本产品，呵护您的健康",
+    "quickLinks": "快速链接",
+    "products": "商品",
+    "healthArticles": "健康文章",
+    "community": "社区",
+    "customerService": "客户服务",
+    "contactUs": "联系我们",
+    "privacyPolicy": "隐私政策",
+    "terms": "服务条款",
+    "contact": "联系我们",
+    "rights": "版权所有"
+  },
   "chatbot": {
     "greeting": "您好！😊 欢迎来到 JWHERBAL。\n需要我为您提供什么帮助？",
     "menu": {

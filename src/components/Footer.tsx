@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Mail, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="bg-secondary mt-20">
       <div className="container mx-auto px-4 py-12">
@@ -15,27 +17,27 @@ const Footer = () => {
               <span className="font-bold text-xl">JWHERBAL</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              สุขภาพดีเริ่มจากสมุนไพรใกล้ตัว ผลิตภัณฑ์สมุนไพรคุณภาพ เพื่อสุขภาพที่ดีของคุณ
+              {t("footer.description")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4">ลิงก์ด่วน</h3>
+            <h3 className="font-semibold mb-4">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/shop" className="text-muted-foreground hover:text-primary transition-colors">
-                  สินค้า
+                  {t("footer.products")}
                 </Link>
               </li>
               <li>
                 <Link to="/articles" className="text-muted-foreground hover:text-primary transition-colors">
-                  บทความสุขภาพ
+                  {t("footer.healthArticles")}
                 </Link>
               </li>
               <li>
                 <Link to="/community" className="text-muted-foreground hover:text-primary transition-colors">
-                  คอมมูนิตี้
+                  {t("footer.community")}
                 </Link>
               </li>
             </ul>
@@ -43,21 +45,21 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-semibold mb-4">บริการลูกค้า</h3>
+            <h3 className="font-semibold mb-4">{t("footer.customerService")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
-                  ติดต่อเรา
+                  {t("footer.contactUs")}
                 </Link>
               </li>
               <li>
                 <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  นโยบายความเป็นส่วนตัว
+                  {t("footer.privacyPolicy")}
                 </Link>
               </li>
               <li>
                 <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  เงื่อนไขการใช้งาน
+                  {t("footer.terms")}
                 </Link>
               </li>
             </ul>
@@ -65,7 +67,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4">ติดต่อเรา</h3>
+            <h3 className="font-semibold mb-4">{t("footer.contact")}</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
@@ -88,7 +90,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} JWHERBAL.com All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} JWHERBAL.com {t("footer.rights")}</p>
         </div>
       </div>
     </footer>

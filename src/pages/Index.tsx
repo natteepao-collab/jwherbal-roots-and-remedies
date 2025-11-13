@@ -9,8 +9,10 @@ import { products } from "@/data/products";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
 import heroImage from "@/assets/hero-herbal.jpg";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
   const featuredProducts = products.slice(0, 4);
   const latestArticles = articles.slice(0, 3);
   const popularPosts = communityPosts.slice(0, 2);
@@ -30,20 +32,20 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-              สุขภาพดี เริ่มจากสมุนไพรใกล้ตัว
+              {t("hero.title")}
             </h1>
             <p className="text-xl mb-8 text-muted-foreground">
-              ผลิตภัณฑ์สมุนไพรคุณภาพ เพื่อสุขภาพที่ดีของคุณและคนที่คุณรัก
+              {t("hero.subtitle")}
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" asChild className="gap-2">
                 <Link to="/products/vflow">
-                  V Flow - สินค้าแนะนำ
+                  {t("hero.vflowButton")}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/shop">เลือกชมสินค้า</Link>
+                <Link to="/shop">{t("hero.shopButton")}</Link>
               </Button>
             </div>
           </div>
@@ -59,9 +61,9 @@ const Index = () => {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Leaf className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">สมุนไพรธรรมชาติ 100%</h3>
+                <h3 className="text-xl font-semibold mb-2">{t("features.natural.title")}</h3>
                 <p className="text-muted-foreground">
-                  คัดสรรสมุนไพรคุณภาพ ปลอดภัย มีมาตรฐาน
+                  {t("features.natural.description")}
                 </p>
               </CardContent>
             </Card>
@@ -70,9 +72,9 @@ const Index = () => {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">ชุมชนแลกเปลี่ยนประสบการณ์</h3>
+                <h3 className="text-xl font-semibold mb-2">{t("features.community.title")}</h3>
                 <p className="text-muted-foreground">
-                  พูดคุย แชร์ประสบการณ์ กับคนรักสุขภาพ
+                  {t("features.community.description")}
                 </p>
               </CardContent>
             </Card>

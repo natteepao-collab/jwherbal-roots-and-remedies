@@ -7,6 +7,123 @@
     "contact": "Contact",
     "cart": "Cart"
   },
+  "hero": {
+    "title": "Good Health Starts with Natural Herbs",
+    "subtitle": "Quality herbal products for your health and your loved ones",
+    "vflowButton": "V Flow - Featured Product",
+    "shopButton": "Browse Products"
+  },
+  "features": {
+    "natural": {
+      "title": "100% Natural Herbs",
+      "description": "Carefully selected quality herbs, safe and certified"
+    },
+    "community": {
+      "title": "Community Experience Sharing",
+      "description": "Discuss and share experiences with health enthusiasts"
+    },
+    "articles": {
+      "title": "Knowledge Articles",
+      "description": "Health knowledge and herbal tips"
+    }
+  },
+  "sections": {
+    "featuredProducts": "Featured Products",
+    "latestArticles": "Latest Articles",
+    "communityHighlights": "Community Highlights",
+    "viewAll": "View All"
+  },
+  "shop": {
+    "title": "All Products",
+    "categories": "Categories",
+    "all": "All",
+    "showing": "Showing",
+    "products": "products",
+    "sortBy": "Sort by:",
+    "popular": "Popular",
+    "rating": "Highest Rating",
+    "priceLow": "Price: Low - High",
+    "priceHigh": "Price: High - Low",
+    "disclaimer": "* Product images are for illustration only. Actual products are under development"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Add items to your cart to start shopping",
+    "continueShopping": "Continue Shopping",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingFree": "Free",
+    "total": "Total",
+    "checkout": "Checkout",
+    "clearCart": "Clear Cart",
+    "checkoutInProgress": "Payment system is under development"
+  },
+  "product": {
+    "addToCart": "Add to Cart",
+    "added": "Added to cart"
+  },
+  "articles": {
+    "title": "Health Articles",
+    "description": "Knowledge and information about herbs and health care",
+    "readMore": "Read More"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "If you have any questions or concerns, feel free to contact us",
+    "formTitle": "Send us a message",
+    "name": "Full Name",
+    "namePlaceholder": "Please enter your name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "phonePlaceholder": "08x-xxx-xxxx",
+    "message": "Message",
+    "messagePlaceholder": "Type your message here...",
+    "send": "Send Message",
+    "sent": "Message sent successfully. We will contact you as soon as possible",
+    "contactInfo": "Contact Information",
+    "phoneLabel": "Phone",
+    "hours": "Mon-Fri 9:00-18:00",
+    "emailLabel": "Email",
+    "addressLabel": "Address",
+    "address": "123/45 Health Road, Herbal District, Nature City, Bangkok 10100",
+    "socialMedia": "Social Media",
+    "followUs": "Follow us on"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "loginTitle": "Login",
+    "loginDescription": "Login to access your account",
+    "signupTitle": "Sign Up",
+    "signupDescription": "Create a new account to get started",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "forgotPassword": "Forgot Password?",
+    "loginButton": "Login",
+    "signupButton": "Sign Up",
+    "loggingIn": "Logging in...",
+    "signingUp": "Signing up...",
+    "loginSuccess": "Login successful",
+    "signupSuccess": "Sign up successful",
+    "backToHome": "Back to Home"
+  },
+  "footer": {
+    "description": "Good health starts with natural herbs. Quality herbal products for your well-being",
+    "quickLinks": "Quick Links",
+    "products": "Products",
+    "healthArticles": "Health Articles",
+    "community": "Community",
+    "customerService": "Customer Service",
+    "contactUs": "Contact Us",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "rights": "All Rights Reserved."
+  },
   "chatbot": {
     "greeting": "Hello! 😊 Welcome to JWHERBAL.\nHow can I help you today?",
     "menu": {

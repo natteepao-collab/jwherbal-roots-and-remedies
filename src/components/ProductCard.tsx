@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
 import type { Product } from "@/data/products";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { t } = useTranslation();
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
@@ -18,6 +21,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       price: product.price,
       image: product.image,
     });
+    toast.success(t("product.added"));
   };
 
   return (
@@ -40,7 +44,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <span className="text-xl font-bold text-primary">฿{product.price}</span>
           <Button size="sm" onClick={handleAddToCart} className="gap-2">
             <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">หยิบใส่ตะกร้า</span>
+            <span className="hidden sm:inline">{t("product.addToCart")}</span>
           </Button>
         </div>
       </CardContent>

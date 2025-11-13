@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -19,7 +21,7 @@ const Auth = () => {
     // Simulate login - in production, integrate with backend
     setTimeout(() => {
       setIsLoading(false);
-      toast.success("เข้าสู่ระบบสำเร็จ");
+      toast.success(t("auth.loginSuccess"));
     }, 1500);
   };
 
@@ -29,7 +31,7 @@ const Auth = () => {
     // Simulate signup - in production, integrate with backend
     setTimeout(() => {
       setIsLoading(false);
-      toast.success("สมัครสมาชิกสำเร็จ");
+      toast.success(t("auth.signupSuccess"));
     }, 1500);
   };
 
