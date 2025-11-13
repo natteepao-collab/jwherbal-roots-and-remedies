@@ -54,11 +54,19 @@ const Index = () => {
               </div>
             </div>
             <div className="hidden lg:flex justify-center items-center">
-              <img 
-                src={vflowProduct} 
-                alt="V Flow Herbal Drink Product" 
-                className="w-full max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
-              />
+              <div className="relative">
+                <img 
+                  src={vflowProduct} 
+                  alt="V Flow Herbal Drink Product" 
+                  className="w-full max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
+                />
+                {/* Steam Effect */}
+                <div className="steam-container">
+                  <span className="steam steam-1"></span>
+                  <span className="steam steam-2"></span>
+                  <span className="steam steam-3"></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
