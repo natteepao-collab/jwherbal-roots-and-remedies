@@ -5,11 +5,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { articles } from "@/data/articles";
+import { healthArticles } from "@/data/healthArticles";
 import { useTranslation } from "react-i18next";
+import ArticleLikeShare from "@/components/ArticleLikeShare";
 
 const Articles = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language as "th" | "en" | "zh";
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
@@ -22,48 +25,50 @@ const Articles = () => {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl font-bold mb-4">{t("articles.title")}</h1>
           <p className="text-muted-foreground mb-8">
             {t("articles.description")}
           </p>
 
-          <div className="space-y-6">
-            {articles.map((article) => (
-              <Card key={article.id} className="hover:shadow-card-hover transition-shadow">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {healthArticles.map((article) => (
+              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
+                <img 
+                  src={article.coverImage} 
+                  alt={article.title[currentLang]}
+                  className="w-full h-48 object-cover"
+                />
                 <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex-1">
-                      <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-3">
-                        {article.category}
-                      </div>
-                      <h2 className="text-2xl font-bold mb-3">
-                        <Link
-                          to={`/articles/${article.id}`}
-                          className="hover:text-primary transition-colors"
-                        >
-                          {article.title}
-                        </Link>
-                      </h2>
-                      <p className="text-muted-foreground mb-4 line-clamp-2">
-                        {article.excerpt}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-                        <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          <span>{article.author}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{article.readTime}</span>
-                        </div>
-                        <span>{article.date}</span>
-                      </div>
-                      <Button variant="link" asChild className="p-0 h-auto">
-                        <Link to={`/articles/${article.id}`}>{t("articles.readMore")} →</Link>
-                      </Button>
-                    </div>
+                  <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-3">
+                    {article.category[currentLang]}
                   </div>
+                  <h2 className="text-xl font-bold mb-3 line-clamp-2">
+                    <Link
+                      to={`/articles/${article.slug}`}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {article.title[currentLang]}
+                    </Link>
+                  </h2>
+                  <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
+                    {article.excerpt[currentLang]}
+                  </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      <span>{article.readTime}</span>
+                    </div>
+                    <ArticleLikeShare
+                      articleId={article.id}
+                      articleTitle={article.title[currentLang]}
+                      articleUrl={`${window.location.origin}/articles/${article.slug}`}
+                      initialLikes={article.likes}
+                    />
+                  </div>
+                  <Button variant="link" asChild className="p-0 h-auto w-full justify-start">
+                    <Link to={`/articles/${article.slug}`}>{t("articles.readMore")} →</Link>
+                  </Button>
                 </CardContent>
               </Card>
             ))}

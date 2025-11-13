@@ -69,7 +69,13 @@
   "articles": {
     "title": "Health Articles",
     "description": "Knowledge and information about herbs and health care",
-    "readMore": "Read More"
+    "readMore": "Read More",
+    "share": "Share",
+    "liked": "Liked!",
+    "unliked": "Unliked",
+    "shareSuccess": "Shared successfully",
+    "backToAll": "Back to all articles",
+    "relatedArticles": "Related Articles"
   },
   "contact": {
     "title": "Contact Us",
