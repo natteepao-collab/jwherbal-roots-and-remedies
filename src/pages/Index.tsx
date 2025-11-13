@@ -10,6 +10,7 @@ import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
+import vflowProduct from "@/assets/vflow-product.png";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -32,23 +33,32 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/70" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-              {t("hero.title")}
-            </h1>
-            <p className="text-xl mb-8 text-muted-foreground">
-              {t("hero.subtitle")}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" asChild className="gap-2">
-                <Link to="/products/vflow">
-                  {t("hero.vflowButton")}
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/shop">{t("hero.shopButton")}</Link>
-              </Button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div className="max-w-2xl">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
+                {t("hero.title")}
+              </h1>
+              <p className="text-xl mb-8 text-muted-foreground">
+                {t("hero.subtitle")}
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" asChild className="gap-2">
+                  <Link to="/products/vflow">
+                    {t("hero.vflowButton")}
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/shop">{t("hero.shopButton")}</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="hidden lg:flex justify-center items-center">
+              <img 
+                src={vflowProduct} 
+                alt="V Flow Herbal Drink Product" 
+                className="w-full max-w-md h-auto object-contain drop-shadow-2xl animate-float"
+              />
             </div>
           </div>
         </div>
