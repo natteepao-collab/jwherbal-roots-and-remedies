@@ -10,7 +10,7 @@ import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
-import vflowProduct from "@/assets/vflow-product.png";
+import vflowProduct from "@/assets/vflow-product-transparent.png";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -57,7 +57,7 @@ const Index = () => {
               <img 
                 src={vflowProduct} 
                 alt="V Flow Herbal Drink Product" 
-                className="w-full max-w-md h-auto object-contain drop-shadow-2xl animate-float"
+                className="w-full max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
               />
             </div>
           </div>
