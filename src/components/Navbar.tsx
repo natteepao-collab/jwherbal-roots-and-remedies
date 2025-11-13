@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import jwGroupLogo from "@/assets/jwgroup-logo.png";
 
 const Navbar = () => {
   const { items } = useCart();
@@ -24,12 +25,14 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary">
-            <span className="text-primary-foreground font-bold text-lg">JW</span>
-          </div>
-          <span className="font-bold text-xl text-foreground hidden sm:inline-block">
-            JWHERBAL
+        <Link to="/" className="flex items-center space-x-3">
+          <img 
+            src={jwGroupLogo} 
+            alt="JW Group Logo" 
+            className="h-10 w-auto object-contain"
+          />
+          <span className="font-bold text-lg text-foreground hidden sm:inline-block">
+            JWHERBAL BY JWGROUP
           </span>
         </Link>
 
