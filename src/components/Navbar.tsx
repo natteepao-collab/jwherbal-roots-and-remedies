@@ -17,7 +17,7 @@ const Navbar = () => {
     { to: "/shop", label: t("nav.shop") },
     { to: "/articles", label: t("nav.articles") },
     { to: "/community", label: t("nav.community") },
-    { to: "/#reviews", label: t("nav.reviews") },
+    { to: "/reviews", label: t("nav.reviews") },
     { to: "/contact", label: t("nav.contact") },
   ];
 
