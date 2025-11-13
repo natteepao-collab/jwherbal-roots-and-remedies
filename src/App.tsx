@@ -13,6 +13,7 @@ import Community from "./pages/Community";
 import CommunityPost from "./pages/CommunityPost";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import VFlowProduct from "./pages/VFlowProduct";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/community/:id" element={<CommunityPost />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/products/vflow" element={<VFlowProduct />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

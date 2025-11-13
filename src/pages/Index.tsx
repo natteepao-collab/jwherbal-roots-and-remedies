@@ -37,13 +37,13 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" asChild className="gap-2">
-                <Link to="/shop">
-                  เลือกชมสินค้า
+                <Link to="/products/vflow">
+                  V Flow - สินค้าแนะนำ
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/community">เข้าร่วมคอมมูนิตี้</Link>
+                <Link to="/shop">เลือกชมสินค้า</Link>
               </Button>
             </div>
           </div>
