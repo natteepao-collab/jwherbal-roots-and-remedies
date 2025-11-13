@@ -15,6 +15,62 @@
   animation: float 3s ease-in-out infinite;
 }
 
+/* Steam effect for hot drink */
+@keyframes steam-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.7);
+  }
+  20% {
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 0.4;
+    transform: translate(-50%, -25px) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -45px) scale(1.2);
+  }
+}
+
+.steam-container {
+  position: absolute;
+  left: 60%;
+  bottom: 38%;
+  width: 60px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.steam {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 18px;
+  height: 40px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: steam-rise 4s infinite;
+}
+
+.steam-2 {
+  animation-delay: 1.3s;
+}
+
+.steam-3 {
+  animation-delay: 2.6s;
+}
+
+/* Responsive steam for mobile */
+@media (max-width: 768px) {
+  .steam-container {
+    transform: scale(0.7);
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
