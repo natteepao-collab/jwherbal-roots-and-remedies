@@ -4,17 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
   const { items } = useCart();
+  const { t } = useTranslation();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const navLinks = [
-    { to: "/", label: "หน้าแรก" },
-    { to: "/shop", label: "สินค้า" },
-    { to: "/articles", label: "บทความสุขภาพ" },
-    { to: "/community", label: "คอมมูนิตี้" },
-    { to: "/contact", label: "ติดต่อเรา" },
+    { to: "/", label: t("nav.home") },
+    { to: "/shop", label: t("nav.shop") },
+    { to: "/articles", label: t("nav.articles") },
+    { to: "/community", label: t("nav.community") },
+    { to: "/contact", label: t("nav.contact") },
   ];
 
   return (
@@ -43,6 +46,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-2">
+          <LanguageSwitcher />
           <Button variant="ghost" size="icon" asChild>
             <Link to="/auth">
               <User className="h-5 w-5" />

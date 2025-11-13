@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "articles": "Articles",
+    "community": "Community",
+    "contact": "Contact",
+    "cart": "Cart"
+  },
+  "chatbot": {
+    "greeting": "Hello! 😊 Welcome to JWHERBAL.\nHow can I help you today?",
+    "menu": {
+      "productInfo": "Product information (V Flow)",
+      "pricing": "Prices & promotions",
+      "howToUse": "How to drink / precautions",
+      "talkToAdmin": "Talk to a staff member"
+    },
+    "productInfo": {
+      "title": "V Flow Herbal Drink",
+      "description": "V Flow Herbal Drink is a 100% natural herbal supplement made from ginger, jujube, and black fungus.\n\n✔ Helps improve blood circulation\n✔ Supports people with thick blood, cold hands/feet, dizziness\n✔ No sugar added\n✔ Only 1 sachet per day before breakfast\n\nWould you like to see full details or how to drink?",
+      "viewDetails": "Full Details",
+      "viewHowToUse": "How to Drink"
+    },
+    "pricing": {
+      "title": "Pricing & Promotions",
+      "description": "V Flow is 890 THB per box (14 sachets).\n\nBuying 2 boxes or more comes with special promotions 🎁\n\nWould you like to:",
+      "talkToAdmin": "Chat with our staff for the latest promotion",
+      "viewOrderMethod": "View ordering instructions"
+    },
+    "howToUse": {
+      "title": "How to Drink V Flow",
+      "description": "Recommended use:\n\n1️⃣ Tear 1 sachet of V Flow\n2️⃣ Mix with 150–200 ml of hot water\n3️⃣ Stir well\n4️⃣ Drink before breakfast\n\nSafe for daily consumption as it contains natural herbs and no sugar.\n\nIf you have underlying health conditions, please consult your doctor first 💚"
+    },
+    "healthWarning": "Please note that this information is general advice only and does not replace a doctor's diagnosis.\n\nIf you are taking medication or have a serious condition, please consult a healthcare professional before use.",
+    "contactAdmin": {
+      "title": "Contact Staff",
+      "description": "Let me connect you with our staff for more details 😊",
+      "lineChat": "Chat with admin via LINE",
+      "requestCallback": "Request a callback",
+      "leaveContact": "Please leave your name and phone number."
+    },
+    "buttons": {
+      "backToMenu": "Back to Menu",
+      "close": "Close",
+      "send": "Send"
+    },
+    "placeholder": "Type a message...",
+    "typingIndicator": "Typing..."
+  },
+  "language": {
+    "th": "ไทย",
+    "en": "English",
+    "zh": "中文"
+  }
+}

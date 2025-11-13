@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "首页",
+    "shop": "商品",
+    "articles": "文章",
+    "community": "社区",
+    "contact": "联系我们",
+    "cart": "购物车"
+  },
+  "chatbot": {
+    "greeting": "您好！😊 欢迎来到 JWHERBAL。\n需要我为您提供什么帮助？",
+    "menu": {
+      "productInfo": "产品信息（V Flow）",
+      "pricing": "价格与优惠",
+      "howToUse": "饮用方法 / 注意事项",
+      "talkToAdmin": "联系客服人员"
+    },
+    "productInfo": {
+      "title": "V Flow 草本饮品",
+      "description": "V Flow 草本饮品是一款 100% 天然草本保健饮品，主要成分包括姜、红枣和黑木耳。\n\n✔ 帮助促进血液循环\n✔ 适合血液黏稠、手脚冰冷、头晕人群\n✔ 无糖配方\n✔ 每天早上饭前 1 条即可\n\n您想查看 产品详情 还是 饮用方法 呢？",
+      "viewDetails": "产品详情",
+      "viewHowToUse": "饮用方法"
+    },
+    "pricing": {
+      "title": "价格与优惠",
+      "description": "V Flow 一盒（14 条）售价 890 泰铢。\n\n购买 2 盒以上可享受特别优惠 🎁\n\n您需要：",
+      "talkToAdmin": "与客服人员联系，查看最新优惠",
+      "viewOrderMethod": "查看购买方式"
+    },
+    "howToUse": {
+      "title": "饮用方法",
+      "description": "建议饮用方式：\n\n1️⃣ 撕开 1 条 V Flow\n2️⃣ 加入 150–200 ml 热水\n3️⃣ 搅拌均匀\n4️⃣ 早餐前饮用\n\n因为是天然草本成分且无糖，每天饮用是安全的。\n\n如有慢性疾病或正在服药，建议先咨询医生 💚"
+    },
+    "healthWarning": "温馨提示：以上信息仅为一般建议，不能替代医生的专业诊断。\n\n如您有严重疾病或正在服药，请先咨询专业医生。",
+    "contactAdmin": {
+      "title": "联系客服",
+      "description": "我可以为您连接人工客服 😊",
+      "lineChat": "通过 LINE 联系客服",
+      "requestCallback": "请求客服回电",
+      "leaveContact": "请留下您的姓名和电话号码。"
+    },
+    "buttons": {
+      "backToMenu": "返回主菜单",
+      "close": "关闭",
+      "send": "发送"
+    },
+    "placeholder": "输入消息...",
+    "typingIndicator": "正在输入..."
+  },
+  "language": {
+    "th": "ไทย",
+    "en": "English",
+    "zh": "中文"
+  }
+}
