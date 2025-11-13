@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Clock, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,6 +10,24 @@ import { articles } from "@/data/articles";
 const Articles = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>บทความสุขภาพและความรู้เกี่ยวกับสมุนไพร | JWHERBAL</title>
+        <meta 
+          name="description" 
+          content="รวมบทความสุขภาพและความรู้เกี่ยวกับสมุนไพรไทย วิธีใช้สมุนไพร การดูแลสุขภาพ ลดน้ำหนัก เสริมภูมิคุ้มกัน และเคล็ดลับสุขภาพดี" 
+        />
+        <meta 
+          name="keywords" 
+          content="บทความสมุนไพร, สุขภาพ, ความรู้สมุนไพร, ชาสมุนไพร, ลดน้ำหนัก, เสริมภูมิคุ้มกัน" 
+        />
+        <meta property="og:title" content="บทความสุขภาพและความรู้เกี่ยวกับสมุนไพร | JWHERBAL" />
+        <meta 
+          property="og:description" 
+          content="รวมบทความสุขภาพและความรู้เกี่ยวกับสมุนไพรไทย วิธีใช้สมุนไพร การดูแลสุขภาพ" 
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://jwherbal.com/articles" />
+      </Helmet>
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">

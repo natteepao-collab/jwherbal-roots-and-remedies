@@ -1,4 +1,5 @@
 import { useParams, Link, Navigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Clock, User, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -18,6 +19,22 @@ const ArticleDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{article.title} | JWHERBAL</title>
+        <meta name="description" content={article.metaDescription} />
+        <meta name="keywords" content={article.keywords.join(", ")} />
+        <meta name="author" content={article.author} />
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.metaDescription} />
+        <meta property="og:type" content="article" />
+        <meta property="article:published_time" content={article.date} />
+        <meta property="article:author" content={article.author} />
+        <meta property="article:section" content={article.category} />
+        {article.keywords.map((keyword) => (
+          <meta key={keyword} property="article:tag" content={keyword} />
+        ))}
+        <link rel="canonical" href={`https://jwherbal.com/articles/${article.id}`} />
+      </Helmet>
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
