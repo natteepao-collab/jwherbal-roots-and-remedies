@@ -69,7 +69,13 @@
   "articles": {
     "title": "健康文章",
     "description": "关于草本和健康护理的知识和信息",
-    "readMore": "阅读更多"
+    "readMore": "阅读更多",
+    "share": "分享",
+    "liked": "已点赞！",
+    "unliked": "已取消点赞",
+    "shareSuccess": "分享成功",
+    "backToAll": "返回所有文章",
+    "relatedArticles": "相关文章"
   },
   "contact": {
     "title": "联系我们",
