@@ -126,6 +126,37 @@
     "contact": "Contact Us",
     "rights": "All Rights Reserved."
   },
+  "community": {
+    "title": "Community",
+    "description": "Share experiences and knowledge about herbs",
+    "newPost": "Create New Post",
+    "loginToPost": "Please log in to post",
+    "locale": "en-US",
+    "categories": { "all": "All" },
+    "tags": { "herbs": "Herbs", "elderly": "Elderly", "caregiving": "Caregiving", "health": "Health" },
+    "posts": {
+      "post1": { "title": "Using Ginger to Reduce Dizziness in Elderly", "preview": "Daughter shares experience of giving warm ginger water to mother every morning, reducing dizziness", "author": "Ms. Napa (Daughter, 45)" },
+      "post2": { "title": "Black Wood Ear Mushroom Improves Blood Circulation", "preview": "Review from 62-year-old uncle who drinks 3 times a week and numbness disappeared", "author": "Mr. Prasit (Uncle, 62)" },
+      "post3": { "title": "Jujube Helps Elderly Sleep Better", "preview": "Experience from 70-year-old grandmother who sleeps better after drinking jujube tea", "author": "Grandma Chan (70)" },
+      "post4": { "title": "How to Care for Parents with High Blood Pressure Using Thai Herbs", "preview": "Collection of simple herbal tea recipes", "author": "Mr. Somchai (Son, 52)" },
+      "post5": { "title": "Herbs for Elderly with Thick Blood Issues", "preview": "Explains benefits of lemongrass tea, ginger, and wood ear mushroom", "author": "Mr. Manit (Herbalist, 58)" },
+      "post6": { "title": "Son Caring for 65-Year-Old Father with V Flow", "preview": "14-day report showing reduced headache symptoms", "author": "Mr. Wichai (Son, 43)" },
+      "post7": { "title": "How to Reduce Blood Fat with 3 Herbs", "preview": "Turmeric / Lemon / Wood Ear Mushroom", "author": "Ms. Wanna (Blogger, 50)" },
+      "post8": { "title": "Herbal Recipes for Heart Health", "preview": "Suitable for elderly who get tired easily climbing stairs", "author": "Ms. Sukanya (Nurse, 55)" },
+      "post9": { "title": "Caring for Mother with Cold Hands and Feet Year-Round", "preview": "Techniques for drinking warm water and herbs to nourish blood", "author": "Ms. Rattana (Daughter, 48)" },
+      "post10": { "title": "Does Safflower Tea Really Lower Blood Pressure?", "preview": "Analysis based on traditional Thai medicine principles", "author": "Dr. Sommai (Traditional Doctor, 60)" },
+      "post11": { "title": "Elderly Who Sit Long with Frequent Leg Numbness - Herbal Solutions", "preview": "Recommend breaks, leg movement + herbal drinks", "author": "Ms. Supaporn (Office Worker, 53)" },
+      "post12": { "title": "Herbal Water Recipe for Elderly with Digestive Issues", "preview": "Recommend tamarind, bael fruit, and warm water", "author": "Pharmacist Dr. Somsak (47)" },
+      "post13": { "title": "Herbs to Nourish Vision for Elderly", "preview": "Goji berries / Carrots / Pennywort", "author": "Teacher Siriporn (Retired, 65)" },
+      "post14": { "title": "Children Should Know - How to Observe Thick Blood Conditions in Elderly", "preview": "Initial symptoms to watch for", "author": "Dr. Thanakorn (Doctor, 56)" },
+      "post15": { "title": "Experience Caring for Father After Surgery with Herbal Foods", "preview": "Easy menus that are digestible and aid recovery", "author": "Ms. Pimjai (Health Coach, 42)" },
+      "post16": { "title": "Stress in Elderly and Herbs for Relaxation", "preview": "Drink jasmine tea after dinner", "author": "Mr. Thanapol (Nutritionist, 38)" },
+      "post17": { "title": "Is Drinking Ginger Before Bed Good?", "preview": "Case of elderly sleeping deeper and feeling warmer", "author": "Nurse Sunee (Retired, 60)" },
+      "post18": { "title": "Elderly Getting Dizzy When Standing Up - How to Care", "preview": "Techniques to improve blood circulation", "author": "Mr. Somsak (Health Writer, 51)" },
+      "post19": { "title": "Herbs Help 75-Year-Old Mother Walk Better", "preview": "Ginger water + light exercise", "author": "Grandma Urai (75)" },
+      "post20": { "title": "Caring Techniques for Elderly from Loving Children", "preview": "Herbs + Food + Activities that help strengthen", "author": "Ms. Prae (Family Caregiver, 46)" }
+    }
+  },
   "chatbot": {
     "greeting": "Hello! 😊 Welcome to JWHERBAL.\nHow can I help you today?",
     "menu": {
