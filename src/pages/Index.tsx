@@ -27,34 +27,34 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center animate-ken-burns"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/70" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="max-w-2xl">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
+            <div className="max-w-2xl space-y-6">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground animate-fade-in-up">
                 {t("hero.title")}
               </h1>
-              <p className="text-xl mb-8 text-muted-foreground">
+              <p className="text-xl mb-8 text-muted-foreground animate-fade-in-up animation-delay-200">
                 {t("hero.subtitle")}
               </p>
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" asChild className="gap-2">
+              <div className="flex flex-wrap gap-4 animate-fade-in-up animation-delay-400">
+                <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform">
                   <Link to="/products/vflow">
                     {t("hero.vflowButton")}
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" asChild className="hover:scale-105 transition-transform">
                   <Link to="/shop">{t("hero.shopButton")}</Link>
                 </Button>
               </div>
             </div>
             <div className="hidden lg:flex justify-center items-center">
-              <div className="relative">
+              <div className="relative animate-fade-in-right">
                 <img 
                   src={vflowProduct} 
                   alt="V Flow Herbal Drink Product" 

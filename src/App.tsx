@@ -16,6 +16,8 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
+import Admin from "./pages/Admin";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/products/vflow" element={<VFlowProduct />} />
             <Route path="/reviews" element={<Reviews />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
