@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import Index from "./pages/Index";
+import About from "./pages/About";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import Articles from "./pages/Articles";
@@ -31,6 +32,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/articles" element={<Articles />} />

@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Home",
+    "about": "About Us",
     "shop": "Shop",
     "articles": "Articles",
     "community": "Community",
@@ -202,6 +203,58 @@
     },
     "placeholder": "Type a message...",
     "typingIndicator": "Typing..."
+  },
+  "about": {
+    "pageTitle": "About Us",
+    "metaDescription": "Learn about JWHERBAL BY JWGROUP, a leader in high-quality herbal and health products",
+    "hero": {
+      "title": "About JWHERBAL",
+      "subtitle": "Committed to providing high-quality herbal and health products for everyone's better quality of life"
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "JWHERBAL BY JWGROUP was founded with the intention to provide high-quality herbal products to Thai consumers. We believe that Thai herbs have excellent value and effectiveness in healthcare.",
+      "paragraph2": "With over 10 years of experience in the herbal industry, we have built trust from over 50,000 customers through offering quality products that meet FDA standards and are certified by international organizations.",
+      "paragraph3": "All our products go through careful selection of raw materials from trusted sources, developed in collaboration with researchers and herbal experts to ensure the highest quality and safety."
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles by which we operate our business and create products",
+      "natural": {
+        "title": "100% Natural",
+        "desc": "Using only high-quality natural herbs, free from harmful chemicals"
+      },
+      "quality": {
+        "title": "High Standards",
+        "desc": "Certified by FDA, GMP, HALAL, and ISO 9001 standards"
+      },
+      "care": {
+        "title": "Customer Care",
+        "desc": "Focusing on customer satisfaction and health as our top priority"
+      },
+      "innovation": {
+        "title": "Innovation",
+        "desc": "Developing new formulas with researchers for maximum effectiveness"
+      }
+    },
+    "achievements": {
+      "title": "Our Achievements",
+      "years": "Years of Experience",
+      "customers": "Trusted Customers",
+      "products": "Quality Products",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "certifications": {
+      "title": "Standard Certifications",
+      "subtitle": "Every product is certified by trusted agencies"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "point1": "Provide high-quality herbal products that meet international standards",
+      "point2": "Promote knowledge about Thai herbs and their proper use",
+      "point3": "Support research and development of Thai herbs for international recognition",
+      "point4": "Create a community for sharing health knowledge and experiences"
+    }
   },
   "language": {
     "th": "ไทย",

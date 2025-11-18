@@ -60,6 +60,8 @@ export default {
         },
       },
       fontFamily: {
+        sans: ['Prompt', 'Sarabun', 'sans-serif'],
+        prompt: ['Prompt', 'sans-serif'],
         sarabun: ['Sarabun', 'sans-serif'],
       },
       borderRadius: {

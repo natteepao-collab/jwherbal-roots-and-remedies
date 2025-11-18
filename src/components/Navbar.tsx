@@ -15,6 +15,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: "/", label: t("nav.home") },
+    { to: "/about", label: t("nav.about") },
     { to: "/shop", label: t("nav.shop") },
     { to: "/articles", label: t("nav.articles") },
     { to: "/community", label: t("nav.community") },
@@ -31,7 +32,7 @@ const Navbar = () => {
             alt="JW Group Logo" 
             className="h-10 w-auto object-contain"
           />
-          <span className="font-bold text-lg text-foreground hidden sm:inline-block">
+          <span className="font-prompt font-semibold text-lg text-foreground hidden sm:inline-block tracking-wide">
             JWHERBAL BY JWGROUP
           </span>
         </Link>
@@ -42,9 +43,10 @@ const Navbar = () => {
             <Link
               key={link.to}
               to={link.to}
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+              className="font-prompt text-sm font-medium text-foreground/80 hover:text-primary transition-colors relative group"
             >
               {link.label}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </div>
