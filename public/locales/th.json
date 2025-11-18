@@ -142,6 +142,11 @@
     "author": "ผู้เขียน",
     "stats": "สถิติ",
     "activity": "กิจกรรม",
+    "searchPlaceholder": "ค้นหากระทู้...",
+    "pinnedPosts": "กระทู้ปักหมุด",
+    "trendingTopics": "กระทู้ยอดนิยม",
+    "noResults": "ไม่พบกระทู้ที่ค้นหา",
+    "tryDifferentSearch": "ลองค้นหาด้วยคำอื่นหรือเปลี่ยนหมวดหมู่",
     "locale": "th-TH",
     "categories": {
       "all": "ทั้งหมด"

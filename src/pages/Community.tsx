@@ -1,17 +1,21 @@
 import { Link } from "react-router-dom";
-import { Calendar, MessageSquare, Eye, User, Plus, TrendingUp } from "lucide-react";
+import { Calendar, MessageSquare, Eye, User, Plus, TrendingUp, Search, Pin, Flame } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { communityPostsData } from "@/data/communityPosts";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useState, useMemo } from "react";
 
 const Community = () => {
   const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const handleNewPost = () => {
     toast.info(t("community.loginToPost"));
@@ -25,6 +29,28 @@ const Community = () => {
       day: "numeric"
     });
   };
+
+  // Pinned posts (top 3)
+  const pinnedPosts = communityPostsData.slice(0, 3);
+
+  // Trending posts (based on views/comments simulation)
+  const trendingPosts = [...communityPostsData]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+
+  // Filter and search posts
+  const filteredPosts = useMemo(() => {
+    return communityPostsData.filter((post) => {
+      const matchesSearch = searchQuery === "" || 
+        t(post.titleKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t(post.previewKey).toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "all" || 
+        t(post.tagKey).toLowerCase() === t(`community.tags.${selectedCategory}`).toLowerCase();
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory, t]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-50/30 via-white to-blue-50/30">
@@ -57,23 +83,141 @@ const Community = () => {
                 </Button>
               </div>
 
+              {/* Search Bar */}
+              <div className="relative mb-4">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder={t("community.searchPlaceholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 rounded-full border-pink-200 focus:border-pink-400 focus:ring-pink-400"
+                />
+              </div>
+
               {/* Categories */}
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="cursor-pointer bg-pink-100 hover:bg-pink-200 text-pink-700 border-pink-200 transition-colors rounded-full px-4 py-1">
+                <Badge 
+                  variant={selectedCategory === "all" ? "secondary" : "outline"}
+                  onClick={() => setSelectedCategory("all")}
+                  className={`cursor-pointer transition-colors rounded-full px-4 py-1 ${
+                    selectedCategory === "all" 
+                      ? "bg-pink-100 text-pink-700 border-pink-200" 
+                      : "hover:bg-pink-100 hover:text-pink-700 hover:border-pink-300"
+                  }`}
+                >
                   {t("community.categories.all")}
                 </Badge>
-                <Badge variant="outline" className="cursor-pointer hover:bg-purple-100 hover:text-purple-700 hover:border-purple-300 transition-colors rounded-full px-4 py-1">
+                <Badge 
+                  variant={selectedCategory === "herbs" ? "secondary" : "outline"}
+                  onClick={() => setSelectedCategory("herbs")}
+                  className={`cursor-pointer transition-colors rounded-full px-4 py-1 ${
+                    selectedCategory === "herbs" 
+                      ? "bg-purple-100 text-purple-700 border-purple-200" 
+                      : "hover:bg-purple-100 hover:text-purple-700 hover:border-purple-300"
+                  }`}
+                >
                   {t("community.tags.herbs")}
                 </Badge>
-                <Badge variant="outline" className="cursor-pointer hover:bg-blue-100 hover:text-blue-700 hover:border-blue-300 transition-colors rounded-full px-4 py-1">
+                <Badge 
+                  variant={selectedCategory === "elderly" ? "secondary" : "outline"}
+                  onClick={() => setSelectedCategory("elderly")}
+                  className={`cursor-pointer transition-colors rounded-full px-4 py-1 ${
+                    selectedCategory === "elderly" 
+                      ? "bg-blue-100 text-blue-700 border-blue-200" 
+                      : "hover:bg-blue-100 hover:text-blue-700 hover:border-blue-300"
+                  }`}
+                >
                   {t("community.tags.elderly")}
                 </Badge>
-                <Badge variant="outline" className="cursor-pointer hover:bg-green-100 hover:text-green-700 hover:border-green-300 transition-colors rounded-full px-4 py-1">
+                <Badge 
+                  variant={selectedCategory === "caregiving" ? "secondary" : "outline"}
+                  onClick={() => setSelectedCategory("caregiving")}
+                  className={`cursor-pointer transition-colors rounded-full px-4 py-1 ${
+                    selectedCategory === "caregiving" 
+                      ? "bg-green-100 text-green-700 border-green-200" 
+                      : "hover:bg-green-100 hover:text-green-700 hover:border-green-300"
+                  }`}
+                >
                   {t("community.tags.caregiving")}
                 </Badge>
-                <Badge variant="outline" className="cursor-pointer hover:bg-amber-100 hover:text-amber-700 hover:border-amber-300 transition-colors rounded-full px-4 py-1">
+                <Badge 
+                  variant={selectedCategory === "health" ? "secondary" : "outline"}
+                  onClick={() => setSelectedCategory("health")}
+                  className={`cursor-pointer transition-colors rounded-full px-4 py-1 ${
+                    selectedCategory === "health" 
+                      ? "bg-amber-100 text-amber-700 border-amber-200" 
+                      : "hover:bg-amber-100 hover:text-amber-700 hover:border-amber-300"
+                  }`}
+                >
                   {t("community.tags.health")}
                 </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Pinned & Trending Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* Pinned Posts */}
+            <div className="lg:col-span-2 bg-gradient-to-br from-pink-50/50 to-purple-50/50 rounded-3xl p-6 border border-pink-200/50">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Pin className="h-5 w-5 text-pink-500" />
+                {t("community.pinnedPosts")}
+              </h2>
+              <div className="space-y-3">
+                {pinnedPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    to={`/community/${post.id}`}
+                    className="flex gap-3 p-3 bg-white/80 rounded-2xl hover:shadow-md transition-all group"
+                  >
+                    <img
+                      src={post.thumbnail}
+                      alt={t(post.titleKey)}
+                      className="w-16 h-16 rounded-xl object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-pink-600 transition-colors">
+                        {t(post.titleKey)}
+                      </h3>
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {t(post.previewKey)}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Trending Topics */}
+            <div className="bg-gradient-to-br from-amber-50/50 to-orange-50/50 rounded-3xl p-6 border border-amber-200/50">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-500" />
+                {t("community.trendingTopics")}
+              </h2>
+              <div className="space-y-3">
+                {trendingPosts.map((post, index) => (
+                  <Link
+                    key={post.id}
+                    to={`/community/${post.id}`}
+                    className="flex gap-3 items-start p-2 hover:bg-white/50 rounded-xl transition-all group"
+                  >
+                    <span className="text-2xl font-bold text-orange-400/50">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm line-clamp-2 group-hover:text-orange-600 transition-colors">
+                        {t(post.titleKey)}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                        <Eye className="h-3 w-3" />
+                        <span>{Math.floor(Math.random() * 500) + 50}</span>
+                        <MessageSquare className="h-3 w-3 ml-2" />
+                        <span>{Math.floor(Math.random() * 30) + 1}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
@@ -95,7 +239,14 @@ const Community = () => {
 
             {/* Posts List */}
             <div className="divide-y divide-pink-100/30">
-              {communityPostsData.map((post, index) => (
+              {filteredPosts.length === 0 ? (
+                <div className="p-12 text-center text-muted-foreground">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 text-pink-300" />
+                  <p className="text-lg">{t("community.noResults")}</p>
+                  <p className="text-sm">{t("community.tryDifferentSearch")}</p>
+                </div>
+              ) : (
+                filteredPosts.map((post, index) => (
                 <Link
                   key={post.id}
                   to={`/community/${post.id}`}
@@ -164,7 +315,8 @@ const Community = () => {
                     </div>
                   </div>
                 </Link>
-              ))}
+              ))
+            )}
             </div>
           </div>
         </div>
