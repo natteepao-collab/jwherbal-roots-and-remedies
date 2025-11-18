@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "首页",
+    "about": "关于我们",
     "shop": "商品",
     "articles": "文章",
     "community": "社区",
@@ -202,6 +203,58 @@
     },
     "placeholder": "输入消息...",
     "typingIndicator": "正在输入..."
+  },
+  "about": {
+    "pageTitle": "关于我们",
+    "metaDescription": "了解JWHERBAL BY JWGROUP，高品质草药和健康产品的领导者",
+    "hero": {
+      "title": "关于JWHERBAL",
+      "subtitle": "致力于为每个人提供高品质的草药和健康产品，创造更好的生活质量"
+    },
+    "story": {
+      "title": "我们的故事",
+      "paragraph1": "JWHERBAL BY JWGROUP成立的初衷是为泰国消费者提供高品质的草药产品。我们相信泰国草药在医疗保健方面具有卓越的价值和效果。",
+      "paragraph2": "凭借草药行业超过10年的经验，我们通过提供符合FDA标准并获得国际组织认证的优质产品，赢得了50,000多名客户的信任。",
+      "paragraph3": "我们所有产品都经过精心挑选来自可信来源的原材料，与研究人员和草药专家合作开发，以确保最高的质量和安全性。"
+    },
+    "values": {
+      "title": "我们的价值观",
+      "subtitle": "我们经营业务和创造产品的原则",
+      "natural": {
+        "title": "100%天然",
+        "desc": "仅使用高品质天然草药，不含有害化学物质"
+      },
+      "quality": {
+        "title": "高标准",
+        "desc": "获得FDA、GMP、HALAL和ISO 9001标准认证"
+      },
+      "care": {
+        "title": "关心客户",
+        "desc": "将客户满意度和健康作为我们的首要任务"
+      },
+      "innovation": {
+        "title": "创新",
+        "desc": "与研究人员合作开发新配方以获得最大效果"
+      }
+    },
+    "achievements": {
+      "title": "我们的成就",
+      "years": "年经验",
+      "customers": "信任客户",
+      "products": "优质产品",
+      "satisfaction": "满意率"
+    },
+    "certifications": {
+      "title": "标准认证",
+      "subtitle": "每款产品均由可信机构认证"
+    },
+    "mission": {
+      "title": "我们的使命",
+      "point1": "提供符合国际标准的高品质草药产品",
+      "point2": "推广有关泰国草药及其正确使用的知识",
+      "point3": "支持泰国草药的研究和开发以获得国际认可",
+      "point4": "创建一个分享健康知识和经验的社区"
+    }
   },
   "language": {
     "th": "ไทย",
