@@ -14,16 +14,227 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author: string
+          category: string
+          content_en: string
+          content_th: string
+          content_zh: string
+          created_at: string | null
+          excerpt_en: string
+          excerpt_th: string
+          excerpt_zh: string
+          id: string
+          image_url: string
+          likes: number | null
+          published_date: string | null
+          slug: string
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string | null
+        }
+        Insert: {
+          author: string
+          category: string
+          content_en: string
+          content_th: string
+          content_zh: string
+          created_at?: string | null
+          excerpt_en: string
+          excerpt_th: string
+          excerpt_zh: string
+          id?: string
+          image_url: string
+          likes?: number | null
+          published_date?: string | null
+          slug: string
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string
+          category?: string
+          content_en?: string
+          content_th?: string
+          content_zh?: string
+          created_at?: string | null
+          excerpt_en?: string
+          excerpt_th?: string
+          excerpt_zh?: string
+          id?: string
+          image_url?: string
+          likes?: number | null
+          published_date?: string | null
+          slug?: string
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          author_avatar: string
+          author_name: string
+          category: string
+          comments_count: number | null
+          content_en: string
+          content_th: string
+          content_zh: string
+          created_at: string | null
+          id: string
+          preview_en: string
+          preview_th: string
+          preview_zh: string
+          thumbnail: string
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          author_avatar: string
+          author_name: string
+          category: string
+          comments_count?: number | null
+          content_en: string
+          content_th: string
+          content_zh: string
+          created_at?: string | null
+          id?: string
+          preview_en: string
+          preview_th: string
+          preview_zh: string
+          thumbnail: string
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          author_avatar?: string
+          author_name?: string
+          category?: string
+          comments_count?: number | null
+          content_en?: string
+          content_th?: string
+          content_zh?: string
+          created_at?: string | null
+          id?: string
+          preview_en?: string
+          preview_th?: string
+          preview_zh?: string
+          thumbnail?: string
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
+      community_replies: {
+        Row: {
+          author_avatar: string
+          author_name: string
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author_avatar: string
+          author_name: string
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author_avatar?: string
+          author_name?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +361,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
