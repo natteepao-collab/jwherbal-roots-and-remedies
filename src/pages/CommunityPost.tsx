@@ -40,7 +40,7 @@ const CommunityPost = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-50/30 via-white to-blue-50/30">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50/30 via-white to-emerald-50/20">
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -49,7 +49,7 @@ const CommunityPost = () => {
           <Button 
             variant="ghost" 
             asChild 
-            className="mb-6 hover:bg-pink-100 rounded-full"
+            className="mb-6 hover:bg-primary/10 rounded-full"
           >
             <Link to="/community">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -58,26 +58,26 @@ const CommunityPost = () => {
           </Button>
 
           {/* Main Post */}
-          <Card className="mb-6 bg-white/80 backdrop-blur-sm border-pink-100/50 shadow-lg rounded-3xl overflow-hidden">
+          <Card className="mb-6 bg-white/80 backdrop-blur-sm border-primary/20 shadow-lg rounded-3xl overflow-hidden">
             <CardContent className="p-8">
               {/* Category Badge */}
               <Badge 
                 variant="secondary" 
-                className="mb-4 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 border-pink-200 rounded-full px-4 py-1"
+                className="mb-4 bg-gradient-to-r from-primary/10 to-emerald-100 text-primary border-primary/20 rounded-full px-4 py-1"
               >
                 {post.category}
               </Badge>
 
               {/* Title */}
-              <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
                 {post.title}
               </h1>
               
               {/* Author Info */}
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-pink-100">
-                <Avatar className="h-12 w-12 border-2 border-pink-200">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-primary/20">
+                <Avatar className="h-12 w-12 border-2 border-primary/30">
                   <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author}`} />
-                  <AvatarFallback className="bg-gradient-to-br from-pink-200 to-purple-200">
+                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-emerald-200">
                     {post.author.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
@@ -103,18 +103,18 @@ const CommunityPost = () => {
                     onClick={handleLike}
                     className={`rounded-full transition-all ${
                       liked 
-                        ? "bg-pink-100 text-pink-600 border-pink-300 hover:bg-pink-200" 
-                        : "hover:bg-pink-50"
+                        ? "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20" 
+                        : "hover:bg-primary/5"
                     }`}
                   >
-                    <Heart className={`h-4 w-4 mr-1 ${liked ? "fill-pink-600" : ""}`} />
+                    <Heart className={`h-4 w-4 mr-1 ${liked ? "fill-primary" : ""}`} />
                     {liked ? "ถูกใจแล้ว" : "ถูกใจ"}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleShare}
-                    className="rounded-full hover:bg-blue-50"
+                    className="rounded-full hover:bg-emerald-50"
                   >
                     <Share2 className="h-4 w-4 mr-1" />
                     แชร์
@@ -132,20 +132,20 @@ const CommunityPost = () => {
           {/* Replies */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-pink-500" />
+              <MessageSquare className="h-6 w-6 text-primary" />
               ความคิดเห็น ({post.replies.length})
             </h2>
             <div className="space-y-4">
               {post.replies.map((reply) => (
                 <Card 
                   key={reply.id}
-                  className="bg-white/60 backdrop-blur-sm border-pink-100/50 rounded-2xl hover:shadow-md transition-shadow"
+                  className="bg-white/60 backdrop-blur-sm border-primary/20 rounded-2xl hover:shadow-md transition-shadow"
                 >
                   <CardContent className="p-6">
                     <div className="flex gap-4">
-                      <Avatar className="h-10 w-10 border-2 border-pink-200">
+                      <Avatar className="h-10 w-10 border-2 border-primary/30">
                         <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.author}`} />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-200 to-purple-200">
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-emerald-200">
                           {reply.author.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
@@ -167,22 +167,22 @@ const CommunityPost = () => {
           </div>
 
           {/* Reply Form */}
-          <Card className="bg-gradient-to-br from-pink-50/50 to-purple-50/50 backdrop-blur-sm border-pink-200/50 rounded-3xl">
+          <Card className="bg-gradient-to-br from-primary/5 to-emerald-50/50 backdrop-blur-sm border-primary/20 rounded-3xl">
             <CardContent className="p-6">
               <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-pink-500" />
+                <MessageSquare className="h-5 w-5 text-primary" />
                 แสดงความคิดเห็น
               </h3>
               <Textarea
                 placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="mb-4 rounded-2xl border-pink-200 focus:border-pink-400 focus:ring-pink-400 bg-white/80"
+                className="mb-4 rounded-2xl border-primary/20 focus:border-primary focus:ring-primary bg-white/80"
                 rows={4}
               />
               <Button 
                 onClick={handleReply}
-                className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white rounded-full px-6"
+                className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
               >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 ส่งความคิดเห็น
