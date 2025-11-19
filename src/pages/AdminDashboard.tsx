@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Trash2, Edit, FileText, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { LogOut, Trash2, Edit, FileText, Eye, Shield, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -29,11 +30,13 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuth();
     fetchArticles();
+    fetchUsers();
   }, []);
 
   const checkAuth = async () => {
@@ -79,6 +82,85 @@ const AdminDashboard = () => {
       setArticles(data || []);
     }
     setLoading(false);
+  };
+
+  const fetchUsers = async () => {
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (profilesError) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถโหลดข้อมูลผู้ใช้ได้",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const usersWithRoles = await Promise.all(
+      (profilesData || []).map(async (profile) => {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", profile.id)
+          .eq("role", "admin")
+          .single();
+
+        return {
+          ...profile,
+          isAdmin: !!roleData,
+        };
+      })
+    );
+
+    setUsers(usersWithRoles);
+  };
+
+  const toggleAdminRole = async (userId: string, currentIsAdmin: boolean) => {
+    if (currentIsAdmin) {
+      const { error } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId)
+        .eq("role", "admin");
+
+      if (error) {
+        toast({
+          title: "เกิดข้อผิดพลาด",
+          description: "ไม่สามารถลบสิทธิ์ผู้ดูแลระบบได้",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "สำเร็จ",
+          description: "ลบสิทธิ์ผู้ดูแลระบบแล้ว",
+        });
+        fetchUsers();
+      }
+    } else {
+      const { error } = await supabase
+        .from("user_roles")
+        .insert({
+          user_id: userId,
+          role: "admin",
+        });
+
+      if (error) {
+        toast({
+          title: "เกิดข้อผิดพลาด",
+          description: "ไม่สามารถเพิ่มสิทธิ์ผู้ดูแลระบบได้",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "สำเร็จ",
+          description: "เพิ่มสิทธิ์ผู้ดูแลระบบแล้ว",
+        });
+        fetchUsers();
+      }
+    }
   };
 
   const handleLogout = async () => {
@@ -138,6 +220,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="articles" className="gap-2">
               <FileText className="h-4 w-4" />
               จัดการบทความ
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <Shield className="h-4 w-4" />
+              จัดการผู้ใช้
             </TabsTrigger>
           </TabsList>
 
@@ -218,6 +304,75 @@ const AdminDashboard = () => {
                                 >
                                   <Trash2 className="h-3 w-3" />
                                   ลบ
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>จัดการผู้ใช้และสิทธิ์</CardTitle>
+                <CardDescription>
+                  กำหนดสิทธิ์ผู้ดูแลระบบให้กับผู้ใช้ (สามารถมีผู้ดูแลระบบหลายคนได้)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ชื่อ-นามสกุล</TableHead>
+                        <TableHead>อีเมล</TableHead>
+                        <TableHead>วันที่สมัคร</TableHead>
+                        <TableHead>สถานะ</TableHead>
+                        <TableHead className="text-right">การจัดการ</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8">
+                            ยังไม่มีผู้ใช้ในระบบ
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">{user.full_name || "-"}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>
+                              {new Date(user.created_at).toLocaleDateString("th-TH")}
+                            </TableCell>
+                            <TableCell>
+                              {user.isAdmin ? (
+                                <Badge variant="default" className="gap-1">
+                                  <Shield className="h-3 w-3" />
+                                  ผู้ดูแลระบบ
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="gap-1">
+                                  <User className="h-3 w-3" />
+                                  ผู้ใช้ทั่วไป
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  variant={user.isAdmin ? "destructive" : "default"}
+                                  size="sm"
+                                  onClick={() => toggleAdminRole(user.id, user.isAdmin)}
+                                >
+                                  {user.isAdmin ? "ลบสิทธิ์ Admin" : "เพิ่มสิทธิ์ Admin"}
                                 </Button>
                               </div>
                             </TableCell>
