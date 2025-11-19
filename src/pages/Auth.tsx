@@ -1,164 +1,194 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Lock, Mail } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
 const Auth = () => {
-  const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        checkAdminRole(session.user.id);
+      }
+    });
+  }, []);
+
+  const checkAdminRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .single();
+
+    if (data && !error) {
+      navigate("/admin/dashboard");
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "สมัครสมาชิกสำเร็จ",
+          description: "กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี",
+        });
+        setIsLogin(true);
+      }
+    } catch (error: any) {
+      setError(error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate login - in production, integrate with backend
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success(t("auth.loginSuccess"));
-    }, 1500);
-  };
+    setError("");
+    setLoading(true);
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Simulate signup - in production, integrate with backend
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success(t("auth.signupSuccess"));
-    }, 1500);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .eq("role", "admin")
+          .single();
+
+        if (roleData) {
+          toast({
+            title: "เข้าสู่ระบบสำเร็จ",
+            description: "ยินดีต้อนรับสู่ระบบจัดการ",
+          });
+          navigate("/admin/dashboard");
+        } else {
+          setError("คุณไม่มีสิทธิ์เข้าถึงระบบจัดการ");
+          await supabase.auth.signOut();
+        }
+      }
+    } catch (error: any) {
+      setError(error.message || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto">
-          <Button variant="ghost" asChild className="mb-6">
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              กลับหน้าแรก
-            </Link>
-          </Button>
-
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">เข้าสู่ระบบ</TabsTrigger>
-              <TabsTrigger value="signup">สมัครสมาชิก</TabsTrigger>
-            </TabsList>
-
-            {/* Login Tab */}
-            <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>เข้าสู่ระบบ</CardTitle>
-                  <CardDescription>
-                    เข้าสู่ระบบเพื่อเข้าถึงบัญชีของคุณ
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                      <Label htmlFor="login-email">อีเมล</Label>
-                      <Input
-                        id="login-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="login-password">รหัสผ่าน</Label>
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
-                    </Button>
-                    <div className="text-center text-sm text-muted-foreground">
-                      <a href="#" className="hover:text-primary">
-                        ลืมรหัสผ่าน?
-                      </a>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Signup Tab */}
-            <TabsContent value="signup">
-              <Card>
-                <CardHeader>
-                  <CardTitle>สมัครสมาชิก</CardTitle>
-                  <CardDescription>
-                    สร้างบัญชีใหม่เพื่อเริ่มใช้งาน
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSignup} className="space-y-4">
-                    <div>
-                      <Label htmlFor="signup-name">ชื่อ-นามสกุล</Label>
-                      <Input
-                        id="signup-name"
-                        placeholder="สมชาย ใจดี"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="signup-email">อีเมล</Label>
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="signup-password">รหัสผ่าน</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="••••••••"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="signup-confirm">ยืนยันรหัสผ่าน</Label>
-                      <Input
-                        id="signup-confirm"
-                        type="password"
-                        placeholder="••••••••"
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}
-                    </Button>
-                    <div className="text-center text-xs text-muted-foreground">
-                      การสมัครสมาชิก ถือว่าคุณยอมรับ
-                      <a href="#" className="text-primary hover:underline"> เงื่อนไขการใช้งาน </a>
-                      และ
-                      <a href="#" className="text-primary hover:underline"> นโยบายความเป็นส่วนตัว</a>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/10 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 rounded-full bg-primary/10">
+                <Lock className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center">
+              {isLogin ? "เข้าสู่ระบบ Admin" : "สมัครสมาชิก Admin"}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {isLogin ? "กรุณาเข้าสู่ระบบเพื่อจัดการบทความและเนื้อหา" : "สร้างบัญชีผู้ดูแลระบบใหม่"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={isLogin ? handleLogin : handleSignUp} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">ชื่อ-นามสกุล</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="กรอกชื่อ-นามสกุล"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="email">อีเมล</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">รหัสผ่าน</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "กำลังดำเนินการ..." : isLogin ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
+              </Button>
+            </form>
+            <div className="mt-4 text-center">
+              <Button variant="link" onClick={() => { setIsLogin(!isLogin); setError(""); }} className="text-sm">
+                {isLogin ? "ยังไม่มีบัญชี? สมัครสมาชิก" : "มีบัญชีแล้ว? เข้าสู่ระบบ"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       <Footer />
     </div>
   );
