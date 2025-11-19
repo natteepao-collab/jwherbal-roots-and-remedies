@@ -8,28 +8,35 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const Admin = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "ออกจากระบบสำเร็จ",
+      description: "ขอบคุณที่ใช้บริการ",
+    });
+    navigate("/admin");
+  };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const handleDeleteArticle = async (id: string) => {
+    if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบบทความนี้?")) return;
 
-    // Simple authentication check - INSECURE for production
-    if (username === "administrator" && password === "Jwreal999@") {
-      // Store admin session (localStorage is insecure - for demo only)
-      sessionStorage.setItem("adminAuth", "true");
+    const { error } = await supabase
+      .from("articles")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
       toast({
-        title: "เข้าสู่ระบบสำเร็จ",
-        description: "ยินดีต้อนรับสู่ระบบจัดการ",
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถลบบทความได้",
+        variant: "destructive",
       });
-      navigate("/admin/dashboard");
     } else {
-      setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+      await fetchArticles();
+      toast({
+        title: "ลบบทความสำเร็จ",
+        description: "บทความถูกลบออกจากระบบแล้ว",
+      });
     }
   };
 
