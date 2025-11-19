@@ -87,6 +87,7 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Check if user is admin
         const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
@@ -94,15 +95,16 @@ const Auth = () => {
           .eq("role", "admin")
           .single();
 
+        toast({
+          title: "เข้าสู่ระบบสำเร็จ",
+          description: roleData ? "ยินดีต้อนรับสู่ระบบจัดการ" : "ยินดีต้อนรับ",
+        });
+
+        // Redirect admins to dashboard, regular users to community
         if (roleData) {
-          toast({
-            title: "เข้าสู่ระบบสำเร็จ",
-            description: "ยินดีต้อนรับสู่ระบบจัดการ",
-          });
           navigate("/admin/dashboard");
         } else {
-          setError("คุณไม่มีสิทธิ์เข้าถึงระบบจัดการ");
-          await supabase.auth.signOut();
+          navigate("/community");
         }
       }
     } catch (error: any) {
@@ -124,10 +126,10 @@ const Auth = () => {
               </div>
             </div>
             <CardTitle className="text-2xl text-center">
-              {isLogin ? "เข้าสู่ระบบ Admin" : "สมัครสมาชิก Admin"}
+              {isLogin ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
             </CardTitle>
             <CardDescription className="text-center">
-              {isLogin ? "กรุณาเข้าสู่ระบบเพื่อจัดการบทความและเนื้อหา" : "สร้างบัญชีผู้ดูแลระบบใหม่"}
+              {isLogin ? "เข้าสู่ระบบเพื่อโพสต์ในคอมมูนิตี้" : "สร้างบัญชีใหม่เพื่อเข้าร่วมชุมชน"}
             </CardDescription>
           </CardHeader>
           <CardContent>
