@@ -3,12 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Plus, Trash2, Edit, FileText, Eye } from "lucide-react";
+import { LogOut, Trash2, Edit, FileText, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -33,8 +29,6 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState<"th" | "en" | "zh">("th");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +39,7 @@ const AdminDashboard = () => {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      navigate("/admin");
+      navigate("/auth");
       return;
     }
 
@@ -63,6 +57,7 @@ const AdminDashboard = () => {
         description: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
         variant: "destructive",
       });
+      await supabase.auth.signOut();
       navigate("/");
     }
   };
@@ -92,7 +87,7 @@ const AdminDashboard = () => {
       title: "ออกจากระบบสำเร็จ",
       description: "ขอบคุณที่ใช้บริการ",
     });
-    navigate("/admin");
+    navigate("/auth");
   };
 
   const handleDeleteArticle = async (id: string) => {
@@ -154,55 +149,6 @@ const AdminDashboard = () => {
                     <CardTitle>บทความสุขภาพทั้งหมด</CardTitle>
                     <CardDescription>จัดการบทความสุขภาพและสมุนไพร ({articles.length} บทความ)</CardDescription>
                   </div>
-                  <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        เพิ่มบทความใหม่
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>เพิ่มบทความใหม่</DialogTitle>
-                        <DialogDescription>กรอกข้อมูลบทความในภาษาต่างๆ</DialogDescription>
-                      </DialogHeader>
-                      <Tabs value={selectedLang} onValueChange={(v) => setSelectedLang(v as "th" | "en" | "zh")}>
-                        <TabsList className="grid w-full grid-cols-3">
-                          <TabsTrigger value="th">ไทย</TabsTrigger>
-                          <TabsTrigger value="en">English</TabsTrigger>
-                          <TabsTrigger value="zh">中文</TabsTrigger>
-                        </TabsList>
-                        <div className="space-y-4 mt-4">
-                          <div className="space-y-2">
-                            <Label>หัวข้อบทความ</Label>
-                            <Input placeholder="กรอกหัวข้อบทความ" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>คำอธิบายสั้น (Excerpt)</Label>
-                            <Textarea placeholder="กรอกคำอธิบายสั้นๆ" rows={3} />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>เนื้อหาบทความ</Label>
-                            <Textarea placeholder="กรอกเนื้อหาบทความ" rows={10} />
-                          </div>
-                        </div>
-                      </Tabs>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                          ยกเลิก
-                        </Button>
-                        <Button onClick={() => {
-                          toast({
-                            title: "ฟีเจอร์ยังไม่พร้อมใช้งาน",
-                            description: "กรุณาใช้ Lovable Cloud สำหรับระบบจัดการข้อมูลที่สมบูรณ์",
-                          });
-                          setIsAddDialogOpen(false);
-                        }}>
-                          บันทึก
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
@@ -210,12 +156,12 @@ const AdminDashboard = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>หัวข้อ (ภาษาไทย)</TableHead>
+                        <TableHead className="w-[100px]">ID</TableHead>
+                        <TableHead>ชื่อบทความ</TableHead>
                         <TableHead>หมวดหมู่</TableHead>
                         <TableHead>ผู้เขียน</TableHead>
                         <TableHead>วันที่</TableHead>
-                        <TableHead>การกระทำ</TableHead>
+                        <TableHead className="text-right">การจัดการ</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -240,7 +186,7 @@ const AdminDashboard = () => {
                             <TableCell>{article.author}</TableCell>
                             <TableCell>{new Date(article.published_date).toLocaleDateString('th-TH')}</TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 justify-end">
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -278,12 +224,6 @@ const AdminDashboard = () => {
                           </TableRow>
                         ))
                       )}
-                    </TableBody>
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
                     </TableBody>
                   </Table>
                 </div>
