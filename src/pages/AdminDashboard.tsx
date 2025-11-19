@@ -10,27 +10,84 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Plus, Trash2, Edit, FileText, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { healthArticles, HealthArticle } from "@/data/healthArticles";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+interface Article {
+  id: string;
+  slug: string;
+  title_th: string;
+  title_en: string;
+  title_zh: string;
+  excerpt_th: string;
+  excerpt_en: string;
+  excerpt_zh: string;
+  author: string;
+  category: string;
+  published_date: string;
+  likes: number;
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [articles, setArticles] = useState<HealthArticle[]>(healthArticles);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState<"th" | "en" | "zh">("th");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const isAuth = sessionStorage.getItem("adminAuth");
-    if (!isAuth) {
-      navigate("/admin");
-    }
-  }, [navigate]);
+    checkAuth();
+    fetchArticles();
+  }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("adminAuth");
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/admin");
+      return;
+    }
+
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .eq("role", "admin")
+      .single();
+
+    if (!roleData) {
+      toast({
+        title: "ไม่มีสิทธิ์เข้าถึง",
+        description: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  };
+
+  const fetchArticles = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("articles")
+      .select("*")
+      .order("published_date", { ascending: false });
+
+    if (error) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถโหลดบทความได้",
+        variant: "destructive",
+      });
+    } else {
+      setArticles(data || []);
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     toast({
       title: "ออกจากระบบสำเร็จ",
       description: "ขอบคุณที่ใช้บริการ",
@@ -38,12 +95,27 @@ const AdminDashboard = () => {
     navigate("/admin");
   };
 
-  const handleDeleteArticle = (id: number) => {
-    setArticles(articles.filter((article) => article.id !== id));
-    toast({
-      title: "ลบบทความสำเร็จ",
-      description: "บทความถูกลบออกจากระบบแล้ว",
-    });
+  const handleDeleteArticle = async (id: string) => {
+    if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบบทความนี้?")) return;
+
+    const { error } = await supabase
+      .from("articles")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถลบบทความได้",
+        variant: "destructive",
+      });
+    } else {
+      await fetchArticles();
+      toast({
+        title: "ลบบทความสำเร็จ",
+        description: "บทความถูกลบออกจากระบบแล้ว",
+      });
+    }
   };
 
   const handleViewArticle = (slug: string) => {
@@ -147,50 +219,66 @@ const AdminDashboard = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {articles.map((article) => (
-                        <TableRow key={article.id}>
-                          <TableCell className="font-medium">{article.id}</TableCell>
-                          <TableCell className="max-w-md truncate">{article.title.th}</TableCell>
-                          <TableCell>{article.category.th}</TableCell>
-                          <TableCell>{article.author}</TableCell>
-                          <TableCell>{article.date}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleViewArticle(article.slug)}
-                                className="gap-1"
-                              >
-                                <Eye className="h-3 w-3" />
-                                ดู
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  toast({
-                                    title: "ฟีเจอร์ยังไม่พร้อมใช้งาน",
-                                    description: "กรุณาใช้ Lovable Cloud สำหรับการแก้ไขข้อมูล",
-                                  });
-                                }}
-                                className="gap-1"
-                              >
-                                <Edit className="h-3 w-3" />
-                                แก้ไข
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => {
-                                  if (confirm(`ต้องการลบบทความ "${article.title.th}" หรือไม่?`)) {
-                                    handleDeleteArticle(article.id);
-                                  }
-                                }}
-                                className="gap-1"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                ลบ
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            กำลังโหลดข้อมูล...
+                          </TableCell>
+                        </TableRow>
+                      ) : articles.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            ยังไม่มีบทความในระบบ
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        articles.map((article) => (
+                          <TableRow key={article.id}>
+                            <TableCell className="font-medium">{article.id.substring(0, 8)}...</TableCell>
+                            <TableCell className="max-w-md truncate">{article.title_th}</TableCell>
+                            <TableCell>{article.category}</TableCell>
+                            <TableCell>{article.author}</TableCell>
+                            <TableCell>{new Date(article.published_date).toLocaleDateString('th-TH')}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewArticle(article.slug)}
+                                  className="gap-1"
+                                >
+                                  <Eye className="h-3 w-3" />
+                                  ดู
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    toast({
+                                      title: "ฟีเจอร์ยังไม่พร้อมใช้งาน",
+                                      description: "กรุณาใช้ Backend Dashboard สำหรับการแก้ไขข้อมูล",
+                                    });
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                  แก้ไข
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteArticle(article.id)}
+                                  className="gap-1"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  ลบ
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
                               </Button>
                             </div>
                           </TableCell>
