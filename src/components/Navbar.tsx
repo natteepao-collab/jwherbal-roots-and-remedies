@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -7,11 +7,61 @@ import { useCart } from "@/contexts/CartContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const { items } = useCart();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "ออกจากระบบสำเร็จ",
+      description: "คุณได้ออกจากระบบเรียบร้อยแล้ว",
+    });
+    navigate("/");
+  };
+
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name;
+    }
+    if (user?.email) {
+      return user.email.split("@")[0];
+    }
+    return "ผู้ใช้";
+  };
 
   const navLinks = [
     { to: "/", label: t("nav.home"), icon: Home },
@@ -57,11 +107,41 @@ const Navbar = () => {
 
         <div className="flex items-center space-x-2">
           <LanguageSwitcher />
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/auth">
-              <User className="h-5 w-5" />
-            </Link>
-          </Button>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <span className="hidden sm:inline-block font-prompt text-sm">
+                    {getUserDisplayName()}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="font-prompt">
+                  {getUserDisplayName()}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/community")} className="font-prompt cursor-pointer">
+                  <Users className="mr-2 h-4 w-4" />
+                  คอมมูนิตี้
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="font-prompt cursor-pointer text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  ออกจากระบบ
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/auth">
+                <User className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
+
           <Button variant="ghost" size="icon" className="relative" asChild>
             <Link to="/cart">
               <ShoppingCart className="h-5 w-5" />
