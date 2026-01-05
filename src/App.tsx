@@ -18,8 +18,15 @@ import Auth from "./pages/Auth";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
 import Admin from "./pages/Admin";
-import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+
+// Admin pages
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminArticles from "./pages/admin/AdminArticles";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminCommunity from "./pages/admin/AdminCommunity";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -44,7 +51,16 @@ const App = () => (
             <Route path="/products/vflow" element={<VFlowProduct />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            
+            {/* Admin Dashboard Routes */}
+            <Route path="/admin/dashboard" element={<AdminLayout />}>
+              <Route index element={<AdminOverview />} />
+              <Route path="articles" element={<AdminArticles />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="community" element={<AdminCommunity />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
