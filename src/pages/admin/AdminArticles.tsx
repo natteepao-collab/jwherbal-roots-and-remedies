@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface Article {
   id: string;
@@ -289,8 +290,17 @@ const AdminArticles = () => {
           </DialogHeader>
 
           <div className="grid gap-6 py-4">
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <Label>รูปภาพหน้าปก</Label>
+              <ImageUpload
+                value={selectedArticle?.image_url || ""}
+                onChange={(url) => setSelectedArticle({ ...selectedArticle, image_url: url })}
+              />
+            </div>
+
             {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>หมวดหมู่</Label>
                 <Input
@@ -305,14 +315,6 @@ const AdminArticles = () => {
                   value={selectedArticle?.author || ""}
                   onChange={(e) => setSelectedArticle({ ...selectedArticle, author: e.target.value })}
                   placeholder="ชื่อผู้เขียน"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>รูปภาพ URL</Label>
-                <Input
-                  value={selectedArticle?.image_url || ""}
-                  onChange={(e) => setSelectedArticle({ ...selectedArticle, image_url: e.target.value })}
-                  placeholder="https://..."
                 />
               </div>
             </div>
