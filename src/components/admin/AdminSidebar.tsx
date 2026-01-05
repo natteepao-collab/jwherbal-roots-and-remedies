@@ -7,7 +7,8 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  Shield
+  Shield,
+  Home
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -73,21 +74,36 @@ export const AdminSidebar = () => {
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-foreground">Admin Panel</span>
-          </div>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn("h-8 w-8", collapsed && "mx-auto")}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          {!collapsed && (
+            <div className="flex items-center gap-2">
+              <Shield className="h-6 w-6 text-primary" />
+              <span className="font-semibold text-foreground">Admin Panel</span>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className={cn("h-8 w-8", collapsed && "mx-auto")}
+          >
+            <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
+          </Button>
+        </div>
+        
+        {/* Back to Home Button */}
+        <Link
+          to="/"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 mt-3 rounded-lg transition-all duration-200",
+            "bg-accent/50 text-foreground hover:bg-accent",
+            collapsed && "justify-center px-2"
+          )}
         >
-          <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
-        </Button>
+          <Home className="h-4 w-4 flex-shrink-0" />
+          {!collapsed && <span className="text-sm font-medium">กลับหน้าหลัก</span>}
+        </Link>
       </div>
 
       {/* Navigation */}
