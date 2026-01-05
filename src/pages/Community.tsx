@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Calendar, MessageSquare, Eye, User, Plus, TrendingUp, Search, Pin, Flame } from "lucide-react";
+import { Calendar, MessageSquare, Eye, Plus, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -7,15 +7,54 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { communityPostsData } from "@/data/communityPosts";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface CommunityPost {
+  id: string;
+  title_th: string;
+  title_en: string;
+  title_zh: string;
+  preview_th: string;
+  preview_en: string;
+  preview_zh: string;
+  category: string;
+  thumbnail: string;
+  author_name: string;
+  author_avatar: string;
+  views: number;
+  comments_count: number;
+  created_at: string;
+}
 
 const Community = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("community_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching posts:", error);
+      toast.error("ไม่สามารถโหลดโพสต์ได้");
+    } else {
+      setPosts(data || []);
+    }
+    setLoading(false);
+  };
 
   const handleNewPost = () => {
     toast.info(t("community.loginToPost"));
@@ -30,27 +69,69 @@ const Community = () => {
     });
   };
 
-  // Pinned posts (top 3)
-  const pinnedPosts = communityPostsData.slice(0, 3);
+  // Get localized content based on current language
+  const getLocalizedTitle = (post: CommunityPost) => {
+    const lang = i18n.language;
+    if (lang === "zh") return post.title_zh || post.title_en || post.title_th;
+    if (lang === "en") return post.title_en || post.title_th;
+    return post.title_th;
+  };
 
-  // Trending posts (based on views/comments simulation)
-  const trendingPosts = [...communityPostsData]
-    .sort(() => Math.random() - 0.5)
+  const getLocalizedPreview = (post: CommunityPost) => {
+    const lang = i18n.language;
+    if (lang === "zh") return post.preview_zh || post.preview_en || post.preview_th;
+    if (lang === "en") return post.preview_en || post.preview_th;
+    return post.preview_th;
+  };
+
+  const getCategoryLabel = (category: string) => {
+    const categoryMap: Record<string, string> = {
+      herbs: t("community.tags.herbs"),
+      elderly: t("community.tags.elderly"),
+      caregiving: t("community.tags.caregiving"),
+      health: t("community.tags.health"),
+    };
+    return categoryMap[category] || category;
+  };
+
+  // Pinned posts (top 3)
+  const pinnedPosts = posts.slice(0, 3);
+
+  // Trending posts (based on views)
+  const trendingPosts = [...posts]
+    .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 5);
 
   // Filter and search posts
   const filteredPosts = useMemo(() => {
-    return communityPostsData.filter((post) => {
+    return posts.filter((post) => {
+      const title = getLocalizedTitle(post).toLowerCase();
+      const preview = getLocalizedPreview(post).toLowerCase();
       const matchesSearch = searchQuery === "" || 
-        t(post.titleKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t(post.previewKey).toLowerCase().includes(searchQuery.toLowerCase());
+        title.includes(searchQuery.toLowerCase()) ||
+        preview.includes(searchQuery.toLowerCase());
       
       const matchesCategory = selectedCategory === "all" || 
-        t(post.tagKey).toLowerCase() === t(`community.tags.${selectedCategory}`).toLowerCase();
+        post.category === selectedCategory;
       
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory, t]);
+  }, [searchQuery, selectedCategory, posts, i18n.language]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50/30 via-white to-emerald-50/20">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">กำลังโหลดข้อมูล...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50/30 via-white to-emerald-50/20">
@@ -173,15 +254,18 @@ const Community = () => {
                   >
                     <img
                       src={post.thumbnail}
-                      alt={t(post.titleKey)}
+                      alt={getLocalizedTitle(post)}
                       className="w-16 h-16 rounded-xl object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/placeholder.svg";
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                        {t(post.titleKey)}
+                        {getLocalizedTitle(post)}
                       </h3>
                       <p className="text-xs text-muted-foreground line-clamp-1">
-                        {t(post.previewKey)}
+                        {getLocalizedPreview(post)}
                       </p>
                     </div>
                   </Link>
@@ -207,13 +291,13 @@ const Community = () => {
                     </span>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                        {t(post.titleKey)}
+                        {getLocalizedTitle(post)}
                       </h3>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <Eye className="h-3 w-3" />
-                        <span>{Math.floor(Math.random() * 500) + 50}</span>
+                        <span>{post.views || 0}</span>
                         <MessageSquare className="h-3 w-3 ml-2" />
-                        <span>{Math.floor(Math.random() * 30) + 1}</span>
+                        <span>{post.comments_count || 0}</span>
                       </div>
                     </div>
                   </Link>
@@ -246,7 +330,7 @@ const Community = () => {
                   <p className="text-sm">{t("community.tryDifferentSearch")}</p>
                 </div>
               ) : (
-                filteredPosts.map((post, index) => (
+                filteredPosts.map((post) => (
                 <Link
                   key={post.id}
                   to={`/community/${post.id}`}
@@ -258,8 +342,11 @@ const Community = () => {
                       <div className="relative flex-shrink-0">
                         <img
                           src={post.thumbnail}
-                          alt={t(post.titleKey)}
+                          alt={getLocalizedTitle(post)}
                           className="w-16 h-16 rounded-2xl object-cover shadow-sm border-2 border-white group-hover:border-primary/30 transition-all"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/placeholder.svg";
+                          }}
                         />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center border-2 border-primary/20">
                           <MessageSquare className="h-3 w-3 text-primary" />
@@ -270,13 +357,13 @@ const Community = () => {
                           variant="secondary" 
                           className="mb-2 text-xs rounded-full px-3 py-0.5 bg-gradient-to-r from-primary/10 to-emerald-100 text-primary border-primary/20"
                         >
-                          {t(post.tagKey)}
+                          {getCategoryLabel(post.category)}
                         </Badge>
                         <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 mb-1">
-                          {t(post.titleKey)}
+                          {getLocalizedTitle(post)}
                         </h3>
                         <p className="text-sm text-muted-foreground line-clamp-1">
-                          {t(post.previewKey)}
+                          {getLocalizedPreview(post)}
                         </p>
                       </div>
                     </div>
@@ -284,13 +371,19 @@ const Community = () => {
                     {/* Author */}
                     <div className="col-span-6 md:col-span-2 flex items-center justify-center gap-2">
                       <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                        <AvatarImage src={post.authorAvatar} alt={t(post.authorNameKey)} />
+                        <AvatarImage 
+                          src={post.author_avatar} 
+                          alt={post.author_name}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
                         <AvatarFallback className="bg-gradient-to-br from-primary/20 to-emerald-200 text-primary">
-                          {t(post.authorNameKey).charAt(0)}
+                          {post.author_name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium truncate hidden md:block">
-                        {t(post.authorNameKey)}
+                        {post.author_name.split(" ")[0]}
                       </span>
                     </div>
 
@@ -298,11 +391,11 @@ const Community = () => {
                     <div className="col-span-6 md:col-span-2 flex items-center justify-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Eye className="h-4 w-4 text-blue-400" />
-                        <span className="hidden sm:inline">{Math.floor(Math.random() * 500) + 50}</span>
+                        <span className="hidden sm:inline">{post.views || 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageSquare className="h-4 w-4 text-green-400" />
-                        <span>{Math.floor(Math.random() * 30) + 1}</span>
+                        <span>{post.comments_count || 0}</span>
                       </div>
                     </div>
 
@@ -310,7 +403,7 @@ const Community = () => {
                     <div className="hidden lg:flex lg:col-span-1 items-center justify-center">
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3 text-primary" />
-                        <span>{formatDate(post.createdAt).split(' ')[0]}</span>
+                        <span>{formatDate(post.created_at).split(' ')[0]}</span>
                       </div>
                     </div>
                   </div>
