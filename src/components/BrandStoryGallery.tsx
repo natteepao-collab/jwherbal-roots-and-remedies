@@ -5,7 +5,16 @@ import { ChevronLeft, ChevronRight, Award, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { awardCeremony, farmTour, qualityControl } from "@/assets/gallery";
+import { 
+  awardCeremony, 
+  farmTour, 
+  qualityControl,
+  expoBooth,
+  csrEvent,
+  rdLab,
+  healthSeminar,
+  isoCertification
+} from "@/assets/gallery";
 
 interface GalleryItem {
   id: string;
@@ -35,6 +44,11 @@ const fallbackImages: Record<string, string> = {
   "award-ceremony": awardCeremony,
   "farm-tour": farmTour,
   "quality-control": qualityControl,
+  "expo-booth": expoBooth,
+  "csr-event": csrEvent,
+  "rd-lab": rdLab,
+  "health-seminar": healthSeminar,
+  "iso-certification": isoCertification,
 };
 
 const getImageUrl = (url: string): string => {
