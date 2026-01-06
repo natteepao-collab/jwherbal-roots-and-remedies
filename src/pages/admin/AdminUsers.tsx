@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Shield, User, MoreHorizontal } from "lucide-react";
+import { Search, Shield, User, MoreHorizontal, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -45,7 +46,9 @@ const AdminUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [actionType, setActionType] = useState<"add" | "remove">("add");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -121,6 +124,44 @@ const AdminUsers = () => {
 
     setIsConfirmOpen(false);
     setSelectedUser(null);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "เกิดข้อผิดพลาด", description: "กรุณาเข้าสู่ระบบใหม่", variant: "destructive" });
+        return;
+      }
+
+      const response = await supabase.functions.invoke("delete-user", {
+        body: { userId: selectedUser.id },
+      });
+
+      if (response.error) {
+        toast({ 
+          title: "เกิดข้อผิดพลาด", 
+          description: response.error.message || "ไม่สามารถลบผู้ใช้ได้", 
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: "สำเร็จ", description: "ลบผู้ใช้เรียบร้อยแล้ว" });
+        fetchUsers();
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "เกิดข้อผิดพลาด", 
+        description: error.message || "ไม่สามารถลบผู้ใช้ได้", 
+        variant: "destructive" 
+      });
+    } finally {
+      setDeleting(false);
+      setIsDeleteConfirmOpen(false);
+      setSelectedUser(null);
+    }
   };
 
   const filteredUsers = users.filter(
@@ -242,40 +283,75 @@ const AdminUsers = () => {
                             <Shield className="mr-2 h-4 w-4" />
                             เพิ่มสิทธิ์ Admin
                           </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                                        )}
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                          className="text-destructive"
+                                          onClick={() => {
+                                            setSelectedUser(user);
+                                            setIsDeleteConfirmOpen(true);
+                                          }}
+                                        >
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          ลบผู้ใช้
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
 
-      {/* Confirmation Dialog */}
-      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {actionType === "add" ? "เพิ่มสิทธิ์ Admin" : "ลบสิทธิ์ Admin"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {actionType === "add"
-                ? `คุณต้องการเพิ่มสิทธิ์ Admin ให้กับ "${selectedUser?.full_name || selectedUser?.email}" หรือไม่?`
-                : `คุณต้องการลบสิทธิ์ Admin ของ "${selectedUser?.full_name || selectedUser?.email}" หรือไม่?`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRoleChange}>
-              ยืนยัน
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
+                      {/* Role Change Confirmation Dialog */}
+                      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              {actionType === "add" ? "เพิ่มสิทธิ์ Admin" : "ลบสิทธิ์ Admin"}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {actionType === "add"
+                                ? `คุณต้องการเพิ่มสิทธิ์ Admin ให้กับ "${selectedUser?.full_name || selectedUser?.email}" หรือไม่?`
+                                : `คุณต้องการลบสิทธิ์ Admin ของ "${selectedUser?.full_name || selectedUser?.email}" หรือไม่?`}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleRoleChange}>
+                              ยืนยัน
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
 
-export default AdminUsers;
+                      {/* Delete User Confirmation Dialog */}
+                      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-destructive">ลบผู้ใช้ออกจากระบบ</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              คุณต้องการลบผู้ใช้ "{selectedUser?.full_name || selectedUser?.email}" ออกจากระบบหรือไม่?
+                              <br /><br />
+                              <strong className="text-destructive">คำเตือน:</strong> การดำเนินการนี้ไม่สามารถยกเลิกได้ ข้อมูลผู้ใช้ทั้งหมดจะถูกลบอย่างถาวร
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={deleting}>ยกเลิก</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={handleDeleteUser}
+                              disabled={deleting}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              {deleting ? "กำลังลบ..." : "ยืนยันการลบ"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  );
+                };
+
+                export default AdminUsers;
