@@ -11,10 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Star, Check, X, Trash2, MessageSquare } from "lucide-react";
+import { Star, Check, X, Trash2, MessageSquare, User } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+import { avatarImages } from "@/assets/avatars";
 
 interface Review {
   id: string;
@@ -165,12 +166,16 @@ const AdminReviews = () => {
                   <TableRow key={review.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {review.author_avatar && (
+                        {review.author_avatar ? (
                           <img
-                            src={review.author_avatar}
+                            src={avatarImages[review.author_avatar] || review.author_avatar}
                             alt={review.author_name}
                             className="h-8 w-8 rounded-full object-cover"
                           />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                          </div>
                         )}
                         <span className="font-medium">{review.author_name}</span>
                       </div>
