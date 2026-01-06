@@ -34,6 +34,7 @@ import AdminReviews from "./pages/admin/AdminReviews";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminBrandStory from "./pages/admin/AdminBrandStory";
 import AdminTrustElements from "./pages/admin/AdminTrustElements";
+import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="orders" element={<AdminOrders />} />
               <Route path="brand-story" element={<AdminBrandStory />} />
               <Route path="trust-elements" element={<AdminTrustElements />} />
+              <Route path="payment-settings" element={<AdminPaymentSettings />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
