@@ -89,10 +89,10 @@ const AdminBrandStoryGallery = () => {
     const fileExt = file.name.split(".").pop();
     const fileName = `gallery-${Date.now()}.${fileExt}`;
     const { error } = await supabase.storage
-      .from("article-images")
+      .from("brand-story-gallery")
       .upload(fileName, file, { upsert: true });
     if (error) throw error;
-    const { data } = supabase.storage.from("article-images").getPublicUrl(fileName);
+    const { data } = supabase.storage.from("brand-story-gallery").getPublicUrl(fileName);
     return data.publicUrl;
   };
 
