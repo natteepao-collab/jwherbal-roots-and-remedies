@@ -307,6 +307,42 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_settings: {
+        Row: {
+          bank_account_name: string
+          bank_account_number: string
+          bank_name: string
+          id: string
+          is_bank_transfer_enabled: boolean
+          is_promptpay_enabled: boolean
+          promptpay_name: string
+          promptpay_number: string
+          updated_at: string
+        }
+        Insert: {
+          bank_account_name?: string
+          bank_account_number?: string
+          bank_name?: string
+          id?: string
+          is_bank_transfer_enabled?: boolean
+          is_promptpay_enabled?: boolean
+          promptpay_name?: string
+          promptpay_number?: string
+          updated_at?: string
+        }
+        Update: {
+          bank_account_name?: string
+          bank_account_number?: string
+          bank_name?: string
+          id?: string
+          is_bank_transfer_enabled?: boolean
+          is_promptpay_enabled?: boolean
+          promptpay_name?: string
+          promptpay_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string

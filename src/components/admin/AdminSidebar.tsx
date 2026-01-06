@@ -13,7 +13,8 @@ import {
   Star,
   ShoppingCart,
   ImageIcon,
-  BadgeCheck
+  BadgeCheck,
+  CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,11 @@ const menuItems = [
     title: "ความน่าเชื่อถือ", 
     icon: BadgeCheck, 
     path: "/admin/dashboard/trust-elements" 
+  },
+  { 
+    title: "การชำระเงิน", 
+    icon: CreditCard, 
+    path: "/admin/dashboard/payment-settings" 
   },
   { 
     title: "ตั้งค่า", 
