@@ -132,6 +132,7 @@ export type Database = {
           title_th: string
           title_zh: string
           updated_at: string | null
+          user_id: string | null
           views: number | null
         }
         Insert: {
@@ -152,6 +153,7 @@ export type Database = {
           title_th: string
           title_zh: string
           updated_at?: string | null
+          user_id?: string | null
           views?: number | null
         }
         Update: {
@@ -172,6 +174,7 @@ export type Database = {
           title_th?: string
           title_zh?: string
           updated_at?: string | null
+          user_id?: string | null
           views?: number | null
         }
         Relationships: []
@@ -184,6 +187,7 @@ export type Database = {
           created_at: string | null
           id: string
           post_id: string
+          user_id: string | null
         }
         Insert: {
           author_avatar: string
@@ -192,6 +196,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           post_id: string
+          user_id?: string | null
         }
         Update: {
           author_avatar?: string
@@ -200,6 +205,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           post_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
