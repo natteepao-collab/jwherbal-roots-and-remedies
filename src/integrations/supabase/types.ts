@@ -345,6 +345,9 @@ export type Database = {
       }
       reviews: {
         Row: {
+          admin_reply: string | null
+          admin_reply_at: string | null
+          admin_reply_by: string | null
           author_avatar: string | null
           author_name: string
           comment: string
@@ -357,6 +360,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_reply?: string | null
+          admin_reply_at?: string | null
+          admin_reply_by?: string | null
           author_avatar?: string | null
           author_name: string
           comment: string
@@ -369,6 +375,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_reply?: string | null
+          admin_reply_at?: string | null
+          admin_reply_by?: string | null
           author_avatar?: string | null
           author_name?: string
           comment?: string
