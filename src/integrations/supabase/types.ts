@@ -217,6 +217,51 @@ export type Database = {
           },
         ]
       }
+      contact_settings: {
+        Row: {
+          address: string
+          email: string
+          facebook_url: string
+          id: string
+          instagram_url: string
+          line_id: string
+          line_url: string
+          phone: string
+          phone_hours: string
+          updated_at: string
+          weekday_hours: string
+          weekend_hours: string
+        }
+        Insert: {
+          address?: string
+          email?: string
+          facebook_url?: string
+          id?: string
+          instagram_url?: string
+          line_id?: string
+          line_url?: string
+          phone?: string
+          phone_hours?: string
+          updated_at?: string
+          weekday_hours?: string
+          weekend_hours?: string
+        }
+        Update: {
+          address?: string
+          email?: string
+          facebook_url?: string
+          id?: string
+          instagram_url?: string
+          line_id?: string
+          line_url?: string
+          phone?: string
+          phone_hours?: string
+          updated_at?: string
+          weekday_hours?: string
+          weekend_hours?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string

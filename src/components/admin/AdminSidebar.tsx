@@ -14,7 +14,8 @@ import {
   ShoppingCart,
   ImageIcon,
   BadgeCheck,
-  CreditCard
+  CreditCard,
+  Phone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,11 @@ const menuItems = [
     title: "การชำระเงิน", 
     icon: CreditCard, 
     path: "/admin/dashboard/payment-settings" 
+  },
+  { 
+    title: "ติดต่อเรา", 
+    icon: Phone, 
+    path: "/admin/dashboard/contact" 
   },
   { 
     title: "ตั้งค่า", 
