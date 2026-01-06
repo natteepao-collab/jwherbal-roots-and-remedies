@@ -343,6 +343,35 @@ export type Database = {
         }
         Relationships: []
       }
+      review_likes: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_likes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           admin_reply: string | null
@@ -354,6 +383,7 @@ export type Database = {
           created_at: string
           id: string
           is_approved: boolean | null
+          likes_count: number | null
           product_id: string | null
           rating: number
           updated_at: string
@@ -369,6 +399,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          likes_count?: number | null
           product_id?: string | null
           rating: number
           updated_at?: string
@@ -384,6 +415,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          likes_count?: number | null
           product_id?: string | null
           rating?: number
           updated_at?: string

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Star, MessageCircle } from "lucide-react";
+import { Star, MessageCircle, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +31,12 @@ interface Review {
   admin_reply: string | null;
   admin_reply_at: string | null;
   admin_reply_by: string | null;
+  likes_count: number;
+}
+
+interface ReviewLike {
+  review_id: string;
+  user_id: string;
 }
 
 const Reviews = () => {
@@ -50,7 +56,7 @@ const Reviews = () => {
     });
   }, []);
 
-  const { data: dbReviews } = useQuery({
+  const { data: dbReviews, refetch: refetchReviews } = useQuery({
     queryKey: ["approved-reviews"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -60,6 +66,65 @@ const Reviews = () => {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Review[];
+    },
+  });
+
+  const { data: userLikes } = useQuery({
+    queryKey: ["user-review-likes", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("review_likes")
+        .select("review_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return data.map((l) => l.review_id);
+    },
+    enabled: !!user,
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: async (reviewId: string) => {
+      if (!user) throw new Error("กรุณาเข้าสู่ระบบก่อน");
+
+      const isLiked = userLikes?.includes(reviewId);
+      const currentReview = dbReviews?.find((r) => r.id === reviewId);
+      const currentLikes = currentReview?.likes_count || 0;
+
+      if (isLiked) {
+        // Unlike
+        const { error } = await supabase
+          .from("review_likes")
+          .delete()
+          .eq("review_id", reviewId)
+          .eq("user_id", user.id);
+        if (error) throw error;
+
+        // Decrease likes_count
+        await supabase
+          .from("reviews")
+          .update({ likes_count: Math.max(0, currentLikes - 1) })
+          .eq("id", reviewId);
+      } else {
+        // Like
+        const { error } = await supabase
+          .from("review_likes")
+          .insert({ review_id: reviewId, user_id: user.id });
+        if (error) throw error;
+
+        // Increase likes_count
+        await supabase
+          .from("reviews")
+          .update({ likes_count: currentLikes + 1 })
+          .eq("id", reviewId);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["approved-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["user-review-likes"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -235,6 +300,28 @@ const Reviews = () => {
                         <p className="text-sm text-muted-foreground leading-relaxed">
                           {review.comment}
                         </p>
+
+                        {/* Like Button */}
+                        <div className="mt-4 flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`gap-1.5 ${userLikes?.includes(review.id) ? "text-red-500" : "text-muted-foreground"}`}
+                            onClick={() => {
+                              if (!user) {
+                                toast.error("กรุณาเข้าสู่ระบบเพื่อกดถูกใจ");
+                                return;
+                              }
+                              likeMutation.mutate(review.id);
+                            }}
+                            disabled={likeMutation.isPending}
+                          >
+                            <Heart
+                              className={`h-4 w-4 ${userLikes?.includes(review.id) ? "fill-current" : ""}`}
+                            />
+                            <span>{review.likes_count || 0}</span>
+                          </Button>
+                        </div>
                         
                         {/* Admin Reply */}
                         {review.admin_reply && (
