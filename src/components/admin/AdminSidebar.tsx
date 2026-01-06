@@ -12,7 +12,8 @@ import {
   Package,
   Star,
   ShoppingCart,
-  ImageIcon
+  ImageIcon,
+  BadgeCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,11 @@ const menuItems = [
     title: "เรื่องราวแบรนด์", 
     icon: ImageIcon, 
     path: "/admin/dashboard/brand-story" 
+  },
+  { 
+    title: "ความน่าเชื่อถือ", 
+    icon: BadgeCheck, 
+    path: "/admin/dashboard/trust-elements" 
   },
   { 
     title: "ตั้งค่า", 

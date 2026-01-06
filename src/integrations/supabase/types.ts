@@ -473,6 +473,174 @@ export type Database = {
           },
         ]
       }
+      trust_certifications: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          icon: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trust_expert: {
+        Row: {
+          description_en: string
+          description_th: string
+          description_zh: string
+          id: string
+          image_url: string | null
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url?: string | null
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url?: string | null
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trust_ingredients: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          id: string
+          is_active: boolean
+          name_en: string
+          name_th: string
+          name_zh: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          id?: string
+          is_active?: boolean
+          name_en: string
+          name_th: string
+          name_zh: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string
+          name_th?: string
+          name_zh?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trust_section_settings: {
+        Row: {
+          id: string
+          ingredients_image_url: string | null
+          ingredients_title_en: string
+          ingredients_title_th: string
+          ingredients_title_zh: string
+          section_subtitle_en: string
+          section_subtitle_th: string
+          section_subtitle_zh: string
+          section_title_en: string
+          section_title_th: string
+          section_title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          ingredients_image_url?: string | null
+          ingredients_title_en?: string
+          ingredients_title_th?: string
+          ingredients_title_zh?: string
+          section_subtitle_en?: string
+          section_subtitle_th?: string
+          section_subtitle_zh?: string
+          section_title_en?: string
+          section_title_th?: string
+          section_title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          ingredients_image_url?: string | null
+          ingredients_title_en?: string
+          ingredients_title_th?: string
+          ingredients_title_zh?: string
+          section_subtitle_en?: string
+          section_subtitle_th?: string
+          section_subtitle_zh?: string
+          section_title_en?: string
+          section_title_th?: string
+          section_title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
