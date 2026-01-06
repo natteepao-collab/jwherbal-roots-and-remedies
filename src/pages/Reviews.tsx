@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Star } from "lucide-react";
+import { Star, MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
+import { avatarImages } from "@/assets/avatars";
 
 interface Review {
   id: string;
@@ -27,6 +28,9 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
+  admin_reply: string | null;
+  admin_reply_at: string | null;
+  admin_reply_by: string | null;
 }
 
 const Reviews = () => {
@@ -210,9 +214,17 @@ const Reviews = () => {
                     >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                            {review.author_name.charAt(0).toUpperCase()}
-                          </div>
+                          {review.author_avatar ? (
+                            <img
+                              src={avatarImages[review.author_avatar] || review.author_avatar}
+                              alt={review.author_name}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-border"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                              {review.author_name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                           <div className="flex-1">
                             <h3 className="font-semibold text-foreground">
                               {review.author_name}
@@ -223,6 +235,19 @@ const Reviews = () => {
                         <p className="text-sm text-muted-foreground leading-relaxed">
                           {review.comment}
                         </p>
+                        
+                        {/* Admin Reply */}
+                        {review.admin_reply && (
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <div className="flex items-center gap-2 mb-2">
+                              <MessageCircle className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium text-primary">ตอบกลับจากทีมงาน</span>
+                            </div>
+                            <p className="text-sm text-foreground bg-primary/5 p-3 rounded-lg">
+                              {review.admin_reply}
+                            </p>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
