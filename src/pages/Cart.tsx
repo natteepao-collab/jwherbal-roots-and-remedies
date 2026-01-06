@@ -1,19 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const Cart = () => {
   const { t } = useTranslation();
-  const { items, updateQuantity, removeItem, totalPrice, clearCart } = useCart();
+  const navigate = useNavigate();
+  const { items, updateQuantity, removeItem, totalPrice } = useCart();
 
   const handleCheckout = () => {
-    toast.success(t("cart.checkoutInProgress"));
+    navigate("/checkout");
   };
 
   if (items.length === 0) {

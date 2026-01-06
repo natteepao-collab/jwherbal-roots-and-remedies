@@ -8,7 +8,10 @@ import {
   LogOut,
   ChevronLeft,
   Shield,
-  Home
+  Home,
+  Package,
+  Star,
+  ShoppingCart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,21 @@ const menuItems = [
     title: "ภาพรวม", 
     icon: LayoutDashboard, 
     path: "/admin/dashboard" 
+  },
+  { 
+    title: "สินค้า", 
+    icon: Package, 
+    path: "/admin/dashboard/products" 
+  },
+  { 
+    title: "คำสั่งซื้อ", 
+    icon: ShoppingCart, 
+    path: "/admin/dashboard/orders" 
+  },
+  { 
+    title: "รีวิว", 
+    icon: Star, 
+    path: "/admin/dashboard/reviews" 
   },
   { 
     title: "บทความ", 

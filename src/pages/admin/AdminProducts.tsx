@@ -1,0 +1,415 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { toast } from "sonner";
+
+interface Product {
+  id: string;
+  name_th: string;
+  name_en: string;
+  name_zh: string;
+  description_th: string;
+  description_en: string;
+  description_zh: string;
+  price: number;
+  image_url: string;
+  category: string;
+  rating: number;
+  stock: number;
+  is_active: boolean;
+}
+
+const AdminProducts = () => {
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [formData, setFormData] = useState({
+    name_th: "",
+    name_en: "",
+    name_zh: "",
+    description_th: "",
+    description_en: "",
+    description_zh: "",
+    price: 0,
+    image_url: "",
+    category: "",
+    stock: 0,
+    is_active: true,
+  });
+
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Product[];
+    },
+  });
+
+  const uploadImage = async (file: File) => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const { error } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from("product-images").getPublicUrl(fileName);
+    return data.publicUrl;
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: typeof formData & { id?: string }) => {
+      let imageUrl = data.image_url;
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const productData = { ...data, image_url: imageUrl };
+
+      if (data.id) {
+        const { error } = await supabase
+          .from("products")
+          .update(productData)
+          .eq("id", data.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("products").insert(productData);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success(editingProduct ? "อัปเดตสินค้าเรียบร้อย" : "เพิ่มสินค้าเรียบร้อย");
+      resetForm();
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("ลบสินค้าเรียบร้อย");
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      name_th: "",
+      name_en: "",
+      name_zh: "",
+      description_th: "",
+      description_en: "",
+      description_zh: "",
+      price: 0,
+      image_url: "",
+      category: "",
+      stock: 0,
+      is_active: true,
+    });
+    setEditingProduct(null);
+    setImageFile(null);
+    setIsDialogOpen(false);
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      name_th: product.name_th,
+      name_en: product.name_en,
+      name_zh: product.name_zh,
+      description_th: product.description_th,
+      description_en: product.description_en,
+      description_zh: product.description_zh,
+      price: product.price,
+      image_url: product.image_url,
+      category: product.category,
+      stock: product.stock,
+      is_active: product.is_active,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveMutation.mutate({
+      ...formData,
+      id: editingProduct?.id,
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">จัดการสินค้า</h1>
+          <p className="text-muted-foreground">เพิ่ม แก้ไข หรือลบสินค้า</p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => resetForm()}>
+              <Plus className="h-4 w-4 mr-2" />
+              เพิ่มสินค้า
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingProduct ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>ชื่อสินค้า (ไทย)</Label>
+                  <Input
+                    value={formData.name_th}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name_th: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ชื่อสินค้า (English)</Label>
+                  <Input
+                    value={formData.name_en}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name_en: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ชื่อสินค้า (中文)</Label>
+                  <Input
+                    value={formData.name_zh}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name_zh: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>รายละเอียด (ไทย)</Label>
+                  <Textarea
+                    value={formData.description_th}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description_th: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>รายละเอียด (English)</Label>
+                  <Textarea
+                    value={formData.description_en}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description_en: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>รายละเอียด (中文)</Label>
+                  <Textarea
+                    value={formData.description_zh}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description_zh: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>ราคา (บาท)</Label>
+                  <Input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) =>
+                      setFormData({ ...formData, price: Number(e.target.value) })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>หมวดหมู่</Label>
+                  <Input
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>จำนวนในสต็อก</Label>
+                  <Input
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) =>
+                      setFormData({ ...formData, stock: Number(e.target.value) })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label>รูปภาพสินค้า</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                />
+                {formData.image_url && !imageFile && (
+                  <img
+                    src={formData.image_url}
+                    alt="Preview"
+                    className="mt-2 h-20 w-20 object-cover rounded"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, is_active: checked })
+                  }
+                />
+                <Label>เปิดใช้งาน</Label>
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  ยกเลิก
+                </Button>
+                <Button type="submit" disabled={saveMutation.isPending}>
+                  {saveMutation.isPending ? "กำลังบันทึก..." : "บันทึก"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            รายการสินค้า ({products?.length || 0})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p>กำลังโหลด...</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>รูป</TableHead>
+                  <TableHead>ชื่อสินค้า</TableHead>
+                  <TableHead>หมวดหมู่</TableHead>
+                  <TableHead>ราคา</TableHead>
+                  <TableHead>สต็อก</TableHead>
+                  <TableHead>สถานะ</TableHead>
+                  <TableHead>จัดการ</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products?.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <img
+                        src={product.image_url}
+                        alt={product.name_th}
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {product.name_th}
+                    </TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>฿{product.price}</TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          product.is_active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {product.is_active ? "เปิดใช้งาน" : "ปิดใช้งาน"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteMutation.mutate(product.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default AdminProducts;
