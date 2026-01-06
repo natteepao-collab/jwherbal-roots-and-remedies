@@ -77,6 +77,42 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_story: {
+        Row: {
+          description_en: string
+          description_th: string
+          description_zh: string
+          id: string
+          image_url: string | null
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url?: string | null
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url?: string | null
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_posts: {
         Row: {
           author_avatar: string
