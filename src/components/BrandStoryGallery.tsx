@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Award, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { awardCeremony, farmTour, qualityControl } from "@/assets/gallery";
 
 interface GalleryItem {
   id: string;
@@ -28,6 +29,23 @@ interface BrandStory {
   description_zh: string;
   image_url: string | null;
 }
+
+// Fallback images map for sample data
+const fallbackImages: Record<string, string> = {
+  "award-ceremony": awardCeremony,
+  "farm-tour": farmTour,
+  "quality-control": qualityControl,
+};
+
+const getImageUrl = (url: string): string => {
+  // Check if URL contains known fallback patterns
+  for (const [key, fallback] of Object.entries(fallbackImages)) {
+    if (url.includes(key)) {
+      return fallback;
+    }
+  }
+  return url;
+};
 
 export const BrandStoryGallery = () => {
   const { i18n } = useTranslation();
@@ -178,7 +196,7 @@ export const BrandStoryGallery = () => {
             {/* Background blur effect */}
             <div 
               className="absolute inset-0 scale-110 blur-3xl opacity-30"
-              style={{ backgroundImage: `url(${currentItem.image_url})`, backgroundSize: 'cover' }}
+              style={{ backgroundImage: `url(${getImageUrl(currentItem.image_url)})`, backgroundSize: 'cover' }}
             />
             
             {/* Main Image */}
@@ -198,7 +216,7 @@ export const BrandStoryGallery = () => {
                   )}
                 >
                   <img
-                    src={item.image_url}
+                    src={getImageUrl(item.image_url)}
                     alt={getLocalizedText(item, "title")}
                     className="w-full h-full object-cover"
                   />
@@ -263,7 +281,7 @@ export const BrandStoryGallery = () => {
                   )}
                 >
                   <img
-                    src={item.image_url}
+                    src={getImageUrl(item.image_url)}
                     alt={getLocalizedText(item, "title")}
                     className="w-full h-full object-cover"
                   />
