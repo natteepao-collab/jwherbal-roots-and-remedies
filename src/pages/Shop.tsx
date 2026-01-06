@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
+import { productImages } from "@/assets/products";
 
 interface Product {
   id: string;
@@ -177,7 +178,7 @@ const Shop = () => {
                       id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
                       name: getProductName(product),
                       price: product.price,
-                      image: product.image_url,
+                      image: productImages[product.id] || product.image_url,
                       category: product.category,
                       description: getProductDescription(product),
                       rating: product.rating || 0,
