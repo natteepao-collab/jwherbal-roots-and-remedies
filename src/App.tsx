@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Articles from "./pages/Articles";
 import ArticleDetail from "./pages/ArticleDetail";
 import Community from "./pages/Community";
@@ -27,6 +28,9 @@ import AdminArticles from "./pages/admin/AdminArticles";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCommunity from "./pages/admin/AdminCommunity";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminReviews from "./pages/admin/AdminReviews";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +46,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<ArticleDetail />} />
             <Route path="/community" element={<Community />} />
@@ -58,6 +63,9 @@ const App = () => (
               <Route path="articles" element={<AdminArticles />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="community" element={<AdminCommunity />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="reviews" element={<AdminReviews />} />
+              <Route path="orders" element={<AdminOrders />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
