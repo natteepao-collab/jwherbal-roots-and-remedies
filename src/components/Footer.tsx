@@ -3,6 +3,7 @@ import { Facebook, Instagram, Mail, Phone, MessageCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import jwherbalLogo from "@/assets/jwherbal-logo.png";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -26,10 +27,11 @@ const Footer = () => {
           {/* About */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary">
-                <span className="text-primary-foreground font-bold text-lg">JW</span>
-              </div>
-              <span className="font-bold text-xl">JWHERBAL</span>
+              <img 
+                src={jwherbalLogo} 
+                alt="JW Herbal Logo" 
+                className="h-12 w-auto"
+              />
             </div>
             <p className="text-sm text-muted-foreground">
               {t("footer.description")}
