@@ -19,28 +19,48 @@ interface NotificationRequest {
   };
 }
 
-const sendLineNotify = async (message: string) => {
-  const token = Deno.env.get("LINE_NOTIFY_TOKEN");
-  if (!token) {
-    console.log("LINE_NOTIFY_TOKEN not set, skipping Line notification");
+const sendLineMessage = async (message: string) => {
+  const channelAccessToken = Deno.env.get("LINE_CHANNEL_ACCESS_TOKEN");
+  const userId = Deno.env.get("LINE_USER_ID");
+  
+  if (!channelAccessToken) {
+    console.log("LINE_CHANNEL_ACCESS_TOKEN not set, skipping LINE notification");
+    return;
+  }
+  
+  if (!userId) {
+    console.log("LINE_USER_ID not set, skipping LINE notification");
     return;
   }
 
   try {
-    const response = await fetch("https://notify-api.line.me/api/notify", {
+    const response = await fetch("https://api.line.me/v2/bot/message/push", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Bearer ${channelAccessToken}`,
+        "Content-Type": "application/json",
       },
-      body: `message=${encodeURIComponent(message)}`,
+      body: JSON.stringify({
+        to: userId,
+        messages: [
+          {
+            type: "text",
+            text: message,
+          },
+        ],
+      }),
     });
 
-    const result = await response.json();
-    console.log("Line Notify response:", result);
-    return result;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("LINE Messaging API error:", response.status, errorText);
+      throw new Error(`LINE API error: ${response.status} - ${errorText}`);
+    }
+
+    console.log("LINE message sent successfully");
+    return { success: true };
   } catch (error) {
-    console.error("Line Notify error:", error);
+    console.error("LINE Messaging error:", error);
     throw error;
   }
 };
@@ -159,7 +179,7 @@ ${stars}
 
     // Send notifications in parallel
     const results = await Promise.allSettled([
-      sendLineNotify(lineMessage),
+      sendLineMessage(lineMessage),
       sendEmailNotify(emailSubject, emailHtml),
     ]);
 
