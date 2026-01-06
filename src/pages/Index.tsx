@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Leaf, Users, BookOpen, Star } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
@@ -11,6 +11,7 @@ import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
 import vflowProduct from "@/assets/vflow-product-transparent.png";
+import brandStoryImage from "@/assets/brand-story-farm.jpg";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -72,43 +73,58 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-secondary">
+      {/* Brand Story Section */}
+      <section className="py-20 bg-secondary overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="flex flex-col items-center text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Leaf className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t("features.natural.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("features.natural.description")}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex flex-col items-center text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t("features.community.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("features.community.description")}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex flex-col items-center text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <BookOpen className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t("features.articles.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("features.articles.description")}
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Image */}
+            <div className="relative">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={brandStoryImage}
+                  alt="Organic herbal farm"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+              <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+            </div>
+
+            {/* Content */}
+            <div className="space-y-6">
+              <div className="inline-block px-4 py-1 bg-primary/10 rounded-full">
+                <span className="text-primary font-medium text-sm">
+                  {currentLanguage === "th" ? "เรื่องราวของเรา" : currentLanguage === "en" ? "Our Story" : "我们的故事"}
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+                {currentLanguage === "th" 
+                  ? "จากแปลงปลูกอินทรีย์ สู่มือคุณ" 
+                  : currentLanguage === "en" 
+                  ? "From Organic Farms to Your Hands" 
+                  : "从有机农场到您手中"}
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                {currentLanguage === "th"
+                  ? "เราคัดสรรเฉพาะสมุนไพรเกรดพรีเมียมจากแหล่งปลูกที่ดีที่สุดในประเทศไทย ผ่านกระบวนการผลิตที่ได้มาตรฐาน เพื่อให้คุณมั่นใจได้ในคุณภาพทุกหยดที่ดื่ม"
+                  : currentLanguage === "en"
+                  ? "We carefully select only premium-grade herbs from the finest farms in Thailand, processed through certified production standards, ensuring quality in every drop you drink."
+                  : "我们精心挑选来自泰国最好农场的优质草药，通过认证的生产标准加工，确保您饮用的每一滴都是高品质的。"}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button asChild size="lg" className="gap-2">
+                  <Link to="/about">
+                    {currentLanguage === "th" ? "เรียนรู้เพิ่มเติม" : currentLanguage === "en" ? "Learn More" : "了解更多"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/products/vflow">
+                    {currentLanguage === "th" ? "ดูผลิตภัณฑ์ V Flow" : currentLanguage === "en" ? "View V Flow Product" : "查看V Flow产品"}
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
