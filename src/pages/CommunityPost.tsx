@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
 
 interface CommunityPost {
   id: string;
@@ -191,7 +192,7 @@ const CommunityPost = () => {
             {post.thumbnail && (
               <div className="aspect-video w-full overflow-hidden">
                 <img
-                  src={post.thumbnail}
+                  src={getCommunityPostImage(post.thumbnail)}
                   alt={getLocalizedTitle()}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -218,7 +219,7 @@ const CommunityPost = () => {
               {/* Author Info */}
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-primary/20">
                 <Avatar className="h-12 w-12 border-2 border-primary/30">
-                  <AvatarImage src={post.author_avatar} />
+                  <AvatarImage src={getCommunityAuthorImage(post.author_avatar)} />
                   <AvatarFallback className="bg-gradient-to-br from-primary/20 to-emerald-200">
                     {post.author_name.charAt(0)}
                   </AvatarFallback>
@@ -293,7 +294,7 @@ const CommunityPost = () => {
                     <CardContent className="p-6">
                       <div className="flex gap-4">
                         <Avatar className="h-10 w-10 border-2 border-primary/30">
-                          <AvatarImage src={reply.author_avatar} />
+                          <AvatarImage src={getCommunityAuthorImage(reply.author_avatar)} />
                           <AvatarFallback className="bg-gradient-to-br from-primary/20 to-emerald-200">
                             {reply.author_name.charAt(0)}
                           </AvatarFallback>
