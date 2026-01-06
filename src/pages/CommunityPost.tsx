@@ -41,6 +41,12 @@ interface Reply {
   created_at: string;
 }
 
+interface UserProfile {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+}
+
 const CommunityPost = () => {
   const { id } = useParams();
   const { i18n, t } = useTranslation();
@@ -49,14 +55,48 @@ const CommunityPost = () => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [comment, setComment] = useState("");
+  const [submittingReply, setSubmittingReply] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     if (id) {
       fetchPost();
       fetchReplies();
       incrementViews();
+      checkUser();
     }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserProfile(session.user.id);
+        }, 0);
+      } else {
+        setUserProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [id]);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      fetchUserProfile(user.id);
+    }
+  };
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .eq("id", userId)
+      .single();
+    
+    if (data) {
+      setUserProfile(data);
+    }
+  };
 
   const fetchPost = async () => {
     const { data, error } = await supabase
@@ -149,13 +189,52 @@ const CommunityPost = () => {
     return <Navigate to="/community" replace />;
   }
 
-  const handleReply = () => {
+  const handleReply = async () => {
     if (!comment.trim()) {
       toast.error("กรุณาใส่ความคิดเห็น");
       return;
     }
-    toast.info("กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น");
-    setComment("");
+
+    if (comment.length > 1000) {
+      toast.error("ความคิดเห็นต้องไม่เกิน 1000 ตัวอักษร");
+      return;
+    }
+
+    if (!userProfile) {
+      toast.info("กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น");
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.info("กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น");
+      return;
+    }
+
+    setSubmittingReply(true);
+
+    const authorName = userProfile.full_name || userProfile.email?.split("@")[0] || "Anonymous";
+
+    const { error } = await supabase
+      .from("community_replies")
+      .insert({
+        post_id: id,
+        user_id: user.id,
+        author_name: authorName,
+        author_avatar: "/community/author01.jpg", // Default avatar
+        content: comment.trim(),
+      });
+
+    if (error) {
+      console.error("Error creating reply:", error);
+      toast.error("ไม่สามารถส่งความคิดเห็นได้");
+    } else {
+      toast.success("ส่งความคิดเห็นสำเร็จ!");
+      setComment("");
+      fetchReplies();
+    }
+
+    setSubmittingReply(false);
   };
 
   const handleLike = () => {
@@ -324,20 +403,46 @@ const CommunityPost = () => {
                 <MessageSquare className="h-5 w-5 text-primary" />
                 แสดงความคิดเห็น
               </h3>
-              <Textarea
-                placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="mb-4 rounded-2xl border-primary/20 focus:border-primary focus:ring-primary bg-white/80"
-                rows={4}
-              />
-              <Button 
-                onClick={handleReply}
-                className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                ส่งความคิดเห็น
-              </Button>
+              {userProfile ? (
+                <>
+                  <Textarea
+                    placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="mb-2 rounded-2xl border-primary/20 focus:border-primary focus:ring-primary bg-white/80"
+                    rows={4}
+                    maxLength={1000}
+                  />
+                  <p className="text-xs text-muted-foreground mb-4">{comment.length}/1000 ตัวอักษร</p>
+                  <Button 
+                    onClick={handleReply}
+                    disabled={submittingReply}
+                    className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
+                  >
+                    {submittingReply ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        กำลังส่ง...
+                      </>
+                    ) : (
+                      <>
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        ส่งความคิดเห็น
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground mb-4">กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น</p>
+                  <Button 
+                    asChild
+                    className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
+                  >
+                    <Link to="/auth">เข้าสู่ระบบ</Link>
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

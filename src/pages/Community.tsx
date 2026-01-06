@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Calendar, MessageSquare, Eye, Plus, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
+import { Calendar, MessageSquare, Eye, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
+import NewPostDialog from "@/components/community/NewPostDialog";
 
 interface CommunityPost {
   id: string;
@@ -30,16 +31,55 @@ interface CommunityPost {
   created_at: string;
 }
 
+interface UserProfile {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+}
+
 const Community = () => {
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     fetchPosts();
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserProfile(session.user.id);
+        }, 0);
+      } else {
+        setUserProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      fetchUserProfile(user.id);
+    }
+  };
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .eq("id", userId)
+      .single();
+    
+    if (data) {
+      setUserProfile(data);
+    }
+  };
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -58,7 +98,9 @@ const Community = () => {
   };
 
   const handleNewPost = () => {
-    toast.info(t("community.loginToPost"));
+    if (!userProfile) {
+      toast.info(t("community.loginToPost"));
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -156,13 +198,19 @@ const Community = () => {
                     {t("community.description")}
                   </p>
                 </div>
-                <Button 
-                  onClick={handleNewPost}
-                  className="bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("community.newPost")}
-                </Button>
+                {userProfile ? (
+                  <NewPostDialog 
+                    onPostCreated={fetchPosts} 
+                    userProfile={userProfile}
+                  />
+                ) : (
+                  <Button 
+                    onClick={handleNewPost}
+                    className="bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6"
+                  >
+                    {t("community.newPost")}
+                  </Button>
+                )}
               </div>
 
               {/* Search Bar */}
