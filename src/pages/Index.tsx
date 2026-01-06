@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +12,9 @@ import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
 import vflowProduct from "@/assets/vflow-product-transparent.png";
-import brandStoryImageDefault from "@/assets/brand-story-farm.jpg";
+import brandStoryImageDefault from "@/assets/brand-story-organic-farm.jpg";
+import trustPharmacist from "@/assets/trust-pharmacist.jpg";
+import trustIngredients from "@/assets/trust-ingredients.jpg";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -171,6 +173,148 @@ const Index = () => {
                 <Button asChild variant="outline" size="lg">
                   <Link to="/products/vflow">
                     {currentLanguage === "th" ? "ดูผลิตภัณฑ์ V Flow" : currentLanguage === "en" ? "View V Flow Product" : "查看V Flow产品"}
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Elements Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-block px-4 py-1 bg-primary/10 rounded-full mb-4">
+              <span className="text-primary font-medium text-sm">
+                {currentLanguage === "th" ? "ความน่าเชื่อถือ" : currentLanguage === "en" ? "Trust & Quality" : "信任与品质"}
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              {currentLanguage === "th" ? "มาตรฐานที่คุณวางใจได้" : currentLanguage === "en" ? "Standards You Can Trust" : "您可以信赖的标准"}
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {currentLanguage === "th" 
+                ? "เราผ่านการรับรองมาตรฐานจากหน่วยงานที่เชื่อถือได้ พร้อมทีมผู้เชี่ยวชาญคอยให้คำปรึกษา" 
+                : currentLanguage === "en" 
+                ? "We are certified by trusted authorities with a team of experts ready to assist you." 
+                : "我们获得了可信机构的认证，并有专家团队随时为您提供帮助。"}
+            </p>
+          </div>
+
+          {/* Certifications */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            {[
+              { 
+                icon: ShieldCheck, 
+                title: currentLanguage === "th" ? "อย." : currentLanguage === "en" ? "FDA Thailand" : "泰国FDA",
+                desc: currentLanguage === "th" ? "ขึ้นทะเบียนอาหาร" : currentLanguage === "en" ? "Food Registration" : "食品注册"
+              },
+              { 
+                icon: Award, 
+                title: "GMP",
+                desc: currentLanguage === "th" ? "มาตรฐานการผลิต" : currentLanguage === "en" ? "Manufacturing Standard" : "生产标准"
+              },
+              { 
+                icon: Leaf, 
+                title: "Organic",
+                desc: currentLanguage === "th" ? "วัตถุดิบอินทรีย์" : currentLanguage === "en" ? "Organic Ingredients" : "有机原料"
+              },
+              { 
+                icon: Award, 
+                title: "OTOP",
+                desc: currentLanguage === "th" ? "สินค้าคัดสรร" : currentLanguage === "en" ? "Selected Product" : "精选产品"
+              },
+            ].map((cert, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-primary/10">
+                <CardContent className="p-6">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <cert.icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-lg text-foreground mb-1">{cert.title}</h3>
+                  <p className="text-sm text-muted-foreground">{cert.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Ingredients Highlight */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+            <div className="order-2 lg:order-1 space-y-6">
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                {currentLanguage === "th" ? "วัตถุดิบพรีเมียม คัดสรรอย่างพิถีพิถัน" : currentLanguage === "en" ? "Premium Ingredients, Carefully Selected" : "优质原料，精心挑选"}
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { 
+                    name: currentLanguage === "th" ? "ขิงแก่ 12 เดือน" : currentLanguage === "en" ? "12-Month Aged Ginger" : "12个月陈姜",
+                    desc: currentLanguage === "th" ? "ขิงแก่จัดที่มีสารจินเจอรอลสูง ช่วยกระตุ้นการไหลเวียนโลหิต" : currentLanguage === "en" ? "Mature ginger with high gingerol content for blood circulation" : "成熟的生姜，姜酚含量高，有助于血液循环"
+                  },
+                  { 
+                    name: currentLanguage === "th" ? "ไพลสดจากสวน" : currentLanguage === "en" ? "Fresh Galangal from Gardens" : "花园新鲜南姜",
+                    desc: currentLanguage === "th" ? "ไพลสดคุณภาพ ช่วยบรรเทาอาการปวดเมื่อย" : currentLanguage === "en" ? "Quality fresh galangal for pain relief" : "优质新鲜南姜，缓解疼痛"
+                  },
+                  { 
+                    name: currentLanguage === "th" ? "ขมิ้นชันออร์แกนิก" : currentLanguage === "en" ? "Organic Turmeric" : "有机姜黄",
+                    desc: currentLanguage === "th" ? "ขมิ้นชันปลอดสารพิษ อุดมด้วยเคอร์คูมิน" : currentLanguage === "en" ? "Pesticide-free turmeric rich in curcumin" : "无农药姜黄，富含姜黄素"
+                  },
+                ].map((ingredient, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-secondary rounded-lg">
+                    <div className="w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-foreground">{ingredient.name}</h4>
+                      <p className="text-sm text-muted-foreground">{ingredient.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 relative">
+              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={trustIngredients}
+                  alt="Premium herbal ingredients"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+            </div>
+          </div>
+
+          {/* Expert Consultation */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={trustPharmacist}
+                  alt="Expert pharmacist consultation"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+            </div>
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                <UserCheck className="h-4 w-4 text-primary" />
+                <span className="text-primary font-medium text-sm">
+                  {currentLanguage === "th" ? "ปรึกษาผู้เชี่ยวชาญ" : currentLanguage === "en" ? "Expert Consultation" : "专家咨询"}
+                </span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                {currentLanguage === "th" ? "ทีมเภสัชกรพร้อมให้คำปรึกษา" : currentLanguage === "en" ? "Pharmacist Team Ready to Assist" : "药剂师团队随时为您服务"}
+              </h3>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                {currentLanguage === "th" 
+                  ? "เรามีทีมเภสัชกรและผู้เชี่ยวชาญด้านสมุนไพรไทยคอยให้คำปรึกษาตลอดเวลา เพื่อให้คุณมั่นใจในการเลือกผลิตภัณฑ์ที่เหมาะกับสุขภาพของคุณ" 
+                  : currentLanguage === "en" 
+                  ? "Our team of pharmacists and Thai herbal experts are always available to advise you, ensuring you choose the right products for your health." 
+                  : "我们的药剂师和泰国草药专家团队随时为您提供建议，确保您选择适合您健康的产品。"}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button asChild size="lg" className="gap-2">
+                  <Link to="/contact">
+                    {currentLanguage === "th" ? "ติดต่อปรึกษา" : currentLanguage === "en" ? "Contact Us" : "联系我们"}
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </div>
