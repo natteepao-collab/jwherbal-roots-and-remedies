@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
@@ -11,8 +12,20 @@ import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
 import vflowProduct from "@/assets/vflow-product-transparent.png";
-import brandStoryImage from "@/assets/brand-story-farm.jpg";
+import brandStoryImageDefault from "@/assets/brand-story-farm.jpg";
 import { useTranslation } from "react-i18next";
+import { supabase } from "@/integrations/supabase/client";
+
+interface BrandStory {
+  id: string;
+  title_th: string;
+  title_en: string;
+  title_zh: string;
+  description_th: string;
+  description_en: string;
+  description_zh: string;
+  image_url: string | null;
+}
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -20,6 +33,51 @@ const Index = () => {
   const latestArticles = articles.slice(0, 3);
   const popularPosts = communityPosts.slice(0, 2);
   const currentLanguage = i18n.language as "th" | "en" | "zh";
+
+  const { data: brandStory } = useQuery({
+    queryKey: ["brand-story-public"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brand_story")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data as BrandStory | null;
+    },
+  });
+
+  const getBrandStoryTitle = () => {
+    if (!brandStory) {
+      return currentLanguage === "th" 
+        ? "จากแปลงปลูกอินทรีย์ สู่มือคุณ" 
+        : currentLanguage === "en" 
+        ? "From Organic Farms to Your Hands" 
+        : "从有机农场到您手中";
+    }
+    switch (currentLanguage) {
+      case "en": return brandStory.title_en;
+      case "zh": return brandStory.title_zh;
+      default: return brandStory.title_th;
+    }
+  };
+
+  const getBrandStoryDescription = () => {
+    if (!brandStory) {
+      return currentLanguage === "th"
+        ? "เราคัดสรรเฉพาะสมุนไพรเกรดพรีเมียมจากแหล่งปลูกที่ดีที่สุดในประเทศไทย ผ่านกระบวนการผลิตที่ได้มาตรฐาน เพื่อให้คุณมั่นใจได้ในคุณภาพทุกหยดที่ดื่ม"
+        : currentLanguage === "en"
+        ? "We carefully select only premium-grade herbs from the finest farms in Thailand, processed through certified production standards, ensuring quality in every drop you drink."
+        : "我们精心挑选来自泰国最好农场的优质草药，通过认证的生产标准加工，确保您饮用的每一滴都是高品质的。";
+    }
+    switch (currentLanguage) {
+      case "en": return brandStory.description_en;
+      case "zh": return brandStory.description_zh;
+      default: return brandStory.description_th;
+    }
+  };
+
+  const brandStoryImage = brandStory?.image_url || brandStoryImageDefault;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -98,18 +156,10 @@ const Index = () => {
                 </span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
-                {currentLanguage === "th" 
-                  ? "จากแปลงปลูกอินทรีย์ สู่มือคุณ" 
-                  : currentLanguage === "en" 
-                  ? "From Organic Farms to Your Hands" 
-                  : "从有机农场到您手中"}
+                {getBrandStoryTitle()}
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                {currentLanguage === "th"
-                  ? "เราคัดสรรเฉพาะสมุนไพรเกรดพรีเมียมจากแหล่งปลูกที่ดีที่สุดในประเทศไทย ผ่านกระบวนการผลิตที่ได้มาตรฐาน เพื่อให้คุณมั่นใจได้ในคุณภาพทุกหยดที่ดื่ม"
-                  : currentLanguage === "en"
-                  ? "We carefully select only premium-grade herbs from the finest farms in Thailand, processed through certified production standards, ensuring quality in every drop you drink."
-                  : "我们精心挑选来自泰国最好农场的优质草药，通过认证的生产标准加工，确保您饮用的每一滴都是高品质的。"}
+                {getBrandStoryDescription()}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button asChild size="lg" className="gap-2">

@@ -11,7 +11,8 @@ import {
   Home,
   Package,
   Star,
-  ShoppingCart
+  ShoppingCart,
+  ImageIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,11 @@ const menuItems = [
     title: "ผู้ใช้", 
     icon: Users, 
     path: "/admin/dashboard/users" 
+  },
+  { 
+    title: "เรื่องราวแบรนด์", 
+    icon: ImageIcon, 
+    path: "/admin/dashboard/brand-story" 
   },
   { 
     title: "ตั้งค่า", 
