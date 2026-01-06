@@ -33,6 +33,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminBrandStory from "./pages/admin/AdminBrandStory";
+import AdminBrandStoryGallery from "./pages/admin/AdminBrandStoryGallery";
 import AdminTrustElements from "./pages/admin/AdminTrustElements";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 import AdminContact from "./pages/admin/AdminContact";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="reviews" element={<AdminReviews />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="brand-story" element={<AdminBrandStory />} />
+              <Route path="brand-story-gallery" element={<AdminBrandStoryGallery />} />
               <Route path="trust-elements" element={<AdminTrustElements />} />
               <Route path="payment-settings" element={<AdminPaymentSettings />} />
               <Route path="contact" element={<AdminContact />} />

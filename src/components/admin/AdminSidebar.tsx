@@ -65,6 +65,11 @@ const menuItems = [
     path: "/admin/dashboard/brand-story" 
   },
   { 
+    title: "แกลเลอรี่กิจกรรม", 
+    icon: ImageIcon, 
+    path: "/admin/dashboard/brand-story-gallery" 
+  },
+  { 
     title: "ความน่าเชื่อถือ", 
     icon: BadgeCheck, 
     path: "/admin/dashboard/trust-elements" 

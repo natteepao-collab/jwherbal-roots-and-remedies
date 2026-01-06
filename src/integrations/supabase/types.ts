@@ -113,6 +113,51 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_story_gallery: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          id: string
+          image_url: string
+          is_active: boolean
+          sort_order: number
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_posts: {
         Row: {
           author_avatar: string
