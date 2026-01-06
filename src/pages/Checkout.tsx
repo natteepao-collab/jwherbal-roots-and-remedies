@@ -96,7 +96,7 @@ const Checkout = () => {
       // Create order items
       const orderItems = items.map((item) => ({
         order_id: orderData.id,
-        product_id: null, // We don't have product_id mapping yet
+        product_id: null,
         product_name: item.name,
         quantity: item.quantity,
         price: item.price,
@@ -107,6 +107,23 @@ const Checkout = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Send admin notification
+      try {
+        await supabase.functions.invoke("send-admin-notification", {
+          body: {
+            type: "new_order",
+            data: {
+              order_id: orderData.id,
+              customer_name: data.customer_name,
+              total_amount: totalPrice,
+            },
+          },
+        });
+      } catch (notifyError) {
+        console.error("Failed to send notification:", notifyError);
+        // Don't fail the order if notification fails
+      }
 
       setOrderId(orderData.id);
       setOrderComplete(true);

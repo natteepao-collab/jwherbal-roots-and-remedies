@@ -69,14 +69,34 @@ const Reviews = () => {
         .eq("id", user.id)
         .single();
 
-      const { error } = await supabase.from("reviews").insert({
+      const authorName = profile?.full_name || user.email.split("@")[0];
+
+      const { data: reviewData, error } = await supabase.from("reviews").insert({
         user_id: user.id,
         rating: newRating,
         comment: newComment,
-        author_name: profile?.full_name || user.email.split("@")[0],
+        author_name: authorName,
         is_approved: false,
-      });
+      }).select().single();
+      
       if (error) throw error;
+
+      // Send admin notification
+      try {
+        await supabase.functions.invoke("send-admin-notification", {
+          body: {
+            type: "new_review",
+            data: {
+              review_id: reviewData.id,
+              author_name: authorName,
+              rating: newRating,
+              comment: newComment,
+            },
+          },
+        });
+      } catch (notifyError) {
+        console.error("Failed to send notification:", notifyError);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["approved-reviews"] });
