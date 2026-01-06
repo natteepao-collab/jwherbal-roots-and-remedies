@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
 
 interface CommunityPost {
   id: string;
@@ -253,7 +254,7 @@ const Community = () => {
                     className="flex gap-3 p-3 bg-white/80 rounded-2xl hover:shadow-md transition-all group"
                   >
                     <img
-                      src={post.thumbnail}
+                      src={getCommunityPostImage(post.thumbnail)}
                       alt={getLocalizedTitle(post)}
                       className="w-16 h-16 rounded-xl object-cover"
                       onError={(e) => {
@@ -341,7 +342,7 @@ const Community = () => {
                     <div className="col-span-12 md:col-span-7 flex gap-4">
                       <div className="relative flex-shrink-0">
                         <img
-                          src={post.thumbnail}
+                          src={getCommunityPostImage(post.thumbnail)}
                           alt={getLocalizedTitle(post)}
                           className="w-16 h-16 rounded-2xl object-cover shadow-sm border-2 border-white group-hover:border-primary/30 transition-all"
                           onError={(e) => {
@@ -372,7 +373,7 @@ const Community = () => {
                     <div className="col-span-6 md:col-span-2 flex items-center justify-center gap-2">
                       <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
                         <AvatarImage 
-                          src={post.author_avatar} 
+                          src={getCommunityAuthorImage(post.author_avatar)} 
                           alt={post.author_name}
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
