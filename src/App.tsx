@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
+import OrderHistory from "./pages/OrderHistory";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/products/vflow" element={<VFlowProduct />} />
             <Route path="/reviews" element={<Reviews />} />
+            <Route path="/orders" element={<OrderHistory />} />
             <Route path="/admin" element={<Admin />} />
             
             {/* Admin Dashboard Routes */}

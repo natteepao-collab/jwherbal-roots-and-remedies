@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield } from "lucide-react";
+import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -146,6 +146,10 @@ const Navbar = () => {
                   {getUserDisplayName()}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/orders")} className="font-prompt cursor-pointer">
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  ประวัติคำสั่งซื้อ
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/community")} className="font-prompt cursor-pointer">
                   <Users className="mr-2 h-4 w-4" />
                   คอมมูนิตี้
