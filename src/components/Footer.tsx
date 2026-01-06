@@ -1,9 +1,24 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Mail, Phone } from "lucide-react";
+import { Facebook, Instagram, Mail, Phone, MessageCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Footer = () => {
   const { t } = useTranslation();
+
+  const { data: settings } = useQuery({
+    queryKey: ["contact-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contact_settings")
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <footer className="bg-secondary mt-20">
       <div className="container mx-auto px-4 py-12">
@@ -71,19 +86,43 @@ const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>08x-xxx-xxxx</span>
+                <span>{settings?.phone || "08x-xxx-xxxx"}</span>
               </li>
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>info@jwherbal.com</span>
+                <span>{settings?.email || "info@jwherbal.com"}</span>
               </li>
               <li className="flex items-center space-x-4 mt-4">
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
+                {settings?.facebook_url && (
+                  <a 
+                    href={settings.facebook_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                )}
+                {settings?.instagram_url && (
+                  <a 
+                    href={settings.instagram_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                )}
+                {settings?.line_url && (
+                  <a 
+                    href={settings.line_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                  </a>
+                )}
               </li>
             </ul>
           </div>
