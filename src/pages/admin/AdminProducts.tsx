@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
+import { productImages } from "@/assets/products";
 
 interface Product {
   id: string;
@@ -302,9 +303,17 @@ const AdminProducts = () => {
                   onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                 />
                 {formData.image_url && !imageFile && (
-                  <div className="mt-2 h-20 w-20 rounded bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                    <Package className="h-8 w-8 text-primary/60" />
-                  </div>
+                  productImages[editingProduct?.id || ''] ? (
+                    <img
+                      src={productImages[editingProduct?.id || '']}
+                      alt="Preview"
+                      className="mt-2 h-20 w-20 object-cover rounded"
+                    />
+                  ) : (
+                    <div className="mt-2 h-20 w-20 rounded bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                      <Package className="h-8 w-8 text-primary/60" />
+                    </div>
+                  )
                 )}
               </div>
 
@@ -358,9 +367,17 @@ const AdminProducts = () => {
                 {products?.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
-                      <div className="h-12 w-12 rounded bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                        <Package className="h-6 w-6 text-primary/60" />
-                      </div>
+                      {productImages[product.id] ? (
+                        <img
+                          src={productImages[product.id]}
+                          alt={product.name_th}
+                          className="h-12 w-12 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                          <Package className="h-6 w-6 text-primary/60" />
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="font-medium">
                       {product.name_th}
