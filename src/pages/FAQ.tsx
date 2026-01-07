@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ReviewImageCarousel from "@/components/ReviewImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
@@ -114,6 +115,13 @@ const FAQ = () => {
       <Navbar />
 
       <main className="flex-1">
+        {/* Review Images Carousel */}
+        <section className="py-8 bg-secondary/30">
+          <div className="container mx-auto px-4">
+            <ReviewImageCarousel />
+          </div>
+        </section>
+
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
           {/* Background Decoration */}
