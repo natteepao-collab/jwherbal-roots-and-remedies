@@ -91,6 +91,11 @@ const menuItems = [
     path: "/admin/dashboard/faq" 
   },
   { 
+    title: "รูปภาพถามตอบ", 
+    icon: ImageIcon, 
+    path: "/admin/dashboard/faq-images" 
+  },
+  { 
     title: "ตั้งค่า", 
     icon: Settings, 
     path: "/admin/dashboard/settings" 

@@ -39,6 +39,7 @@ import AdminTrustElements from "./pages/admin/AdminTrustElements";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 import AdminContact from "./pages/admin/AdminContact";
 import AdminFAQ from "./pages/admin/AdminFAQ";
+import AdminFAQImages from "./pages/admin/AdminFAQImages";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="payment-settings" element={<AdminPaymentSettings />} />
               <Route path="contact" element={<AdminContact />} />
               <Route path="faq" element={<AdminFAQ />} />
+              <Route path="faq-images" element={<AdminFAQImages />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
