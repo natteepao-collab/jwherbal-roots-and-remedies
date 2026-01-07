@@ -358,23 +358,31 @@ const Reviews = () => {
                         <Quote className="h-12 w-12 text-primary" />
                       </div>
                       
-                      <CardContent className="p-6">
+                      <CardContent className={`p-6 ${displayedDbReviews.length === 1 ? 'p-8' : 'p-6'}`}>
                         <div className="flex items-start gap-4 mb-4">
                           {review.author_avatar ? (
                             <img
                               src={review.author_avatar}
                               alt={review.author_name}
-                              className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-md"
+                              className={`rounded-full object-cover border-2 border-primary/20 shadow-md ${displayedDbReviews.length === 1 ? 'w-16 h-16' : 'w-14 h-14'}`}
                             />
                           ) : (
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold text-lg shadow-md">
-                              {review.author_name.charAt(0).toUpperCase()}
+                            <div className={`rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold shadow-md ${displayedDbReviews.length === 1 ? 'w-16 h-16 text-xl' : 'w-14 h-14 text-lg'}`}>
+                              {review.author_name.split(' ')[0].charAt(0).toUpperCase()}
                             </div>
                           )}
                           <div className="flex-1">
-                            <h3 className="font-semibold text-foreground text-lg">
-                              {review.author_name}
+                            <h3 className={`font-semibold text-foreground ${displayedDbReviews.length === 1 ? 'text-xl' : 'text-lg'}`}>
+                              {/* Parse name - extract just the name part before parenthesis */}
+                              {review.author_name.includes('(') 
+                                ? review.author_name.split('(')[0].trim()
+                                : review.author_name}
                             </h3>
+                            {review.author_name.includes('(') && (
+                              <p className="text-sm text-muted-foreground">
+                                {review.author_name.match(/\(([^)]+)\)/)?.[1]}
+                              </p>
+                            )}
                             <div className="flex items-center gap-2 mt-1">
                               {renderStars(review.rating)}
                               <span className="text-xs text-muted-foreground">
@@ -384,7 +392,7 @@ const Reviews = () => {
                           </div>
                         </div>
                         
-                        <p className="text-muted-foreground leading-relaxed mb-4 line-clamp-4">
+                        <p className={`text-muted-foreground leading-relaxed mb-4 ${displayedDbReviews.length === 1 ? 'text-base' : 'line-clamp-4'}`}>
                           {review.comment}
                         </p>
 
