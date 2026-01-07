@@ -35,7 +35,7 @@ interface Review {
   likes_count: number;
 }
 
-const INITIAL_DISPLAY_COUNT = 6;
+const INITIAL_DISPLAY_COUNT = 1;
 
 const Reviews = () => {
   const { t, i18n } = useTranslation();
@@ -348,11 +348,11 @@ const Reviews = () => {
                   <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border max-w-[100px]" />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className={`grid gap-6 ${displayedDbReviews && displayedDbReviews.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                   {displayedDbReviews?.map((review) => (
                     <Card
                       key={review.id}
-                      className="group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                      className={`group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${displayedDbReviews.length === 1 ? 'p-2' : ''}`}
                     >
                       <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Quote className="h-12 w-12 text-primary" />
@@ -467,11 +467,11 @@ const Reviews = () => {
                 <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border max-w-[100px]" />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={`grid gap-6 ${displayedStaticReviews.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                 {displayedStaticReviews.map((review) => (
                   <Card
                     key={review.id}
-                    className="group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    className={`group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${displayedStaticReviews.length === 1 ? 'p-2' : ''}`}
                   >
                     <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
                       <Quote className="h-12 w-12 text-primary" />
@@ -483,7 +483,17 @@ const Reviews = () => {
                           src={review.avatarUrl}
                           alt={review.name}
                           className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-md bg-muted"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.nextElementSibling) {
+                              (target.nextElementSibling as HTMLElement).style.display = 'flex';
+                            }
+                          }}
                         />
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 items-center justify-center text-primary font-bold text-lg shadow-md hidden">
+                          {review.name.charAt(0).toUpperCase()}
+                        </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-foreground text-lg">
                             {review.name}
