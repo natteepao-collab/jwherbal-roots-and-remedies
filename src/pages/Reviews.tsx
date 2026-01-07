@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Star, MessageCircle, Heart, Quote, Sparkles } from "lucide-react";
+import { Star, MessageCircle, Heart, Quote, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
-import { avatarImages } from "@/assets/avatars";
 
 interface Review {
   id: string;
@@ -36,10 +35,7 @@ interface Review {
   likes_count: number;
 }
 
-interface ReviewLike {
-  review_id: string;
-  user_id: string;
-}
+const INITIAL_DISPLAY_COUNT = 6;
 
 const Reviews = () => {
   const { t, i18n } = useTranslation();
@@ -50,6 +46,8 @@ const Reviews = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
+  const [showAllDbReviews, setShowAllDbReviews] = useState(false);
+  const [showAllStaticReviews, setShowAllStaticReviews] = useState(false);
 
   useEffect(() => {
     const checkUserAndRole = async () => {
@@ -57,7 +55,6 @@ const Reviews = () => {
       if (authUser) {
         setUser({ id: authUser.id, email: authUser.email || "" });
         
-        // Check if admin
         const { data: roles } = await supabase
           .from("user_roles")
           .select("role")
@@ -70,7 +67,7 @@ const Reviews = () => {
     checkUserAndRole();
   }, []);
 
-  const { data: dbReviews, refetch: refetchReviews } = useQuery({
+  const { data: dbReviews } = useQuery({
     queryKey: ["approved-reviews"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -221,14 +218,23 @@ const Reviews = () => {
     });
   };
 
+  // Determine displayed reviews
+  const displayedDbReviews = showAllDbReviews 
+    ? dbReviews 
+    : dbReviews?.slice(0, INITIAL_DISPLAY_COUNT);
+  
+  const displayedStaticReviews = showAllStaticReviews 
+    ? staticReviews 
+    : staticReviews.slice(0, INITIAL_DISPLAY_COUNT);
+
+  const hasMoreDbReviews = dbReviews && dbReviews.length > INITIAL_DISPLAY_COUNT;
+  const hasMoreStaticReviews = staticReviews.length > INITIAL_DISPLAY_COUNT;
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-secondary/30 via-background to-secondary/20">
       <Helmet>
         <title>{t("sections.customerReviews")} - JWHERBAL</title>
-        <meta
-          name="description"
-          content={t("sections.customerReviews")}
-        />
+        <meta name="description" content={t("sections.customerReviews")} />
       </Helmet>
       
       <Navbar />
@@ -343,12 +349,11 @@ const Reviews = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {dbReviews.map((review) => (
+                  {displayedDbReviews?.map((review) => (
                     <Card
                       key={review.id}
                       className="group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                     >
-                      {/* Quote Icon */}
                       <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Quote className="h-12 w-12 text-primary" />
                       </div>
@@ -357,7 +362,7 @@ const Reviews = () => {
                         <div className="flex items-start gap-4 mb-4">
                           {review.author_avatar ? (
                             <img
-                              src={avatarImages[review.author_avatar] || review.author_avatar}
+                              src={review.author_avatar}
                               alt={review.author_name}
                               className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-md"
                             />
@@ -379,11 +384,10 @@ const Reviews = () => {
                           </div>
                         </div>
                         
-                        <p className="text-muted-foreground leading-relaxed mb-4">
+                        <p className="text-muted-foreground leading-relaxed mb-4 line-clamp-4">
                           {review.comment}
                         </p>
 
-                        {/* Like Button */}
                         <div className="flex items-center gap-2 pt-2 border-t border-border/50">
                           <Button
                             variant="ghost"
@@ -405,7 +409,6 @@ const Reviews = () => {
                           </Button>
                         </div>
                         
-                        {/* Admin Reply */}
                         {review.admin_reply && (
                           <div className="mt-4 pt-4 border-t border-border/50">
                             <div className="flex items-center gap-2 mb-2">
@@ -423,6 +426,34 @@ const Reviews = () => {
                     </Card>
                   ))}
                 </div>
+
+                {/* Show More/Less Button for DB Reviews */}
+                {hasMoreDbReviews && (
+                  <div className="flex justify-center mt-8">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="rounded-full px-8 gap-2"
+                      onClick={() => setShowAllDbReviews(!showAllDbReviews)}
+                    >
+                      {showAllDbReviews ? (
+                        <>
+                          <ChevronUp className="h-4 w-4" />
+                          {currentLanguage === "th" ? "แสดงน้อยลง" : currentLanguage === "en" ? "Show Less" : "显示更少"}
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-4 w-4" />
+                          {currentLanguage === "th" 
+                            ? `ดูเพิ่มเติม (${dbReviews.length - INITIAL_DISPLAY_COUNT} รีวิว)` 
+                            : currentLanguage === "en" 
+                            ? `Show More (${dbReviews.length - INITIAL_DISPLAY_COUNT} reviews)` 
+                            : `显示更多 (${dbReviews.length - INITIAL_DISPLAY_COUNT} 条评论)`}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -437,12 +468,11 @@ const Reviews = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {staticReviews.map((review) => (
+                {displayedStaticReviews.map((review) => (
                   <Card
                     key={review.id}
                     className="group relative overflow-hidden rounded-2xl border-0 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   >
-                    {/* Quote Icon */}
                     <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
                       <Quote className="h-12 w-12 text-primary" />
                     </div>
@@ -452,7 +482,7 @@ const Reviews = () => {
                         <img
                           src={review.avatarUrl}
                           alt={review.name}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-md"
+                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-md bg-muted"
                         />
                         <div className="flex-1">
                           <h3 className="font-semibold text-foreground text-lg">
@@ -470,13 +500,41 @@ const Reviews = () => {
                           <div className="mt-1">{renderStars(review.rating)}</div>
                         </div>
                       </div>
-                      <p className="text-muted-foreground leading-relaxed">
+                      <p className="text-muted-foreground leading-relaxed line-clamp-4">
                         {review.review[currentLanguage]}
                       </p>
                     </CardContent>
                   </Card>
                 ))}
               </div>
+
+              {/* Show More/Less Button for Static Reviews */}
+              {hasMoreStaticReviews && (
+                <div className="flex justify-center mt-8">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="rounded-full px-8 gap-2"
+                    onClick={() => setShowAllStaticReviews(!showAllStaticReviews)}
+                  >
+                    {showAllStaticReviews ? (
+                      <>
+                        <ChevronUp className="h-4 w-4" />
+                        {currentLanguage === "th" ? "แสดงน้อยลง" : currentLanguage === "en" ? "Show Less" : "显示更少"}
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        {currentLanguage === "th" 
+                          ? `ดูเพิ่มเติม (${staticReviews.length - INITIAL_DISPLAY_COUNT} รีวิว)` 
+                          : currentLanguage === "en" 
+                          ? `Show More (${staticReviews.length - INITIAL_DISPLAY_COUNT} reviews)` 
+                          : `显示更多 (${staticReviews.length - INITIAL_DISPLAY_COUNT} 条评论)`}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </section>
