@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Upload, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Upload, Trash2, HelpCircle, MessageCircle, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { useTranslation } from "react-i18next";
 
 interface FAQImage {
   id: string;
@@ -20,6 +23,8 @@ interface FAQImageCarouselProps {
 }
 
 const FAQImageCarousel = ({ isAdmin = false }: FAQImageCarouselProps) => {
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language as "th" | "en" | "zh";
   const queryClient = useQueryClient();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -171,14 +176,40 @@ const FAQImageCarousel = ({ isAdmin = false }: FAQImageCarouselProps) => {
 
   return (
     <div className="w-full">
+      {/* Section Header */}
+      {!isAdmin && images.length > 0 && (
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-3 mb-3">
+            {/* Q&A Icon Badge */}
+            <div className="relative">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
+                <span className="text-xl font-bold text-primary-foreground">Q</span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-primary/80 flex items-center justify-center shadow-md">
+                <span className="text-xs font-bold text-primary-foreground">A</span>
+              </div>
+            </div>
+            
+            <div className="text-left">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">
+                {currentLanguage === "th" ? "ถาม-ตอบ" : currentLanguage === "en" ? "Q&A" : "问答"}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {currentLanguage === "th" ? "ผลิตภัณฑ์ V Flow" : currentLanguage === "en" ? "V Flow Products" : "V Flow产品"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Admin Upload Area */}
       {isAdmin && (
-        <div
+        <Card
           className={cn(
-            "border-2 border-dashed rounded-xl p-8 mb-6 text-center transition-all cursor-pointer",
+            "border-2 border-dashed p-8 mb-6 text-center transition-all cursor-pointer",
             isDragging
-              ? "border-primary bg-primary/10"
-              : "border-border hover:border-primary/50 hover:bg-muted/50"
+              ? "border-primary bg-primary/10 shadow-lg"
+              : "border-border hover:border-primary/50 hover:bg-muted/30 hover:shadow-md"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -193,98 +224,149 @@ const FAQImageCarousel = ({ isAdmin = false }: FAQImageCarouselProps) => {
             className="hidden"
             onChange={handleFileSelect}
           />
-          <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-lg font-medium text-foreground mb-2">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+            <Upload className="h-8 w-8 text-primary" />
+          </div>
+          <p className="text-lg font-semibold text-foreground mb-2">
             ลากและวางรูปภาพถามตอบ หรือคลิกเพื่อเลือก
           </p>
-          <p className="text-sm text-muted-foreground">
-            รองรับการอัพโหลดหลายไฟล์พร้อมกัน (JPG, PNG, WebP)
+          <p className="text-sm text-muted-foreground mb-1">
+            รองรับการอัพโหลดหลายไฟล์พร้อมกัน
+          </p>
+          <p className="text-xs text-muted-foreground">
+            (JPG, PNG, WebP)
           </p>
           {uploadMutation.isPending && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-primary">กำลังอัพโหลด...</span>
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="text-primary font-medium">กำลังอัพโหลด...</span>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Image Carousel */}
       {images.length > 0 && (
         <div className="relative">
-          {/* Main Carousel */}
-          <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-            <div className="flex">
-              {images.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="flex-[0_0_100%] min-w-0 relative group"
-                >
-                  <div className="aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-muted">
-                    <img
-                      src={image.image_url}
-                      alt={image.title || `รูปถามตอบ ${index + 1}`}
-                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
-                    />
+          {/* Decorative Background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 rounded-3xl -z-10" />
+          
+          {/* Main Carousel Container */}
+          <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-card via-card to-card/95 rounded-2xl md:rounded-3xl">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex">
+                {images.map((image, index) => (
+                  <div
+                    key={image.id}
+                    className="flex-[0_0_100%] min-w-0 relative group"
+                  >
+                    {/* Image Container */}
+                    <div className="relative aspect-square md:aspect-[4/3] lg:aspect-[16/10] overflow-hidden bg-gradient-to-br from-secondary/50 to-secondary/30">
+                      <img
+                        src={image.image_url}
+                        alt={image.title || `รูปถามตอบ ${index + 1}`}
+                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                      />
+                      
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                    
+                    {/* Admin Delete Button */}
+                    {isAdmin && (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteMutation.mutate(image.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
+                    {/* Image Counter Badge */}
+                    <div className="absolute bottom-4 left-4">
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-background/90 backdrop-blur-sm text-foreground shadow-md px-3 py-1.5 text-sm font-medium"
+                      >
+                        <ImageIcon className="h-3.5 w-3.5 mr-1.5" />
+                        {index + 1} / {images.length}
+                      </Badge>
+                    </div>
                   </div>
-                  
-                  {/* Admin Delete Button */}
-                  {isAdmin && (
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => deleteMutation.mutate(image.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                  
-                  {/* Image Counter */}
-                  <div className="absolute bottom-4 left-4 bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium">
-                    {index + 1} / {images.length}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Navigation Arrows */}
-          {images.length > 1 && (
-            <>
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-lg"
-                onClick={scrollPrev}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-lg"
-                onClick={scrollNext}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </>
-          )}
+            {/* Navigation Controls */}
+            {images.length > 1 && (
+              <>
+                {/* Previous Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg border border-border/50 h-10 w-10 md:h-12 md:w-12 transition-all hover:scale-105"
+                  onClick={scrollPrev}
+                >
+                  <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+                </Button>
+                
+                {/* Next Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg border border-border/50 h-10 w-10 md:h-12 md:w-12 transition-all hover:scale-105"
+                  onClick={scrollNext}
+                >
+                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                </Button>
+              </>
+            )}
+          </Card>
 
-          {/* Dot Indicators */}
+          {/* Progress Indicators */}
           {images.length > 1 && (
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex justify-center gap-2 mt-4 md:mt-6">
               {scrollSnaps.map((_, index) => (
                 <button
                   key={index}
                   className={cn(
-                    "h-2 rounded-full transition-all duration-300",
+                    "h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50",
                     selectedIndex === index
-                      ? "w-8 bg-primary"
-                      : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                      ? "w-10 bg-primary shadow-md"
+                      : "w-2.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"
                   )}
                   onClick={() => scrollTo(index)}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
+              ))}
+            </div>
+          )}
+
+          {/* Thumbnail Strip (for many images) */}
+          {images.length > 3 && (
+            <div className="mt-4 flex justify-center gap-2 px-4 overflow-x-auto pb-2">
+              {images.map((image, index) => (
+                <button
+                  key={image.id}
+                  onClick={() => scrollTo(index)}
+                  className={cn(
+                    "flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all duration-200",
+                    selectedIndex === index
+                      ? "border-primary shadow-md scale-105"
+                      : "border-transparent opacity-60 hover:opacity-100 hover:border-border"
+                  )}
+                >
+                  <img
+                    src={image.image_url}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
               ))}
             </div>
           )}
@@ -293,9 +375,15 @@ const FAQImageCarousel = ({ isAdmin = false }: FAQImageCarouselProps) => {
 
       {/* Empty State for Admin */}
       {images.length === 0 && isAdmin && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>ยังไม่มีรูปภาพถามตอบ กรุณาอัพโหลดรูปภาพ</p>
-        </div>
+        <Card className="border-dashed border-2 bg-muted/20">
+          <div className="py-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
+              <HelpCircle className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-medium">ยังไม่มีรูปภาพถามตอบ</p>
+            <p className="text-sm text-muted-foreground mt-1">กรุณาอัพโหลดรูปภาพด้านบน</p>
+          </div>
+        </Card>
       )}
     </div>
   );
