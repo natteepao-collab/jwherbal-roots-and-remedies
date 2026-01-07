@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
+import FAQ from "./pages/FAQ";
 import OrderHistory from "./pages/OrderHistory";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ import AdminBrandStoryGallery from "./pages/admin/AdminBrandStoryGallery";
 import AdminTrustElements from "./pages/admin/AdminTrustElements";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 import AdminContact from "./pages/admin/AdminContact";
+import AdminFAQ from "./pages/admin/AdminFAQ";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +63,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/products/vflow" element={<VFlowProduct />} />
             <Route path="/reviews" element={<Reviews />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route path="/orders" element={<OrderHistory />} />
             <Route path="/admin" element={<Admin />} />
             
@@ -78,6 +81,7 @@ const App = () => (
               <Route path="trust-elements" element={<AdminTrustElements />} />
               <Route path="payment-settings" element={<AdminPaymentSettings />} />
               <Route path="contact" element={<AdminContact />} />
+              <Route path="faq" element={<AdminFAQ />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             

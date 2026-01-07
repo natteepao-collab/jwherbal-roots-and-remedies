@@ -307,6 +307,51 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_items: {
+        Row: {
+          answer_en: string
+          answer_th: string
+          answer_zh: string
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          question_en: string
+          question_th: string
+          question_zh: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer_en?: string
+          answer_th: string
+          answer_zh?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_en?: string
+          question_th: string
+          question_zh?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer_en?: string
+          answer_th?: string
+          answer_zh?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_en?: string
+          question_th?: string
+          question_zh?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
