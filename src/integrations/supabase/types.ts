@@ -872,6 +872,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_questions: {
+        Row: {
+          admin_reply: string | null
+          created_at: string
+          email: string | null
+          id: string
+          question: string
+          replied_at: string | null
+          replied_by: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_reply?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          question: string
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_reply?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          question?: string
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

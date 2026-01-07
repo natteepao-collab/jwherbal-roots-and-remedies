@@ -123,14 +123,55 @@ const FAQ = () => {
   const hasMoreItems = filteredItems.length > INITIAL_DISPLAY_COUNT;
   const remainingCount = filteredItems.length - INITIAL_DISPLAY_COUNT;
 
-  const handleSubmitQuestion = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitQuestion = async () => {
     if (!newQuestion.trim()) return;
-    toast.success(currentLanguage === "th" 
-      ? "ส่งคำถามสำเร็จ! ทีมงานจะตอบกลับโดยเร็ว" 
-      : "Question submitted! Our team will respond soon."
-    );
-    setNewQuestion("");
-    setIsAskDialogOpen(false);
+    
+    setIsSubmitting(true);
+    try {
+      // Save question to database
+      const { data: questionData, error } = await supabase
+        .from("user_questions")
+        .insert({
+          question: newQuestion.trim(),
+          email: user?.email || null,
+          user_id: user?.id || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Send notification to admin
+      try {
+        await supabase.functions.invoke("notify-new-question", {
+          body: {
+            question: newQuestion.trim(),
+            email: user?.email || "ไม่ระบุ",
+            questionId: questionData.id,
+          },
+        });
+      } catch (notifyError) {
+        console.error("Failed to send notification:", notifyError);
+        // Don't fail the submission if notification fails
+      }
+
+      toast.success(currentLanguage === "th" 
+        ? "ส่งคำถามสำเร็จ! ทีมงานจะตอบกลับโดยเร็ว" 
+        : "Question submitted! Our team will respond soon."
+      );
+      setNewQuestion("");
+      setIsAskDialogOpen(false);
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      toast.error(currentLanguage === "th" 
+        ? "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง" 
+        : "An error occurred. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Reset expansion when category changes
@@ -262,10 +303,19 @@ const FAQ = () => {
                       className="w-full"
                       size="lg"
                       onClick={handleSubmitQuestion}
-                      disabled={!newQuestion.trim()}
+                      disabled={!newQuestion.trim() || isSubmitting}
                     >
-                      <Send className="h-4 w-4 mr-2" />
-                      {currentLanguage === "th" ? "ส่งคำถาม" : currentLanguage === "en" ? "Submit Question" : "提交问题"}
+                      {isSubmitting ? (
+                        <>
+                          <div className="h-4 w-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          {currentLanguage === "th" ? "กำลังส่ง..." : "Sending..."}
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          {currentLanguage === "th" ? "ส่งคำถาม" : currentLanguage === "en" ? "Submit Question" : "提交问题"}
+                        </>
+                      )}
                     </Button>
                     <p className="text-xs text-center text-muted-foreground">
                       {currentLanguage === "th" 
