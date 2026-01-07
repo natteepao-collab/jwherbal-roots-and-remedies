@@ -51,12 +51,23 @@ const FAQ = () => {
   const [newQuestion, setNewQuestion] = useState("");
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
         setUser({ id: authUser.id, email: authUser.email || "" });
+        
+        // Check if user is admin
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", authUser.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        
+        setIsAdmin(!!roleData);
       }
     };
     checkUser();
@@ -140,7 +151,7 @@ const FAQ = () => {
         {/* FAQ Images Carousel */}
         <section className="bg-gradient-to-b from-secondary/40 to-secondary/20">
           <div className="container mx-auto px-4 py-6">
-            <FAQImageCarousel />
+            <FAQImageCarousel isAdmin={isAdmin} />
           </div>
         </section>
 
