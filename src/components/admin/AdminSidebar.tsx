@@ -15,7 +15,8 @@ import {
   ImageIcon,
   BadgeCheck,
   CreditCard,
-  Phone
+  Phone,
+  HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,11 @@ const menuItems = [
     title: "ติดต่อเรา", 
     icon: Phone, 
     path: "/admin/dashboard/contact" 
+  },
+  { 
+    title: "ถาม-ตอบ (FAQ)", 
+    icon: HelpCircle, 
+    path: "/admin/dashboard/faq" 
   },
   { 
     title: "ตั้งค่า", 

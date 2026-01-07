@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield, ClipboardList } from "lucide-react";
+import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield, ClipboardList, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +93,7 @@ const Navbar = () => {
     { to: "/articles", label: t("nav.articles"), icon: BookOpen },
     { to: "/community", label: t("nav.community"), icon: Users },
     { to: "/reviews", label: t("nav.reviews"), icon: Star },
+    { to: "/faq", label: t("nav.faq"), icon: HelpCircle },
     { to: "/contact", label: t("nav.contact"), icon: Phone },
   ];
 
