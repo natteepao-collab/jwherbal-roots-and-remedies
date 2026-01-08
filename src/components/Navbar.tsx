@@ -119,10 +119,10 @@ const Navbar = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="font-prompt text-sm font-medium text-foreground/80 hover:text-primary transition-all duration-300 relative group flex items-center gap-1.5"
+                className="font-prompt text-sm font-medium text-foreground/80 hover:text-primary transition-all duration-300 relative group flex items-center gap-1.5 whitespace-nowrap"
               >
-                <IconComponent className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                {link.label}
+                <IconComponent className="h-4 w-4 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="whitespace-nowrap">{link.label}</span>
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </Link>
             );
