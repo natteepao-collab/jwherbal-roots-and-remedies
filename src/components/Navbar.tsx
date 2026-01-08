@@ -27,9 +27,24 @@ const Navbar = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
+    // Fetch custom logo from site_settings
+    const fetchSiteSettings = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("logo_url")
+        .single();
+      
+      if (data?.logo_url) {
+        setCustomLogoUrl(data.logo_url);
+      }
+    };
+    
+    fetchSiteSettings();
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -100,15 +115,12 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-3">
+        <Link to="/" className="flex items-center">
           <img 
-            src={jwGroupLogo} 
+            src={customLogoUrl || jwGroupLogo} 
             alt="JW Group Logo" 
             className="h-10 w-auto object-contain"
           />
-          <span className="font-prompt font-semibold text-lg text-foreground hidden sm:inline-block tracking-wide">
-            JWHERBAL BY JWGROUP
-          </span>
         </Link>
 
         {/* Desktop Navigation */}
