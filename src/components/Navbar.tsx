@@ -112,16 +112,16 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-2 xl:space-x-4 2xl:space-x-6">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
             return (
               <Link
                 key={link.to}
                 to={link.to}
-                className="font-prompt text-sm font-medium text-foreground/80 hover:text-primary transition-all duration-300 relative group flex items-center gap-1.5 whitespace-nowrap"
+                className="font-prompt text-xs xl:text-sm font-medium text-foreground/80 hover:text-primary transition-all duration-300 relative group flex items-center gap-1 xl:gap-1.5 whitespace-nowrap px-1 xl:px-2"
               >
-                <IconComponent className="h-4 w-4 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <IconComponent className="h-3.5 w-3.5 xl:h-4 xl:w-4 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="whitespace-nowrap">{link.label}</span>
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </Link>
@@ -129,7 +129,7 @@ const Navbar = () => {
           })}
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 lg:space-x-2">
           <LanguageSwitcher />
           
           {user ? (
@@ -192,7 +192,7 @@ const Navbar = () => {
 
           {/* Mobile Menu */}
           <Sheet>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
