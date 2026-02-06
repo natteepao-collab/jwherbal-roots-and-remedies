@@ -66,7 +66,6 @@ const PublicRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/products/vflow" element={<VFlowProduct />} />
-        <Route path="/vflow" element={<VFlowProduct />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/orders" element={<OrderHistory />} />
