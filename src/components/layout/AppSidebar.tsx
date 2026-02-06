@@ -122,7 +122,10 @@ export function AppSidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/50">
+    <Sidebar 
+      collapsible="icon" 
+      className="border-r border-border/30 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50"
+    >
       {/* Logo Header */}
       <SidebarHeader className={cn(
         "border-b border-border/50 transition-all duration-200",
