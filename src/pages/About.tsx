@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import companyStoryImg from "@/assets/about/company-story.jpg";
 import valuesNatureImg from "@/assets/about/values-nature.jpg";
 import teamExpertsImg from "@/assets/about/team-experts.jpg";
-import vflowProductImg from "@/assets/vflow-product-transparent.png";
+import visionProductsImg from "@/assets/about/vision-products.jpg";
 
 interface AboutSettings {
   id: string;
@@ -136,7 +136,7 @@ const About = () => {
     { name: "ISO 9001", icon: Award },
   ];
 
-  const defaultVisionImage = vflowProductImg;
+  const defaultVisionImage = visionProductsImg;
 
   if (isLoading) {
     return (
