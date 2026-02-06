@@ -112,15 +112,12 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50">
       {/* Logo Header */}
-      <SidebarHeader className="border-b border-border/50 p-3">
+      <SidebarHeader className="border-b border-border/50 p-4">
         <Link to="/" className="flex items-center justify-center group">
           <img 
             src={customLogoUrl || jwHerbalLogo} 
             alt="JW Herbal Logo" 
-            className={cn(
-              "object-contain transition-all duration-300 group-hover:scale-105",
-              collapsed ? "h-8 w-8" : "h-10 w-auto max-w-[120px]"
-            )}
+            className="h-12 w-auto max-w-[140px] object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
       </SidebarHeader>
