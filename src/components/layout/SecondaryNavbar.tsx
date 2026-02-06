@@ -109,7 +109,7 @@ export function SecondaryNavbar() {
           <img 
             src={customLogoUrl || jwGroupLogo} 
             alt="JW Group Logo" 
-            className="h-10 w-auto max-w-[120px] object-contain"
+            className="h-12 w-auto max-w-[140px] object-contain"
           />
         </Link>
 
