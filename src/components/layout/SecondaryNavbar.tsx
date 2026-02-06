@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, Search, Bell } from "lucide-react";
+import { ShoppingCart, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
@@ -16,17 +16,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ClipboardList, Users, Shield, LogOut } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { SearchCommand } from "./SearchCommand";
 
 export function SecondaryNavbar() {
   const { items } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { state } = useSidebar();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
@@ -117,14 +115,7 @@ export function SecondaryNavbar() {
 
         {/* Search Bar - Desktop */}
         <div className="hidden md:flex flex-1 max-w-lg ml-2">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="ค้นหาสินค้า, บทความ..."
-              className="pl-10 h-9 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-full"
-            />
-          </div>
+          <SearchCommand />
         </div>
 
         {/* Spacer */}
