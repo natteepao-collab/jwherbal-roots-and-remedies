@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Separator } from "@/components/ui/separator";
 
 const Auth = () => {
@@ -135,6 +136,7 @@ const Auth = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/10 p-4">
@@ -265,6 +267,7 @@ const Auth = () => {
       </div>
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

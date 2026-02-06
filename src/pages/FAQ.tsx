@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import FAQImageCarousel from "@/components/FAQImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -180,6 +181,7 @@ const FAQ = () => {
   }, [selectedCategory]);
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-secondary/20 to-background">
       <Helmet>
         <title>{currentLanguage === "th" ? "ถามตอบ" : currentLanguage === "en" ? "Q&A" : "问答"} - JWHERBAL</title>
@@ -481,6 +483,7 @@ const FAQ = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

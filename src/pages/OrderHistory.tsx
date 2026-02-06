@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -128,6 +129,7 @@ const OrderHistory = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
@@ -318,6 +320,7 @@ const OrderHistory = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import ReviewImageCarousel from "@/components/ReviewImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -231,6 +232,7 @@ const Reviews = () => {
   const hasMoreStaticReviews = staticReviews.length > INITIAL_DISPLAY_COUNT;
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-secondary/30 via-background to-secondary/20">
       <Helmet>
         <title>{t("sections.customerReviews")} - JWHERBAL</title>
@@ -560,6 +562,7 @@ const Reviews = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

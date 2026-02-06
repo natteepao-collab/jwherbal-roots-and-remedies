@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check, MessageCircle, ChevronRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -31,6 +32,7 @@ const VFlowProduct = () => {
   };
 
   return (
+    <PageTransition>
     <>
       <Helmet>
         <title>{vflowData.productName} - JWHERBAL</title>
@@ -342,6 +344,7 @@ const VFlowProduct = () => {
         <Footer />
       </div>
     </>
+    </PageTransition>
   );
 };
 

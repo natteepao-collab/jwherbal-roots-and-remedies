@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
@@ -18,6 +19,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
+      <PageTransition>
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-16 flex flex-col items-center justify-center">
@@ -30,10 +32,12 @@ const Cart = () => {
         </main>
         <Footer />
       </div>
+      </PageTransition>
     );
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -128,6 +132,7 @@ const Cart = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

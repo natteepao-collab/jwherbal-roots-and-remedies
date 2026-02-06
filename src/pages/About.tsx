@@ -3,6 +3,7 @@ import { Award, Users, Heart, Leaf, Target, Shield, Eye, Quote, ChevronRight } f
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
+import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
@@ -151,6 +152,7 @@ const About = () => {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>{t("about.pageTitle")} - JWHERBAL BY JWGROUP</title>
@@ -419,6 +421,7 @@ const About = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

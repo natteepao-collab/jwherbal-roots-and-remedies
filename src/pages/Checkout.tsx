@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -188,6 +189,7 @@ const Checkout = () => {
 
   if (orderComplete && orderId) {
     return (
+      <PageTransition>
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-8">
@@ -302,10 +304,12 @@ const Checkout = () => {
         </main>
         <Footer />
       </div>
+      </PageTransition>
     );
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -527,6 +531,7 @@ const Checkout = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 
