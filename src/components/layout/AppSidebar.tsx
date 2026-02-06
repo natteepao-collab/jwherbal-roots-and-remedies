@@ -119,7 +119,7 @@ export function AppSidebar() {
             alt="JW Herbal Logo" 
             className={cn(
               "object-contain transition-all duration-300 group-hover:scale-105",
-              collapsed ? "h-8 w-8" : "h-12 w-auto max-w-[140px]"
+              collapsed ? "h-8 w-8" : "h-10 w-auto max-w-[120px]"
             )}
           />
         </Link>
