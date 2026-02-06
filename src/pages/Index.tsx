@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
+import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import BrandStoryGallery from "@/components/BrandStoryGallery";
@@ -86,6 +87,7 @@ const Index = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -404,6 +406,7 @@ const Index = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

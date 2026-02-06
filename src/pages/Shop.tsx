@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Card, CardContent } from "@/components/ui/card";
@@ -96,6 +97,7 @@ const Shop = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -197,6 +199,7 @@ const Shop = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

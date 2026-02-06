@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Clock, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { healthArticles } from "@/data/healthArticles";
@@ -14,6 +15,7 @@ const Articles = () => {
   const currentLang = i18n.language as "th" | "en" | "zh";
   
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>{t("articles.title")} | JWHERBAL</title>
@@ -78,6 +80,7 @@ const Articles = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

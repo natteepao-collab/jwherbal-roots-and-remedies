@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { healthArticles } from "@/data/healthArticles";
@@ -25,6 +26,7 @@ const ArticleDetail = () => {
     .slice(0, 3);
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>{article.title[currentLang]} | JWHERBAL</title>
@@ -149,6 +151,7 @@ const ArticleDetail = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 

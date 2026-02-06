@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Calendar, MessageSquare, Eye, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,6 +164,7 @@ const Community = () => {
 
   if (loading) {
     return (
+      <PageTransition>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50/30 via-white to-emerald-50/20">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
@@ -173,10 +175,12 @@ const Community = () => {
         </main>
         <Footer />
       </div>
+      </PageTransition>
     );
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50/30 via-white to-emerald-50/20">
       <Navbar />
 
@@ -466,6 +470,7 @@ const Community = () => {
 
       <Footer />
     </div>
+    </PageTransition>
   );
 };
 
