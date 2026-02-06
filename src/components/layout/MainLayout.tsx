@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { SecondaryNavbar } from "./SecondaryNavbar";
@@ -24,18 +23,9 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile();
-  const [defaultOpen, setDefaultOpen] = useState<boolean | undefined>(undefined);
   
-  useEffect(() => {
-    // Read sidebar state from cookie on mount
-    const savedState = getSidebarStateFromCookie();
-    setDefaultOpen(isMobile ? false : savedState);
-  }, [isMobile]);
-
-  // Wait for cookie state to be read before rendering
-  if (defaultOpen === undefined) {
-    return null;
-  }
+  // Read cookie synchronously on first render to prevent flash
+  const defaultOpen = isMobile ? false : getSidebarStateFromCookie();
   
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
