@@ -14,6 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_mission_items: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string
+          description_th: string
+          description_zh?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      about_settings: {
+        Row: {
+          achievement_customers: string
+          achievement_customers_label_en: string
+          achievement_customers_label_th: string
+          achievement_customers_label_zh: string
+          achievement_products: string
+          achievement_products_label_en: string
+          achievement_products_label_th: string
+          achievement_products_label_zh: string
+          achievement_satisfaction: string
+          achievement_satisfaction_label_en: string
+          achievement_satisfaction_label_th: string
+          achievement_satisfaction_label_zh: string
+          achievement_years: string
+          achievement_years_label_en: string
+          achievement_years_label_th: string
+          achievement_years_label_zh: string
+          id: string
+          story_paragraph1_en: string
+          story_paragraph1_th: string
+          story_paragraph1_zh: string
+          story_paragraph2_en: string
+          story_paragraph2_th: string
+          story_paragraph2_zh: string
+          story_paragraph3_en: string
+          story_paragraph3_th: string
+          story_paragraph3_zh: string
+          story_title_en: string
+          story_title_th: string
+          story_title_zh: string
+          updated_at: string
+          vision_image_url: string | null
+          vision_quote_en: string
+          vision_quote_th: string
+          vision_quote_zh: string
+          vision_subtitle_en: string
+          vision_subtitle_th: string
+          vision_subtitle_zh: string
+          vision_title_en: string
+          vision_title_th: string
+          vision_title_zh: string
+        }
+        Insert: {
+          achievement_customers?: string
+          achievement_customers_label_en?: string
+          achievement_customers_label_th?: string
+          achievement_customers_label_zh?: string
+          achievement_products?: string
+          achievement_products_label_en?: string
+          achievement_products_label_th?: string
+          achievement_products_label_zh?: string
+          achievement_satisfaction?: string
+          achievement_satisfaction_label_en?: string
+          achievement_satisfaction_label_th?: string
+          achievement_satisfaction_label_zh?: string
+          achievement_years?: string
+          achievement_years_label_en?: string
+          achievement_years_label_th?: string
+          achievement_years_label_zh?: string
+          id?: string
+          story_paragraph1_en?: string
+          story_paragraph1_th?: string
+          story_paragraph1_zh?: string
+          story_paragraph2_en?: string
+          story_paragraph2_th?: string
+          story_paragraph2_zh?: string
+          story_paragraph3_en?: string
+          story_paragraph3_th?: string
+          story_paragraph3_zh?: string
+          story_title_en?: string
+          story_title_th?: string
+          story_title_zh?: string
+          updated_at?: string
+          vision_image_url?: string | null
+          vision_quote_en?: string
+          vision_quote_th?: string
+          vision_quote_zh?: string
+          vision_subtitle_en?: string
+          vision_subtitle_th?: string
+          vision_subtitle_zh?: string
+          vision_title_en?: string
+          vision_title_th?: string
+          vision_title_zh?: string
+        }
+        Update: {
+          achievement_customers?: string
+          achievement_customers_label_en?: string
+          achievement_customers_label_th?: string
+          achievement_customers_label_zh?: string
+          achievement_products?: string
+          achievement_products_label_en?: string
+          achievement_products_label_th?: string
+          achievement_products_label_zh?: string
+          achievement_satisfaction?: string
+          achievement_satisfaction_label_en?: string
+          achievement_satisfaction_label_th?: string
+          achievement_satisfaction_label_zh?: string
+          achievement_years?: string
+          achievement_years_label_en?: string
+          achievement_years_label_th?: string
+          achievement_years_label_zh?: string
+          id?: string
+          story_paragraph1_en?: string
+          story_paragraph1_th?: string
+          story_paragraph1_zh?: string
+          story_paragraph2_en?: string
+          story_paragraph2_th?: string
+          story_paragraph2_zh?: string
+          story_paragraph3_en?: string
+          story_paragraph3_th?: string
+          story_paragraph3_zh?: string
+          story_title_en?: string
+          story_title_th?: string
+          story_title_zh?: string
+          updated_at?: string
+          vision_image_url?: string | null
+          vision_quote_en?: string
+          vision_quote_th?: string
+          vision_quote_zh?: string
+          vision_subtitle_en?: string
+          vision_subtitle_th?: string
+          vision_subtitle_zh?: string
+          vision_title_en?: string
+          vision_title_th?: string
+          vision_title_zh?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string

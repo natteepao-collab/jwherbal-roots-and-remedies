@@ -41,6 +41,7 @@ import AdminContact from "./pages/admin/AdminContact";
 import AdminFAQ from "./pages/admin/AdminFAQ";
 import AdminFAQImages from "./pages/admin/AdminFAQImages";
 import AdminLogo from "./pages/admin/AdminLogo";
+import AdminAbout from "./pages/admin/AdminAbout";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
               <Route path="faq" element={<AdminFAQ />} />
               <Route path="faq-images" element={<AdminFAQImages />} />
               <Route path="logo" element={<AdminLogo />} />
+              <Route path="about" element={<AdminAbout />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             

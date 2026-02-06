@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
+import {
   LayoutDashboard, 
   FileText, 
   Users, 
@@ -16,7 +16,8 @@ import {
   BadgeCheck,
   CreditCard,
   Phone,
-  HelpCircle
+  HelpCircle,
+  Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,11 @@ const menuItems = [
     title: "รูปภาพถามตอบ", 
     icon: ImageIcon, 
     path: "/admin/dashboard/faq-images" 
+  },
+  { 
+    title: "เกี่ยวกับเรา", 
+    icon: Building, 
+    path: "/admin/dashboard/about" 
   },
   { 
     title: "จัดการ Logo", 
