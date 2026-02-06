@@ -1,5 +1,18 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, HelpCircle, ShoppingCart, LogOut, Shield, ClipboardList, Leaf } from "lucide-react";
+import { 
+  Home, 
+  Info, 
+  ShoppingBag, 
+  BookOpen, 
+  Users, 
+  Star, 
+  Phone, 
+  HelpCircle, 
+  ShoppingCart, 
+  LogOut, 
+  Shield, 
+  ClipboardList 
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +37,18 @@ import {
 } from "@/components/ui/sidebar";
 import jwHerbalLogo from "@/assets/jwherbal-logo-new.png";
 
+// Navigation items configuration
+const mainNavItems = [
+  { to: "/", labelKey: "nav.home", icon: Home },
+  { to: "/about", labelKey: "nav.about", icon: Info },
+  { to: "/shop", labelKey: "nav.shop", icon: ShoppingBag },
+  { to: "/articles", labelKey: "nav.articles", icon: BookOpen },
+  { to: "/community", labelKey: "nav.community", icon: Users },
+  { to: "/reviews", labelKey: "nav.reviews", icon: Star },
+  { to: "/faq", labelKey: "nav.faq", icon: HelpCircle },
+  { to: "/contact", labelKey: "nav.contact", icon: Phone },
+];
+
 export function AppSidebar() {
   const { t } = useTranslation();
   const location = useLocation();
@@ -31,13 +56,15 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { state } = useSidebar();
   const { items } = useCart();
+  
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
+  
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const isCollapsed = state === "collapsed";
 
-  const collapsed = state === "collapsed";
-
+  // Fetch site settings and auth state
   useEffect(() => {
     const fetchSiteSettings = async () => {
       const { data } = await supabase
@@ -59,14 +86,10 @@ export function AppSidebar() {
       }
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        setTimeout(() => {
-          checkAdminRole(session.user.id);
-        }, 0);
+        setTimeout(() => checkAdminRole(session.user.id), 0);
       } else {
         setIsAdmin(false);
       }
@@ -96,17 +119,6 @@ export function AppSidebar() {
     navigate("/");
   };
 
-  const navItems = [
-    { to: "/", label: t("nav.home"), icon: Home },
-    { to: "/about", label: t("nav.about"), icon: Info },
-    { to: "/shop", label: t("nav.shop"), icon: ShoppingBag },
-    { to: "/articles", label: t("nav.articles"), icon: BookOpen },
-    { to: "/community", label: t("nav.community"), icon: Users },
-    { to: "/reviews", label: t("nav.reviews"), icon: Star },
-    { to: "/faq", label: t("nav.faq"), icon: HelpCircle },
-    { to: "/contact", label: t("nav.contact"), icon: Phone },
-  ];
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -114,7 +126,7 @@ export function AppSidebar() {
       {/* Logo Header */}
       <SidebarHeader className={cn(
         "border-b border-border/50 transition-all duration-200",
-        collapsed ? "p-2" : "p-4"
+        isCollapsed ? "p-2" : "p-4"
       )}>
         <Link to="/" className="flex items-center justify-center group">
           <img 
@@ -122,7 +134,7 @@ export function AppSidebar() {
             alt="JW Herbal Logo" 
             className={cn(
               "object-contain transition-all duration-300 group-hover:scale-105",
-              collapsed ? "h-8 w-8 rounded-md" : "h-12 w-auto max-w-[140px]"
+              isCollapsed ? "h-8 w-8 rounded-md" : "h-12 w-auto max-w-[140px]"
             )}
           />
         </Link>
@@ -132,11 +144,11 @@ export function AppSidebar() {
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-prompt text-xs uppercase tracking-wider text-muted-foreground/70">
-            {!collapsed && "เมนูหลัก"}
+            {!isCollapsed && "เมนูหลัก"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.to);
                 return (
@@ -144,7 +156,7 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={active}
-                      tooltip={item.label}
+                      tooltip={t(item.labelKey)}
                       className={cn(
                         "font-prompt transition-all duration-200",
                         active && "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -152,7 +164,7 @@ export function AppSidebar() {
                     >
                       <Link to={item.to}>
                         <Icon className="h-4 w-4" />
-                        <span>{item.label}</span>
+                        <span>{t(item.labelKey)}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -167,7 +179,7 @@ export function AppSidebar() {
         {/* Shopping */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-prompt text-xs uppercase tracking-wider text-muted-foreground/70">
-            {!collapsed && "ช้อปปิ้ง"}
+            {!isCollapsed && "ช้อปปิ้ง"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -205,7 +217,7 @@ export function AppSidebar() {
             <SidebarSeparator />
             <SidebarGroup>
               <SidebarGroupLabel className="font-prompt text-xs uppercase tracking-wider text-muted-foreground/70">
-                {!collapsed && "บัญชีของฉัน"}
+                {!isCollapsed && "บัญชีของฉัน"}
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
