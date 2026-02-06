@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarToggle } from "./SidebarToggle";
 import { ClipboardList, Users, Shield, LogOut } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
 import { SearchCommand } from "./SearchCommand";
@@ -102,7 +102,7 @@ export function SecondaryNavbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-4 gap-2 md:gap-4">
         {/* Sidebar Toggle */}
-        <SidebarTrigger className="h-9 w-9 shrink-0" />
+        <SidebarToggle />
         
         {/* Logo for mobile only */}
         <Link to="/" className="flex items-center md:hidden shrink-0">
