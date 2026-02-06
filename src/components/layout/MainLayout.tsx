@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { SecondaryNavbar } from "./SecondaryNavbar";
@@ -6,6 +6,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+// Module-level state to persist across component remounts
+let cachedSidebarState: boolean | null = null;
 
 function getSidebarStateFromCookie(): boolean {
   if (typeof document === "undefined") return true;
@@ -19,7 +22,18 @@ function getSidebarStateFromCookie(): boolean {
   return true; // Default to expanded
 }
 
+function getInitialSidebarState(): boolean {
+  // Use cached state if available (persists across remounts)
+  if (cachedSidebarState !== null) {
+    return cachedSidebarState;
+  }
+  // Otherwise read from cookie
+  cachedSidebarState = getSidebarStateFromCookie();
+  return cachedSidebarState;
+}
+
 function setSidebarStateToCookie(open: boolean): void {
+  cachedSidebarState = open;
   document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 }
 
@@ -30,28 +44,20 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile();
   
-  // Use ref to store the initial cookie value and prevent re-reads
-  const initialOpenRef = useRef<boolean | null>(null);
-  if (initialOpenRef.current === null) {
-    initialOpenRef.current = getSidebarStateFromCookie();
-  }
+  // Get initial state - uses cached value or reads from cookie once
+  const initialOpen = useMemo(() => getInitialSidebarState(), []);
   
-  // Initialize state from cookie - only once
-  const [open, setOpen] = useState<boolean>(initialOpenRef.current);
-  
-  // Handle open state change and persist to cookie
+  // Handle state changes - update cache and cookie
   const handleOpenChange = useCallback((newOpen: boolean) => {
-    setOpen(newOpen);
     setSidebarStateToCookie(newOpen);
   }, []);
   
-  // On mobile, sidebar is controlled via sheet (openMobile in SidebarProvider)
-  // On desktop, use the persisted open state
-  const effectiveOpen = isMobile ? false : open;
+  // On mobile, always start closed (uses openMobile internally)
+  const defaultOpen = isMobile ? false : initialOpen;
   
   return (
     <SidebarProvider 
-      open={effectiveOpen} 
+      defaultOpen={defaultOpen}
       onOpenChange={handleOpenChange}
     >
       <div className="min-h-screen flex w-full">
