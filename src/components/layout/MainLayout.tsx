@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { SecondaryNavbar } from "./SecondaryNavbar";
@@ -30,8 +30,14 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile();
   
-  // Initialize state from cookie synchronously
-  const [open, setOpen] = useState(() => getSidebarStateFromCookie());
+  // Use ref to store the initial cookie value and prevent re-reads
+  const initialOpenRef = useRef<boolean | null>(null);
+  if (initialOpenRef.current === null) {
+    initialOpenRef.current = getSidebarStateFromCookie();
+  }
+  
+  // Initialize state from cookie - only once
+  const [open, setOpen] = useState<boolean>(initialOpenRef.current);
   
   // Handle open state change and persist to cookie
   const handleOpenChange = useCallback((newOpen: boolean) => {
@@ -39,8 +45,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     setSidebarStateToCookie(newOpen);
   }, []);
   
-  // On mobile, sidebar is controlled differently (via sheet), 
-  // but we still preserve the desktop state
+  // On mobile, sidebar is controlled via sheet (openMobile in SidebarProvider)
+  // On desktop, use the persisted open state
   const effectiveOpen = isMobile ? false : open;
   
   return (
