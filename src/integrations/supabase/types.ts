@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_certifications: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       about_mission_items: {
         Row: {
           created_at: string
@@ -74,7 +104,22 @@ export type Database = {
           achievement_years_label_en: string
           achievement_years_label_th: string
           achievement_years_label_zh: string
+          certifications_subtitle_en: string
+          certifications_subtitle_th: string
+          certifications_subtitle_zh: string
+          certifications_title_en: string
+          certifications_title_th: string
+          certifications_title_zh: string
+          hero_subtitle_en: string
+          hero_subtitle_th: string
+          hero_subtitle_zh: string
+          hero_title_en: string
+          hero_title_th: string
+          hero_title_zh: string
           id: string
+          mission_subtitle_en: string
+          mission_subtitle_th: string
+          mission_subtitle_zh: string
           story_paragraph1_en: string
           story_paragraph1_th: string
           story_paragraph1_zh: string
@@ -88,6 +133,12 @@ export type Database = {
           story_title_th: string
           story_title_zh: string
           updated_at: string
+          values_subtitle_en: string
+          values_subtitle_th: string
+          values_subtitle_zh: string
+          values_title_en: string
+          values_title_th: string
+          values_title_zh: string
           vision_image_url: string | null
           vision_quote_en: string
           vision_quote_th: string
@@ -116,7 +167,22 @@ export type Database = {
           achievement_years_label_en?: string
           achievement_years_label_th?: string
           achievement_years_label_zh?: string
+          certifications_subtitle_en?: string
+          certifications_subtitle_th?: string
+          certifications_subtitle_zh?: string
+          certifications_title_en?: string
+          certifications_title_th?: string
+          certifications_title_zh?: string
+          hero_subtitle_en?: string
+          hero_subtitle_th?: string
+          hero_subtitle_zh?: string
+          hero_title_en?: string
+          hero_title_th?: string
+          hero_title_zh?: string
           id?: string
+          mission_subtitle_en?: string
+          mission_subtitle_th?: string
+          mission_subtitle_zh?: string
           story_paragraph1_en?: string
           story_paragraph1_th?: string
           story_paragraph1_zh?: string
@@ -130,6 +196,12 @@ export type Database = {
           story_title_th?: string
           story_title_zh?: string
           updated_at?: string
+          values_subtitle_en?: string
+          values_subtitle_th?: string
+          values_subtitle_zh?: string
+          values_title_en?: string
+          values_title_th?: string
+          values_title_zh?: string
           vision_image_url?: string | null
           vision_quote_en?: string
           vision_quote_th?: string
@@ -158,7 +230,22 @@ export type Database = {
           achievement_years_label_en?: string
           achievement_years_label_th?: string
           achievement_years_label_zh?: string
+          certifications_subtitle_en?: string
+          certifications_subtitle_th?: string
+          certifications_subtitle_zh?: string
+          certifications_title_en?: string
+          certifications_title_th?: string
+          certifications_title_zh?: string
+          hero_subtitle_en?: string
+          hero_subtitle_th?: string
+          hero_subtitle_zh?: string
+          hero_title_en?: string
+          hero_title_th?: string
+          hero_title_zh?: string
           id?: string
+          mission_subtitle_en?: string
+          mission_subtitle_th?: string
+          mission_subtitle_zh?: string
           story_paragraph1_en?: string
           story_paragraph1_th?: string
           story_paragraph1_zh?: string
@@ -172,6 +259,12 @@ export type Database = {
           story_title_th?: string
           story_title_zh?: string
           updated_at?: string
+          values_subtitle_en?: string
+          values_subtitle_th?: string
+          values_subtitle_zh?: string
+          values_title_en?: string
+          values_title_th?: string
+          values_title_zh?: string
           vision_image_url?: string | null
           vision_quote_en?: string
           vision_quote_th?: string
@@ -182,6 +275,51 @@ export type Database = {
           vision_title_en?: string
           vision_title_th?: string
           vision_title_zh?: string
+        }
+        Relationships: []
+      }
+      about_values: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_th: string
+          description_zh: string
+          icon: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          title_en: string
+          title_th: string
+          title_zh: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string
+          description_th: string
+          description_zh?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th: string
+          title_zh?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_th?: string
+          description_zh?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title_en?: string
+          title_th?: string
+          title_zh?: string
+          updated_at?: string
         }
         Relationships: []
       }
