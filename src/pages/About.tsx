@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Award, Users, Heart, Leaf, Target, CheckCircle, Shield, Eye, Quote } from "lucide-react";
+import { Award, Users, Heart, Leaf, Target, Shield, Eye, Quote, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
@@ -7,6 +7,11 @@ import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+
+// Import images
+import companyStoryImg from "@/assets/about/company-story.jpg";
+import valuesNatureImg from "@/assets/about/values-nature.jpg";
+import teamExpertsImg from "@/assets/about/team-experts.jpg";
 
 interface AboutSettings {
   id: string;
@@ -81,7 +86,7 @@ const About = () => {
       ]);
 
       if (settingsRes.data) setSettings(settingsRes.data);
-      if (missionRes.data) setMissionItems(missionRes.data);
+      if (missionRes.data) setMissionItems(missionRes.data.filter(item => item.is_active));
     } catch (error) {
       console.error("Error fetching about data:", error);
     } finally {
@@ -130,7 +135,6 @@ const About = () => {
     { name: "ISO 9001", icon: Award },
   ];
 
-  // Default vision image if none uploaded
   const defaultVisionImage = "https://guauobzuxgvkluxwfvxt.supabase.co/storage/v1/object/public/product-images/vflow-products.jpg";
 
   if (isLoading) {
@@ -146,7 +150,7 @@ const About = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>{t("about.pageTitle")} - JWHERBAL BY JWGROUP</title>
         <meta name="description" content={t("about.metaDescription")} />
@@ -154,58 +158,60 @@ const About = () => {
 
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-primary/5 to-secondary/10">
+      {/* Hero Section - Minimal */}
+      <section className="py-24 md:py-32 bg-gradient-to-b from-secondary/50 to-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground animate-fade-in-up">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-primary font-medium tracking-wider uppercase text-sm mb-4">
+              JWHERBAL BY JWGROUP
+            </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
               {t("about.hero.title")}
             </h1>
-            <p className="text-xl text-muted-foreground animate-fade-in-up animation-delay-200">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t("about.hero.subtitle")}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Vision Section - New Design based on screenshot */}
+      {/* Vision Section - Clean Layout */}
       {settings && (
-        <section className="py-16">
+        <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              {/* Left - Image */}
-              <div className="relative">
-                <div className="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary/10 to-primary/5 p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              {/* Image */}
+              <div className="order-2 lg:order-1">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-transparent rounded-3xl blur-2xl" />
                   <img
                     src={settings.vision_image_url || defaultVisionImage}
                     alt="V Flow Products"
-                    className="w-full h-auto rounded-xl"
+                    className="relative w-full h-auto rounded-2xl shadow-2xl"
                   />
                 </div>
               </div>
 
-              {/* Right - Vision Content */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Eye className="h-5 w-5 text-primary" />
+              {/* Content */}
+              <div className="order-1 lg:order-2 space-y-8">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                    <Eye className="h-4 w-4" />
+                    <span>Vision</span>
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-primary">
-                      {getLocalizedText(settings.vision_title_th, settings.vision_title_en, settings.vision_title_zh)}
-                    </h2>
-                    <p className="text-sm text-muted-foreground">Vision</p>
-                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                    {getLocalizedText(settings.vision_title_th, settings.vision_title_en, settings.vision_title_zh)}
+                  </h2>
                 </div>
 
-                <div className="relative pl-6 border-l-4 border-primary/30">
-                  <Quote className="absolute -left-3 -top-1 h-6 w-6 text-primary/50" />
-                  <p className="text-lg text-primary font-medium italic">
+                <blockquote className="relative pl-6 border-l-4 border-primary">
+                  <Quote className="absolute -left-3 -top-2 h-6 w-6 text-primary/30" />
+                  <p className="text-xl md:text-2xl text-primary font-medium italic leading-relaxed">
                     {getLocalizedText(settings.vision_quote_th, settings.vision_quote_en, settings.vision_quote_zh)}
                   </p>
-                </div>
+                </blockquote>
 
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground text-lg leading-relaxed">
                   {getLocalizedText(settings.vision_subtitle_th, settings.vision_subtitle_en, settings.vision_subtitle_zh)}
                 </p>
               </div>
@@ -214,164 +220,196 @@ const About = () => {
         </section>
       )}
 
-      {/* Mission Section - Accordion Design based on screenshots */}
-      {missionItems.length > 0 && (
-        <section className="py-16 bg-secondary/30">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">{t("about.mission.title")}</h2>
-            </div>
-
-            <div className="max-w-4xl mx-auto">
-              <Accordion type="single" collapsible className="space-y-4">
-                {missionItems.map((item, index) => (
-                  <AccordionItem
-                    key={item.id}
-                    value={item.id}
-                    className="border rounded-lg bg-card shadow-sm overflow-hidden"
-                  >
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                      <div className="flex items-center gap-4 text-left">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold flex-shrink-0">
-                          {index + 1}
-                        </div>
-                        <span className="font-semibold text-primary">
-                          {getLocalizedText(item.title_th, item.title_en, item.title_zh)}
-                        </span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-4">
-                      <div className="pl-14">
-                        <p className="text-muted-foreground leading-relaxed">
-                          {getLocalizedText(item.description_th, item.description_en, item.description_zh)}
-                        </p>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Story Section */}
+      {/* Achievements Section - Floating Stats */}
       {settings && (
-        <section className="py-16">
+        <section className="py-16 bg-primary/5">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <Card className="overflow-hidden">
-                <CardContent className="p-8 md:p-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Users className="h-8 w-8 text-primary" />
-                    <h2 className="text-3xl font-bold">
-                      {getLocalizedText(settings.story_title_th, settings.story_title_en, settings.story_title_zh)}
-                    </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              {[
+                { value: settings.achievement_years, label: getLocalizedText(settings.achievement_years_label_th, settings.achievement_years_label_en, settings.achievement_years_label_zh) },
+                { value: settings.achievement_customers, label: getLocalizedText(settings.achievement_customers_label_th, settings.achievement_customers_label_en, settings.achievement_customers_label_zh) },
+                { value: settings.achievement_products, label: getLocalizedText(settings.achievement_products_label_th, settings.achievement_products_label_en, settings.achievement_products_label_zh) },
+                { value: settings.achievement_satisfaction, label: getLocalizedText(settings.achievement_satisfaction_label_th, settings.achievement_satisfaction_label_en, settings.achievement_satisfaction_label_zh) },
+              ].map((stat, index) => (
+                <div key={index} className="text-center p-6 bg-card rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                  <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-2">
+                    {stat.value}
                   </div>
-                  <div className="space-y-4 text-muted-foreground leading-relaxed">
-                    <p>{getLocalizedText(settings.story_paragraph1_th, settings.story_paragraph1_en, settings.story_paragraph1_zh)}</p>
-                    <p>{getLocalizedText(settings.story_paragraph2_th, settings.story_paragraph2_en, settings.story_paragraph2_zh)}</p>
-                    <p>{getLocalizedText(settings.story_paragraph3_th, settings.story_paragraph3_en, settings.story_paragraph3_zh)}</p>
+                  <div className="text-sm md:text-base text-muted-foreground">
+                    {stat.label}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Values Section */}
-      <section className="py-16 bg-secondary">
+      {/* Mission Section - Clean Accordion */}
+      {missionItems.length > 0 && (
+        <section className="py-20 md:py-28">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+              {/* Left - Header */}
+              <div className="lg:sticky lg:top-32">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                  <Target className="h-4 w-4" />
+                  <span>Mission</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">{t("about.mission.title")}</h2>
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                  พันธกิจที่เรายึดมั่นในการพัฒนาผลิตภัณฑ์สมุนไพรคุณภาพสูงสำหรับทุกครอบครัว
+                </p>
+                <img
+                  src={teamExpertsImg}
+                  alt="Our Expert Team"
+                  className="rounded-2xl shadow-lg w-full hidden lg:block"
+                />
+              </div>
+
+              {/* Right - Accordion */}
+              <div>
+                <Accordion type="single" collapsible className="space-y-4">
+                  {missionItems.map((item, index) => (
+                    <AccordionItem
+                      key={item.id}
+                      value={item.id}
+                      className="border-none"
+                    >
+                      <AccordionTrigger className="px-6 py-5 bg-card rounded-xl hover:bg-secondary/50 hover:no-underline transition-colors shadow-sm data-[state=open]:rounded-b-none data-[state=open]:bg-secondary/50">
+                        <div className="flex items-center gap-4 text-left">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold flex-shrink-0 text-lg">
+                            {index + 1}
+                          </div>
+                          <span className="font-semibold text-lg text-foreground">
+                            {getLocalizedText(item.title_th, item.title_en, item.title_zh)}
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-6 py-5 bg-secondary/30 rounded-b-xl">
+                        <div className="pl-14">
+                          <p className="text-muted-foreground leading-relaxed">
+                            {getLocalizedText(item.description_th, item.description_en, item.description_zh)}
+                          </p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Story Section - Side by Side */}
+      {settings && (
+        <section className="py-20 md:py-28 bg-secondary/30">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              {/* Content */}
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                  <Users className="h-4 w-4" />
+                  <span>Our Story</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  {getLocalizedText(settings.story_title_th, settings.story_title_en, settings.story_title_zh)}
+                </h2>
+                <div className="space-y-5 text-muted-foreground leading-relaxed text-lg">
+                  <p>{getLocalizedText(settings.story_paragraph1_th, settings.story_paragraph1_en, settings.story_paragraph1_zh)}</p>
+                  <p>{getLocalizedText(settings.story_paragraph2_th, settings.story_paragraph2_en, settings.story_paragraph2_zh)}</p>
+                  <p>{getLocalizedText(settings.story_paragraph3_th, settings.story_paragraph3_en, settings.story_paragraph3_zh)}</p>
+                </div>
+              </div>
+
+              {/* Image */}
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-tl from-primary/20 to-transparent rounded-3xl blur-2xl" />
+                <img
+                  src={companyStoryImg}
+                  alt="Company Story"
+                  className="relative w-full rounded-2xl shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Values Section - Grid Cards */}
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t("about.values.title")}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <Heart className="h-4 w-4" />
+              <span>Values</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("about.values.title")}</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t("about.values.subtitle")}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => {
-              const Icon = value.icon;
-              return (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">{t(value.titleKey)}</h3>
-                    <p className="text-sm text-muted-foreground">{t(value.descKey)}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Image */}
+            <div className="relative hidden lg:block">
+              <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-transparent rounded-3xl blur-2xl" />
+              <img
+                src={valuesNatureImg}
+                alt="Natural Values"
+                className="relative w-full rounded-2xl shadow-2xl"
+              />
+            </div>
+
+            {/* Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {values.map((value, index) => {
+                const Icon = value.icon;
+                return (
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-none bg-card">
+                    <CardContent className="p-6">
+                      <div className="w-14 h-14 mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
+                        <Icon className="h-7 w-7 text-primary group-hover:text-primary-foreground transition-colors" />
+                      </div>
+                      <h3 className="font-bold text-lg mb-2">{t(value.titleKey)}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{t(value.descKey)}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Achievements Section */}
-      {settings && (
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">{t("about.achievements.title")}</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {settings.achievement_years}
-                </div>
-                <div className="text-muted-foreground">
-                  {getLocalizedText(settings.achievement_years_label_th, settings.achievement_years_label_en, settings.achievement_years_label_zh)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {settings.achievement_customers}
-                </div>
-                <div className="text-muted-foreground">
-                  {getLocalizedText(settings.achievement_customers_label_th, settings.achievement_customers_label_en, settings.achievement_customers_label_zh)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {settings.achievement_products}
-                </div>
-                <div className="text-muted-foreground">
-                  {getLocalizedText(settings.achievement_products_label_th, settings.achievement_products_label_en, settings.achievement_products_label_zh)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {settings.achievement_satisfaction}
-                </div>
-                <div className="text-muted-foreground">
-                  {getLocalizedText(settings.achievement_satisfaction_label_th, settings.achievement_satisfaction_label_en, settings.achievement_satisfaction_label_zh)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Certifications Section */}
-      <section className="py-16 bg-secondary">
+      {/* Certifications Section - Minimal */}
+      <section className="py-20 md:py-28 bg-secondary/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t("about.certifications.title")}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <Award className="h-4 w-4" />
+              <span>Certifications</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("about.certifications.title")}</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t("about.certifications.subtitle")}
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+
+          <div className="flex flex-wrap justify-center gap-6">
             {certifications.map((cert, index) => {
               const Icon = cert.icon;
               return (
-                <Card key={index} className="w-40 hover:scale-105 transition-transform">
-                  <CardContent className="p-6 text-center">
-                    <Icon className="h-12 w-12 mx-auto mb-3 text-primary" />
-                    <p className="font-semibold">{cert.name}</p>
-                  </CardContent>
-                </Card>
+                <div
+                  key={index}
+                  className="group flex items-center gap-4 px-8 py-5 bg-card rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
+                    <Icon className="h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
+                  </div>
+                  <span className="font-semibold text-lg">{cert.name}</span>
+                </div>
               );
             })}
           </div>
