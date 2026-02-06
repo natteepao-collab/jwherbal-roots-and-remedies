@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,6 @@ const Cart = () => {
     return (
       <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <main className="flex-1 container mx-auto px-4 py-16 flex flex-col items-center justify-center">
           <ShoppingBag className="h-24 w-24 text-muted-foreground mb-6" />
           <h1 className="text-3xl font-bold mb-4">{t("cart.empty")}</h1>
@@ -39,7 +37,6 @@ const Cart = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col">
-      <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8">{t("cart.title")}</h1>

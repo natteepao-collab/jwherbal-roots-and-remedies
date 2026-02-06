@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Award, Users, Heart, Leaf, Target, Shield, Eye, Quote, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import Navbar from "@/components/Navbar";
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -142,7 +141,6 @@ const About = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-muted-foreground">กำลังโหลด...</div>
         </div>
@@ -158,8 +156,6 @@ const About = () => {
         <title>{t("about.pageTitle")} - JWHERBAL BY JWGROUP</title>
         <meta name="description" content={t("about.metaDescription")} />
       </Helmet>
-
-      <Navbar />
 
       {/* Hero Section - Minimal */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-secondary/50 to-background">

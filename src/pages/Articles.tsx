@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Clock, User } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +23,6 @@ const Articles = () => {
           content={t("articles.description")}
         />
       </Helmet>
-      <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">

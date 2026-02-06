@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import ReviewImageCarousel from "@/components/ReviewImageCarousel";
@@ -238,8 +237,6 @@ const Reviews = () => {
         <title>{t("sections.customerReviews")} - JWHERBAL</title>
         <meta name="description" content={t("sections.customerReviews")} />
       </Helmet>
-      
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero Section */}

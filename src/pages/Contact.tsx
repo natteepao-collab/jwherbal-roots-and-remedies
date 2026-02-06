@@ -1,5 +1,4 @@
 import { Mail, Phone, Facebook, Instagram, MapPin, MessageCircle } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,6 @@ const Contact = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col">
-      <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
