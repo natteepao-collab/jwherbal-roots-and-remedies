@@ -100,7 +100,7 @@ export function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
-      <div className="flex h-14 items-center px-4 gap-2 md:gap-4">
+      <div className="flex h-12 sm:h-14 items-center px-3 sm:px-4 gap-2 md:gap-4">
         {/* Sidebar Toggle */}
         <SidebarToggle />
         
@@ -109,7 +109,7 @@ export function SecondaryNavbar() {
           <img 
             src={customLogoUrl || jwGroupLogo} 
             alt="JW Group Logo" 
-            className="h-12 w-auto max-w-[140px] object-contain"
+            className="h-9 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain"
           />
         </Link>
 
