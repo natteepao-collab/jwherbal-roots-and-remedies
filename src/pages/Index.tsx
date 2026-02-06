@@ -3,7 +3,6 @@ import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award } from "lucide-re
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -89,7 +88,6 @@ const Index = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col">
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">

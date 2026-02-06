@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import FAQImageCarousel from "@/components/FAQImageCarousel";
@@ -187,8 +186,6 @@ const FAQ = () => {
         <title>{currentLanguage === "th" ? "ถามตอบ" : currentLanguage === "en" ? "Q&A" : "问答"} - JWHERBAL</title>
         <meta name="description" content={currentLanguage === "th" ? "คำถามที่พบบ่อยเกี่ยวกับผลิตภัณฑ์ V Flow" : "Frequently asked questions about V Flow products"} />
       </Helmet>
-      
-      <Navbar />
 
       <main className="flex-1">
         {/* FAQ Images Carousel */}

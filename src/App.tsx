@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AnimatePresence } from "framer-motion";
+import { MainLayout } from "@/components/layout/MainLayout";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -46,30 +47,36 @@ import AdminAbout from "./pages/admin/AdminAbout";
 
 const queryClient = new QueryClient();
 
+// Wrapper for pages that use the MainLayout with sidebar
+const PublicPage = ({ children }: { children: React.ReactNode }) => (
+  <MainLayout>{children}</MainLayout>
+);
+
 const AnimatedRoutes = () => {
   const location = useLocation();
   
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Index />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/articles" element={<Articles />} />
-        <Route path="/articles/:slug" element={<ArticleDetail />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/community/:id" element={<CommunityPost />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/products/vflow" element={<VFlowProduct />} />
-        <Route path="/reviews" element={<Reviews />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/orders" element={<OrderHistory />} />
-        <Route path="/admin" element={<Admin />} />
+        {/* Public routes with sidebar layout */}
+        <Route path="/" element={<PublicPage><Index /></PublicPage>} />
+        <Route path="/about" element={<PublicPage><About /></PublicPage>} />
+        <Route path="/shop" element={<PublicPage><Shop /></PublicPage>} />
+        <Route path="/cart" element={<PublicPage><Cart /></PublicPage>} />
+        <Route path="/checkout" element={<PublicPage><Checkout /></PublicPage>} />
+        <Route path="/articles" element={<PublicPage><Articles /></PublicPage>} />
+        <Route path="/articles/:slug" element={<PublicPage><ArticleDetail /></PublicPage>} />
+        <Route path="/community" element={<PublicPage><Community /></PublicPage>} />
+        <Route path="/community/:id" element={<PublicPage><CommunityPost /></PublicPage>} />
+        <Route path="/contact" element={<PublicPage><Contact /></PublicPage>} />
+        <Route path="/auth" element={<PublicPage><Auth /></PublicPage>} />
+        <Route path="/products/vflow" element={<PublicPage><VFlowProduct /></PublicPage>} />
+        <Route path="/reviews" element={<PublicPage><Reviews /></PublicPage>} />
+        <Route path="/faq" element={<PublicPage><FAQ /></PublicPage>} />
+        <Route path="/orders" element={<PublicPage><OrderHistory /></PublicPage>} />
+        <Route path="/admin" element={<PublicPage><Admin /></PublicPage>} />
         
-        {/* Admin Dashboard Routes */}
+        {/* Admin Dashboard Routes - separate layout */}
         <Route path="/admin/dashboard" element={<AdminLayout />}>
           <Route index element={<AdminOverview />} />
           <Route path="articles" element={<AdminArticles />} />

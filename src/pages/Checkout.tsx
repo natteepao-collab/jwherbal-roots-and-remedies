@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -191,7 +190,6 @@ const Checkout = () => {
     return (
       <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card className="max-w-2xl mx-auto">
             <CardContent className="p-8 text-center">
@@ -311,7 +309,6 @@ const Checkout = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col">
-      <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button

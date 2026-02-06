@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check, MessageCircle, ChevronRight } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,6 @@ const VFlowProduct = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <Navbar />
 
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/5 to-background py-12 md:py-20">

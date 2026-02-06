@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 
@@ -18,7 +17,6 @@ const Admin = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/10 p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">

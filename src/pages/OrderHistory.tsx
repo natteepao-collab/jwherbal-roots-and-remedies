@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,7 +130,6 @@ const OrderHistory = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
       
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-6">
