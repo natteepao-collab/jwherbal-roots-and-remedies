@@ -24,19 +24,21 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
           size="icon"
           onClick={toggleSidebar}
           className={cn(
-            "h-9 w-9 shrink-0 transition-colors hover:bg-muted",
+            "h-9 w-9 shrink-0 transition-all duration-200 hover:bg-muted",
             className
           )}
           aria-label={isExpanded ? "ปิด Sidebar" : "เปิด Sidebar"}
         >
-          {isExpanded ? (
-            <PanelLeftClose className="h-5 w-5" />
-          ) : (
-            <PanelLeft className="h-5 w-5" />
-          )}
+          <span className="transition-transform duration-200">
+            {isExpanded ? (
+              <PanelLeftClose className="h-5 w-5" />
+            ) : (
+              <PanelLeft className="h-5 w-5" />
+            )}
+          </span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="right" hidden={isMobile}>
+      <TooltipContent side="bottom" hidden={isMobile}>
         {isExpanded ? "ปิด Sidebar (Ctrl+B)" : "เปิด Sidebar (Ctrl+B)"}
       </TooltipContent>
     </Tooltip>

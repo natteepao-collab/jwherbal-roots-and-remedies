@@ -47,60 +47,75 @@ import AdminAbout from "./pages/admin/AdminAbout";
 
 const queryClient = new QueryClient();
 
-// Wrapper for pages that use the MainLayout with sidebar
-const PublicPage = ({ children }: { children: React.ReactNode }) => (
-  <MainLayout>{children}</MainLayout>
-);
-
-const AnimatedRoutes = () => {
+// Public routes content - rendered inside MainLayout
+const PublicRoutes = () => {
   const location = useLocation();
   
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* Public routes with sidebar layout */}
-        <Route path="/" element={<PublicPage><Index /></PublicPage>} />
-        <Route path="/about" element={<PublicPage><About /></PublicPage>} />
-        <Route path="/shop" element={<PublicPage><Shop /></PublicPage>} />
-        <Route path="/cart" element={<PublicPage><Cart /></PublicPage>} />
-        <Route path="/checkout" element={<PublicPage><Checkout /></PublicPage>} />
-        <Route path="/articles" element={<PublicPage><Articles /></PublicPage>} />
-        <Route path="/articles/:slug" element={<PublicPage><ArticleDetail /></PublicPage>} />
-        <Route path="/community" element={<PublicPage><Community /></PublicPage>} />
-        <Route path="/community/:id" element={<PublicPage><CommunityPost /></PublicPage>} />
-        <Route path="/contact" element={<PublicPage><Contact /></PublicPage>} />
-        <Route path="/auth" element={<PublicPage><Auth /></PublicPage>} />
-        <Route path="/products/vflow" element={<PublicPage><VFlowProduct /></PublicPage>} />
-        <Route path="/reviews" element={<PublicPage><Reviews /></PublicPage>} />
-        <Route path="/faq" element={<PublicPage><FAQ /></PublicPage>} />
-        <Route path="/orders" element={<PublicPage><OrderHistory /></PublicPage>} />
-        <Route path="/admin" element={<PublicPage><Admin /></PublicPage>} />
-        
-        {/* Admin Dashboard Routes - separate layout */}
-        <Route path="/admin/dashboard" element={<AdminLayout />}>
-          <Route index element={<AdminOverview />} />
-          <Route path="articles" element={<AdminArticles />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="community" element={<AdminCommunity />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="reviews" element={<AdminReviews />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="brand-story" element={<AdminBrandStory />} />
-          <Route path="brand-story-gallery" element={<AdminBrandStoryGallery />} />
-          <Route path="trust-elements" element={<AdminTrustElements />} />
-          <Route path="payment-settings" element={<AdminPaymentSettings />} />
-          <Route path="contact" element={<AdminContact />} />
-          <Route path="faq" element={<AdminFAQ />} />
-          <Route path="faq-images" element={<AdminFAQImages />} />
-          <Route path="logo" element={<AdminLogo />} />
-          <Route path="about" element={<AdminAbout />} />
-          <Route path="settings" element={<AdminSettings />} />
-        </Route>
-        
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/articles/:slug" element={<ArticleDetail />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/community/:id" element={<CommunityPost />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/products/vflow" element={<VFlowProduct />} />
+        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/orders" element={<OrderHistory />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
+  );
+};
+
+// Admin routes - separate layout
+const AdminRoutes = () => {
+  return (
+    <Routes>
+      <Route element={<AdminLayout />}>
+        <Route index element={<AdminOverview />} />
+        <Route path="articles" element={<AdminArticles />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="community" element={<AdminCommunity />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="reviews" element={<AdminReviews />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="brand-story" element={<AdminBrandStory />} />
+        <Route path="brand-story-gallery" element={<AdminBrandStoryGallery />} />
+        <Route path="trust-elements" element={<AdminTrustElements />} />
+        <Route path="payment-settings" element={<AdminPaymentSettings />} />
+        <Route path="contact" element={<AdminContact />} />
+        <Route path="faq" element={<AdminFAQ />} />
+        <Route path="faq-images" element={<AdminFAQImages />} />
+        <Route path="logo" element={<AdminLogo />} />
+        <Route path="about" element={<AdminAbout />} />
+        <Route path="settings" element={<AdminSettings />} />
+      </Route>
+    </Routes>
+  );
+};
+
+// Main app with routing
+const AppContent = () => {
+  const location = useLocation();
+  const isAdminDashboard = location.pathname.startsWith("/admin/dashboard");
+  
+  if (isAdminDashboard) {
+    return <AdminRoutes />;
+  }
+  
+  return (
+    <MainLayout>
+      <PublicRoutes />
+    </MainLayout>
   );
 };
 
@@ -111,7 +126,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AnimatedRoutes />
+          <AppContent />
           <ChatbotWidget />
         </BrowserRouter>
       </TooltipProvider>
