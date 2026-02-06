@@ -99,26 +99,26 @@ const Shop = () => {
     <PageTransition>
     <div className="min-h-screen flex flex-col">
 
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">{t("shop.title")}</h1>
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 md:mb-8">{t("shop.title")}</h1>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="lg:w-64 flex-shrink-0">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">{t("shop.categories")}</h2>
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+          {/* Sidebar - Collapsible on mobile */}
+          <aside className="lg:w-56 xl:w-64 flex-shrink-0">
+            <Card className="sticky top-20">
+              <CardContent className="p-4 md:p-6">
+                <h2 className="font-semibold text-sm md:text-base mb-3 md:mb-4">{t("shop.categories")}</h2>
                 <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <RadioGroupItem value="all" id="all" />
-                    <Label htmlFor="all" className="cursor-pointer">
+                  <div className="flex items-center space-x-2 mb-2 md:mb-3">
+                    <RadioGroupItem value="all" id="all" className="h-4 w-4" />
+                    <Label htmlFor="all" className="cursor-pointer text-sm">
                       {t("shop.all")}
                     </Label>
                   </div>
                   {categories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2 mb-3">
-                      <RadioGroupItem value={category} id={category} />
-                      <Label htmlFor={category} className="cursor-pointer">
+                    <div key={category} className="flex items-center space-x-2 mb-2 md:mb-3">
+                      <RadioGroupItem value={category} id={category} className="h-4 w-4" />
+                      <Label htmlFor={category} className="cursor-pointer text-sm">
                         {category}
                       </Label>
                     </div>
@@ -130,16 +130,16 @@ const Shop = () => {
 
           {/* Products Grid */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 {t("shop.showing")} {sortedProducts.length} {t("shop.products")}
               </p>
               <div className="flex items-center gap-2">
-                <Label htmlFor="sort" className="text-sm">
+                <Label htmlFor="sort" className="text-xs sm:text-sm whitespace-nowrap">
                   {t("shop.sortBy")}
                 </Label>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger id="sort" className="w-[180px]">
+                  <SelectTrigger id="sort" className="w-[140px] sm:w-[180px] h-9 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -153,24 +153,24 @@ const Shop = () => {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <Card key={i}>
                     <Skeleton className="aspect-square" />
-                    <CardContent className="p-4">
-                      <Skeleton className="h-4 w-20 mb-2" />
-                      <Skeleton className="h-6 w-full mb-2" />
-                      <Skeleton className="h-4 w-16 mb-3" />
+                    <CardContent className="p-3 sm:p-4">
+                      <Skeleton className="h-3 w-16 mb-2" />
+                      <Skeleton className="h-5 w-full mb-2" />
+                      <Skeleton className="h-3 w-12 mb-3" />
                       <div className="flex justify-between">
+                        <Skeleton className="h-6 w-16" />
                         <Skeleton className="h-8 w-20" />
-                        <Skeleton className="h-8 w-24" />
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {sortedProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -188,7 +188,7 @@ const Shop = () => {
               </div>
             )}
 
-            <div className="mt-8 text-center text-sm text-muted-foreground">
+            <div className="mt-6 md:mt-8 text-center text-xs sm:text-sm text-muted-foreground px-2">
               <p>{t("shop.disclaimer")}</p>
             </div>
           </div>

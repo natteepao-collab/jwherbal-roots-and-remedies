@@ -24,26 +24,26 @@ const Articles = () => {
         />
       </Helmet>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">{t("articles.title")}</h1>
-          <p className="text-muted-foreground mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">{t("articles.title")}</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 md:mb-8">
             {t("articles.description")}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {healthArticles.map((article) => (
               <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
                 <img 
                   src={article.coverImage} 
                   alt={article.title[currentLang]}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-36 sm:h-44 md:h-48 object-cover"
                 />
-                <CardContent className="p-6">
-                  <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-3">
+                <CardContent className="p-4 md:p-6">
+                  <div className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/10 text-primary text-[10px] sm:text-xs font-medium rounded-full mb-2 sm:mb-3">
                     {article.category[currentLang]}
                   </div>
-                  <h2 className="text-xl font-bold mb-3 line-clamp-2">
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 line-clamp-2">
                     <Link
                       to={`/articles/${article.slug}`}
                       className="hover:text-primary transition-colors"
@@ -51,11 +51,11 @@ const Articles = () => {
                       {article.title[currentLang]}
                     </Link>
                   </h2>
-                  <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2 sm:line-clamp-3">
                     {article.excerpt[currentLang]}
                   </p>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       <span>{article.readTime}</span>
                     </div>
@@ -66,7 +66,7 @@ const Articles = () => {
                       initialLikes={article.likes}
                     />
                   </div>
-                  <Button variant="link" asChild className="p-0 h-auto w-full justify-start">
+                  <Button variant="link" asChild className="p-0 h-auto w-full justify-start text-xs sm:text-sm">
                     <Link to={`/articles/${article.slug}`}>{t("articles.readMore")} →</Link>
                   </Button>
                 </CardContent>
