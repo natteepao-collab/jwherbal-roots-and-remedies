@@ -22,7 +22,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
-import jwGroupLogo from "@/assets/jwgroup-logo.png";
+import jwHerbalLogo from "@/assets/jwherbal-logo-new.png";
 
 export function AppSidebar() {
   const { t } = useTranslation();
@@ -112,17 +112,16 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50">
       {/* Logo Header */}
-      <SidebarHeader className="border-b border-border/50 p-4">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-            <Leaf className="h-6 w-6 text-primary" />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="font-prompt font-bold text-lg text-foreground">JW Herbal</span>
-              <span className="text-xs text-muted-foreground">สมุนไพรธรรมชาติ</span>
-            </div>
-          )}
+      <SidebarHeader className="border-b border-border/50 p-3">
+        <Link to="/" className="flex items-center justify-center group">
+          <img 
+            src={customLogoUrl || jwHerbalLogo} 
+            alt="JW Herbal Logo" 
+            className={cn(
+              "object-contain transition-all duration-300 group-hover:scale-105",
+              collapsed ? "h-8 w-8" : "h-12 w-auto max-w-[140px]"
+            )}
+          />
         </Link>
       </SidebarHeader>
 

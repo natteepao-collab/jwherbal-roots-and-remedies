@@ -102,66 +102,96 @@ export function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 gap-4">
+      <div className="flex h-14 items-center px-4 gap-2 md:gap-4">
         {/* Sidebar Toggle */}
-        <SidebarTrigger className="h-9 w-9" />
+        <SidebarTrigger className="h-9 w-9 shrink-0" />
         
-        {/* Logo for mobile / collapsed sidebar */}
-        <Link to="/" className="flex items-center md:hidden">
+        {/* Logo for mobile only */}
+        <Link to="/" className="flex items-center md:hidden shrink-0">
           <img 
             src={customLogoUrl || jwGroupLogo} 
             alt="JW Group Logo" 
-            className="h-8 w-auto object-contain"
+            className="h-7 w-auto object-contain"
           />
         </Link>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-md hidden md:flex">
+        {/* Search Bar - Desktop */}
+        <div className="hidden md:flex flex-1 max-w-lg ml-2">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="ค้นหาสินค้า, บทความ..."
-              className="pl-10 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
+              className="pl-10 h-9 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-full"
             />
           </div>
         </div>
 
         {/* Spacer */}
-        <div className="flex-1 md:hidden" />
+        <div className="flex-1" />
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative hidden sm:flex">
-            <Bell className="h-5 w-5" />
-          </Button>
+        {/* Right Actions - Well organized */}
+        <div className="flex items-center">
+          {/* Desktop: Full icons with separators */}
+          <div className="hidden md:flex items-center gap-1">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+            
+            {/* Divider */}
+            <div className="h-6 w-px bg-border mx-2" />
+            
+            {/* Notifications */}
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-muted">
+              <Bell className="h-[18px] w-[18px]" />
+            </Button>
 
-          {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative" asChild>
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-scale-in"
-                >
-                  {cartItemCount}
-                </Badge>
-              )}
-            </Link>
-          </Button>
+            {/* Cart */}
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-muted" asChild>
+              <Link to="/cart">
+                <ShoppingCart className="h-[18px] w-[18px]" />
+                {cartItemCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px] animate-scale-in"
+                  >
+                    {cartItemCount}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+            
+            {/* Divider */}
+            <div className="h-6 w-px bg-border mx-2" />
+          </div>
+
+          {/* Mobile: Compact icons */}
+          <div className="flex md:hidden items-center gap-0.5">
+            <LanguageSwitcher />
+            
+            <Button variant="ghost" size="icon" className="h-8 w-8 relative" asChild>
+              <Link to="/cart">
+                <ShoppingCart className="h-4 w-4" />
+                {cartItemCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+                  >
+                    {cartItemCount}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+          </div>
 
           {/* User Menu */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-sm">
+                <Button variant="ghost" size="sm" className="relative gap-2 h-9 px-2 md:px-3 hover:bg-muted">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-sm">
                     {getUserDisplayName().charAt(0).toUpperCase()}
                   </div>
+                  <span className="hidden lg:inline text-sm font-medium">{getUserDisplayName()}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -194,12 +224,21 @@ export function SecondaryNavbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="default" size="sm" asChild className="font-prompt hidden sm:flex">
-              <Link to="/auth">
-                <User className="h-4 w-4 mr-2" />
-                เข้าสู่ระบบ
-              </Link>
-            </Button>
+            <>
+              {/* Desktop: Full button */}
+              <Button variant="default" size="sm" asChild className="font-prompt hidden md:flex h-9 px-4 rounded-full">
+                <Link to="/auth">
+                  <User className="h-4 w-4 mr-2" />
+                  เข้าสู่ระบบ
+                </Link>
+              </Button>
+              {/* Mobile: Icon only */}
+              <Button variant="ghost" size="icon" asChild className="md:hidden h-8 w-8">
+                <Link to="/auth">
+                  <User className="h-4 w-4" />
+                </Link>
+              </Button>
+            </>
           )}
         </div>
       </div>
