@@ -21,27 +21,27 @@ const Footer = () => {
   });
 
   return (
-    <footer className="bg-secondary mt-20">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-secondary mt-12 md:mt-20">
+      <div className="container mx-auto px-4 sm:px-6 py-8 md:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {/* About */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center space-x-2 mb-3 md:mb-4">
               <img 
                 src={jwherbalLogo} 
                 alt="JW Herbal Logo" 
-                className="h-12 w-auto"
+                className="h-10 md:h-12 w-auto"
               />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {t("footer.description")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4">{t("footer.quickLinks")}</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="font-semibold text-sm md:text-base mb-3 md:mb-4">{t("footer.quickLinks")}</h3>
+            <ul className="space-y-2 text-xs sm:text-sm">
               <li>
                 <Link to="/shop" className="text-muted-foreground hover:text-primary transition-colors">
                   {t("footer.products")}
@@ -62,8 +62,8 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-semibold mb-4">{t("footer.customerService")}</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="font-semibold text-sm md:text-base mb-3 md:mb-4">{t("footer.customerService")}</h3>
+            <ul className="space-y-2 text-xs sm:text-sm">
               <li>
                 <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                   {t("footer.contactUs")}
@@ -83,18 +83,18 @@ const Footer = () => {
           </div>
 
           {/* Contact */}
-          <div>
-            <h3 className="font-semibold mb-4">{t("footer.contact")}</h3>
-            <ul className="space-y-3 text-sm">
+          <div className="col-span-2 md:col-span-1">
+            <h3 className="font-semibold text-sm md:text-base mb-3 md:mb-4">{t("footer.contact")}</h3>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
               <li className="flex items-center space-x-2 text-muted-foreground">
-                <Phone className="h-4 w-4" />
+                <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
                 <span>{settings?.phone || "08x-xxx-xxxx"}</span>
               </li>
               <li className="flex items-center space-x-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span>{settings?.email || "info@jwherbal.com"}</span>
+                <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="break-all">{settings?.email || "info@jwherbal.com"}</span>
               </li>
-              <li className="flex items-center space-x-4 mt-4">
+              <li className="flex items-center space-x-4 mt-3 md:mt-4">
                 {settings?.facebook_url && (
                   <a 
                     href={settings.facebook_url} 
@@ -130,7 +130,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-border mt-6 md:mt-8 pt-6 md:pt-8 text-center text-xs sm:text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} JWHERBAL.com {t("footer.rights")}</p>
         </div>
       </div>
