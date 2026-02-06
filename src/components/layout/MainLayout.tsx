@@ -1,12 +1,14 @@
+import { useState, useEffect, useCallback } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { SecondaryNavbar } from "./SecondaryNavbar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
+const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 function getSidebarStateFromCookie(): boolean {
-  if (typeof document === "undefined") return false;
+  if (typeof document === "undefined") return true;
   const cookies = document.cookie.split(";");
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split("=");
@@ -14,7 +16,11 @@ function getSidebarStateFromCookie(): boolean {
       return value === "true";
     }
   }
-  return false; // Default to collapsed
+  return true; // Default to expanded
+}
+
+function setSidebarStateToCookie(open: boolean): void {
+  document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 }
 
 interface MainLayoutProps {
@@ -24,11 +30,24 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile();
   
-  // Read cookie synchronously on first render to prevent flash
-  const defaultOpen = isMobile ? false : getSidebarStateFromCookie();
+  // Initialize state from cookie synchronously
+  const [open, setOpen] = useState(() => getSidebarStateFromCookie());
+  
+  // Handle open state change and persist to cookie
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    setOpen(newOpen);
+    setSidebarStateToCookie(newOpen);
+  }, []);
+  
+  // On mobile, sidebar is controlled differently (via sheet), 
+  // but we still preserve the desktop state
+  const effectiveOpen = isMobile ? false : open;
   
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider 
+      open={effectiveOpen} 
+      onOpenChange={handleOpenChange}
+    >
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <SidebarInset className="flex flex-col w-full">
