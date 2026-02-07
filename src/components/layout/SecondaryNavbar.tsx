@@ -100,118 +100,73 @@ export function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
-      <div className="flex h-12 sm:h-14 items-center px-3 sm:px-4 lg:px-6 gap-2 md:gap-4">
-        {/* Sidebar Toggle - Left */}
-        <SidebarToggle />
+      <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4 lg:px-6">
+        {/* Left Section: Sidebar Toggle */}
+        <div className="flex items-center shrink-0">
+          <SidebarToggle />
+        </div>
         
-        {/* Spacer for mobile/tablet to push logo to center */}
-        <div className="flex-1 lg:hidden" />
-        
-        {/* Logo - Center on mobile/tablet, hidden on desktop (shown in sidebar) */}
-        <Link to="/" className="flex items-center shrink-0 lg:hidden">
-          <img 
-            src={customLogoUrl || jwGroupLogo} 
-            alt="JW Group Logo" 
-            className="h-9 sm:h-11 md:h-12 w-auto max-w-[100px] sm:max-w-[130px] md:max-w-[150px] object-contain"
-          />
-        </Link>
-
-        {/* Search Bar - Desktop only */}
-        <div className="hidden lg:flex flex-1 max-w-lg ml-2">
-          <SearchCommand />
+        {/* Center Section: Logo (mobile/tablet only) */}
+        <div className="flex-1 flex justify-center lg:justify-start lg:ml-4">
+          {/* Logo - Center on mobile/tablet */}
+          <Link to="/" className="flex items-center shrink-0 lg:hidden">
+            <img 
+              src={customLogoUrl || jwGroupLogo} 
+              alt="JW Group Logo" 
+              className="h-8 sm:h-10 md:h-11 w-auto max-w-[90px] sm:max-w-[120px] md:max-w-[140px] object-contain"
+            />
+          </Link>
+          
+          {/* Search Bar - Desktop only */}
+          <div className="hidden lg:flex flex-1 max-w-lg">
+            <SearchCommand />
+          </div>
         </div>
 
-        {/* Spacer for mobile/tablet to balance logo centering */}
-        <div className="flex-1 lg:hidden" />
+        {/* Right Section: Actions */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Language Switcher - All screens */}
+          <LanguageSwitcher />
+          
+          {/* Cart - Desktop & Tablet */}
+          <Button variant="ghost" size="icon" className="hidden sm:flex h-8 w-8 lg:h-9 lg:w-9 relative" asChild>
+            <Link to="/cart">
+              <ShoppingCart className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
+              {cartItemCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+                >
+                  {cartItemCount}
+                </Badge>
+              )}
+            </Link>
+          </Button>
+          
+          {/* Notifications - Desktop only */}
+          <Button variant="ghost" size="icon" className="hidden lg:flex h-9 w-9 relative hover:bg-muted">
+            <Bell className="h-[18px] w-[18px]" />
+          </Button>
+          
+          {/* Divider - Desktop only */}
+          <div className="hidden lg:block h-6 w-px bg-border mx-1" />
 
-        {/* Right Actions - Well organized */}
-        <div className="flex items-center">
-          {/* Desktop: Full icons with separators */}
-          <div className="hidden lg:flex items-center gap-1">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
-            
-            {/* Divider */}
-            <div className="h-6 w-px bg-border mx-2" />
-            
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-muted">
-              <Bell className="h-[18px] w-[18px]" />
-            </Button>
-
-            {/* Cart */}
-            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-muted" asChild>
-              <Link to="/cart">
-                <ShoppingCart className="h-[18px] w-[18px]" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px] animate-scale-in"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
-            
-            {/* Divider */}
-            <div className="h-6 w-px bg-border mx-2" />
-          </div>
-
-          {/* Tablet: Medium icons */}
-          <div className="hidden sm:flex lg:hidden items-center gap-1">
-            <LanguageSwitcher />
-            
-            <Button variant="ghost" size="icon" className="h-9 w-9 relative" asChild>
-              <Link to="/cart">
-                <ShoppingCart className="h-[18px] w-[18px]" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
-          </div>
-
-          {/* Mobile: Compact icons */}
-          <div className="flex sm:hidden items-center gap-0.5">
-            <LanguageSwitcher />
-            
-            <Button variant="ghost" size="icon" className="h-8 w-8 relative" asChild>
-              <Link to="/cart">
-                <ShoppingCart className="h-4 w-4" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
-          </div>
-
-          {/* User Menu */}
+          {/* User Menu / Login Button */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative gap-2 h-8 sm:h-9 px-2 lg:px-3 hover:bg-muted">
-                  <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-xs sm:text-sm">
+                <Button variant="ghost" size="sm" className="relative gap-1.5 h-8 sm:h-9 px-1.5 sm:px-2 hover:bg-muted shrink-0">
+                  <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-xs sm:text-sm shrink-0">
                     {getUserDisplayName().charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden xl:inline text-sm font-medium">{getUserDisplayName()}</span>
+                  <span className="hidden xl:inline text-sm font-medium max-w-[100px] truncate">{getUserDisplayName()}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-prompt">
                   <div className="flex flex-col">
                     <span className="font-medium">{getUserDisplayName()}</span>
-                    <span className="text-xs text-muted-foreground font-normal">{user.email}</span>
+                    <span className="text-xs text-muted-foreground font-normal truncate">{user.email}</span>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -239,21 +194,21 @@ export function SecondaryNavbar() {
           ) : (
             <>
               {/* Desktop: Full button */}
-              <Button variant="default" size="sm" asChild className="font-prompt hidden lg:flex h-9 px-4 rounded-full">
+              <Button variant="default" size="sm" asChild className="font-prompt hidden lg:inline-flex h-9 px-4 rounded-full shrink-0">
                 <Link to="/auth">
                   <User className="h-4 w-4 mr-2" />
                   เข้าสู่ระบบ
                 </Link>
               </Button>
-              {/* Tablet: Smaller button */}
-              <Button variant="default" size="sm" asChild className="font-prompt hidden sm:flex lg:hidden h-8 px-3 rounded-full text-xs">
+              {/* Tablet: Compact button */}
+              <Button variant="default" size="sm" asChild className="font-prompt hidden sm:inline-flex lg:hidden h-8 px-3 rounded-full text-xs shrink-0">
                 <Link to="/auth">
-                  <User className="h-3.5 w-3.5 mr-1.5" />
+                  <User className="h-3.5 w-3.5 mr-1" />
                   เข้าสู่ระบบ
                 </Link>
               </Button>
               {/* Mobile: Icon only */}
-              <Button variant="ghost" size="icon" asChild className="sm:hidden h-8 w-8">
+              <Button variant="default" size="icon" asChild className="sm:hidden h-8 w-8 rounded-full shrink-0">
                 <Link to="/auth">
                   <User className="h-4 w-4" />
                 </Link>
