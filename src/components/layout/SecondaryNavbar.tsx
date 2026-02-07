@@ -101,11 +101,14 @@ export function SecondaryNavbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
       <div className="flex h-12 sm:h-14 items-center px-3 sm:px-4 gap-2 md:gap-4">
-        {/* Sidebar Toggle */}
+        {/* Sidebar Toggle - Left */}
         <SidebarToggle />
         
-        {/* Logo for mobile only */}
-        <Link to="/" className="flex items-center md:hidden shrink-0">
+        {/* Spacer for mobile to push logo to center */}
+        <div className="flex-1 md:hidden" />
+        
+        {/* Logo - Center on mobile, left on desktop */}
+        <Link to="/" className="flex items-center shrink-0 md:hidden">
           <img 
             src={customLogoUrl || jwGroupLogo} 
             alt="JW Group Logo" 
@@ -118,8 +121,8 @@ export function SecondaryNavbar() {
           <SearchCommand />
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Spacer for mobile to balance logo centering */}
+        <div className="flex-1 md:hidden" />
 
         {/* Right Actions - Well organized */}
         <div className="flex items-center">
