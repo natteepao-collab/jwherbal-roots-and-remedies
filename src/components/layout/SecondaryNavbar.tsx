@@ -106,21 +106,21 @@ export function SecondaryNavbar() {
           <SidebarToggle />
         </div>
         
-        {/* Center Section: Logo (mobile/tablet only) */}
-        <div className="flex-1 flex justify-center lg:justify-start lg:ml-4 min-w-0">
-          {/* Logo - Center on mobile/tablet */}
-          <Link to="/" className="flex items-center shrink-0 lg:hidden">
+        {/* Center Section */}
+        <div className="flex-1 flex justify-center min-w-0">
+          {/* Logo - Always centered */}
+          <Link to="/" className="flex items-center shrink-0">
             <img 
               src={customLogoUrl || jwGroupLogo} 
               alt="JW Group Logo" 
-              className="h-7 sm:h-8 md:h-9 w-auto max-w-[80px] sm:max-w-[100px] md:max-w-[120px] object-contain"
+              className="h-7 sm:h-8 md:h-9 lg:h-10 w-auto max-w-[80px] sm:max-w-[100px] md:max-w-[120px] lg:max-w-[150px] object-contain"
             />
           </Link>
-          
-          {/* Search Bar - Desktop only */}
-          <div className="hidden lg:flex flex-1 max-w-lg">
-            <SearchCommand />
-          </div>
+        </div>
+
+        {/* Desktop: Search Bar - Positioned after logo area */}
+        <div className="hidden lg:flex flex-1 max-w-md">
+          <SearchCommand />
         </div>
 
         {/* Right Section: Actions - More compact */}
