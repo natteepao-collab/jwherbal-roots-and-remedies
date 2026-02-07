@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { SidebarToggle } from "./SidebarToggle";
 import { ClipboardList, Users, Shield, LogOut } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
-import { SearchCommand } from "./SearchCommand";
 
 export function SecondaryNavbar() {
   const { items } = useCart();
@@ -101,36 +100,30 @@ export function SecondaryNavbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
       <div className="flex h-12 sm:h-14 items-center px-2 sm:px-3 lg:px-6">
-        {/* Left Section: Sidebar Toggle */}
-        <div className="shrink-0">
+        {/* Left Section: Sidebar Toggle + spacer for balance */}
+        <div className="flex-1 flex items-center">
           <SidebarToggle />
         </div>
         
-        {/* Center Section */}
-        <div className="flex-1 flex justify-center min-w-0">
-          {/* Logo - Always centered */}
-          <Link to="/" className="flex items-center shrink-0">
+        {/* Center Section: Logo - Perfectly centered */}
+        <div className="flex items-center justify-center">
+          <Link to="/" className="flex items-center">
             <img 
               src={customLogoUrl || jwGroupLogo} 
               alt="JW Group Logo" 
-              className="h-7 sm:h-8 md:h-9 lg:h-10 w-auto max-w-[80px] sm:max-w-[100px] md:max-w-[120px] lg:max-w-[150px] object-contain"
+              className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto object-contain"
             />
           </Link>
         </div>
 
-        {/* Desktop: Search Bar - Positioned after logo area */}
-        <div className="hidden lg:flex flex-1 max-w-md">
-          <SearchCommand />
-        </div>
-
-        {/* Right Section: Actions - More compact */}
-        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-          {/* Language Switcher - Compact on all */}
+        {/* Right Section: Actions - Same width as left for balance */}
+        <div className="flex-1 flex items-center justify-end gap-0.5 sm:gap-1">
+          {/* Language Switcher */}
           <div className="scale-90 sm:scale-100">
             <LanguageSwitcher />
           </div>
           
-          {/* Cart - All screens */}
+          {/* Cart */}
           <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 relative" asChild>
             <Link to="/cart">
               <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-[18px] lg:w-[18px]" />
