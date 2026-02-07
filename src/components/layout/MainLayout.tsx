@@ -36,7 +36,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <SidebarInset className="flex flex-col w-full">
           <SecondaryNavbar />
           <SubNavbar />
-          <main className="flex-1 pb-16 md:pb-0">
+          <main className="flex-1 pb-14 sm:pb-16 lg:pb-0">
             {children}
           </main>
           <MobileBottomNav />

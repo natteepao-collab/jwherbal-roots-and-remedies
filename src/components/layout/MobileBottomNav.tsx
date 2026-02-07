@@ -18,8 +18,8 @@ export function MobileBottomNav() {
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border/30 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-around h-16 px-2 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/30 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="flex items-center justify-around h-14 sm:h-16 px-2 safe-area-bottom">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || 
             (item.path !== "/" && location.pathname.startsWith(item.path));
@@ -38,7 +38,7 @@ export function MobileBottomNav() {
             >
               <div className="relative">
                 <Icon className={cn(
-                  "h-5 w-5 transition-transform",
+                  "h-5 w-5 sm:h-6 sm:w-6 transition-transform",
                   isActive && "scale-110"
                 )} />
                 {item.path === "/shop" && cartItemCount > 0 && (
@@ -51,7 +51,7 @@ export function MobileBottomNav() {
                 )}
               </div>
               <span className={cn(
-                "text-[10px] font-medium",
+                "text-[10px] sm:text-xs font-medium",
                 isActive && "font-semibold"
               )}>
                 {item.label}
