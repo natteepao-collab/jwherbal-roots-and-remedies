@@ -100,20 +100,20 @@ export function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
-      <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4 lg:px-6">
+      <div className="flex h-12 sm:h-14 items-center px-2 sm:px-3 lg:px-6">
         {/* Left Section: Sidebar Toggle */}
-        <div className="flex items-center shrink-0">
+        <div className="shrink-0">
           <SidebarToggle />
         </div>
         
         {/* Center Section: Logo (mobile/tablet only) */}
-        <div className="flex-1 flex justify-center lg:justify-start lg:ml-4">
+        <div className="flex-1 flex justify-center lg:justify-start lg:ml-4 min-w-0">
           {/* Logo - Center on mobile/tablet */}
           <Link to="/" className="flex items-center shrink-0 lg:hidden">
             <img 
               src={customLogoUrl || jwGroupLogo} 
               alt="JW Group Logo" 
-              className="h-8 sm:h-10 md:h-11 w-auto max-w-[90px] sm:max-w-[120px] md:max-w-[140px] object-contain"
+              className="h-7 sm:h-8 md:h-9 w-auto max-w-[80px] sm:max-w-[100px] md:max-w-[120px] object-contain"
             />
           </Link>
           
@@ -123,21 +123,23 @@ export function SecondaryNavbar() {
           </div>
         </div>
 
-        {/* Right Section: Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Language Switcher - All screens */}
-          <LanguageSwitcher />
+        {/* Right Section: Actions - More compact */}
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+          {/* Language Switcher - Compact on all */}
+          <div className="scale-90 sm:scale-100">
+            <LanguageSwitcher />
+          </div>
           
-          {/* Cart - Desktop & Tablet */}
-          <Button variant="ghost" size="icon" className="hidden sm:flex h-8 w-8 lg:h-9 lg:w-9 relative" asChild>
+          {/* Cart - All screens */}
+          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 relative" asChild>
             <Link to="/cart">
-              <ShoppingCart className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
+              <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-[18px] lg:w-[18px]" />
               {cartItemCount > 0 && (
                 <Badge
                   variant="destructive"
-                  className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+                  className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex items-center justify-center p-0 text-[8px] sm:text-[10px]"
                 >
-                  {cartItemCount}
+                  {cartItemCount > 9 ? "9+" : cartItemCount}
                 </Badge>
               )}
             </Link>
@@ -149,17 +151,17 @@ export function SecondaryNavbar() {
           </Button>
           
           {/* Divider - Desktop only */}
-          <div className="hidden lg:block h-6 w-px bg-border mx-1" />
+          <div className="hidden lg:block h-5 w-px bg-border mx-1" />
 
           {/* User Menu / Login Button */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative gap-1.5 h-8 sm:h-9 px-1.5 sm:px-2 hover:bg-muted shrink-0">
-                  <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-xs sm:text-sm shrink-0">
+                <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-auto lg:px-2 hover:bg-muted shrink-0">
+                  <div className="flex h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-[10px] sm:text-xs shrink-0">
                     {getUserDisplayName().charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden xl:inline text-sm font-medium max-w-[100px] truncate">{getUserDisplayName()}</span>
+                  <span className="hidden xl:inline text-sm font-medium max-w-[80px] truncate ml-1.5">{getUserDisplayName()}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -194,23 +196,16 @@ export function SecondaryNavbar() {
           ) : (
             <>
               {/* Desktop: Full button */}
-              <Button variant="default" size="sm" asChild className="font-prompt hidden lg:inline-flex h-9 px-4 rounded-full shrink-0">
+              <Button variant="default" size="sm" asChild className="font-prompt hidden lg:inline-flex h-8 px-3 rounded-full text-sm shrink-0">
                 <Link to="/auth">
-                  <User className="h-4 w-4 mr-2" />
+                  <User className="h-4 w-4 mr-1.5" />
                   เข้าสู่ระบบ
                 </Link>
               </Button>
-              {/* Tablet: Compact button */}
-              <Button variant="default" size="sm" asChild className="font-prompt hidden sm:inline-flex lg:hidden h-8 px-3 rounded-full text-xs shrink-0">
+              {/* Tablet & Mobile: Icon button */}
+              <Button variant="default" size="icon" asChild className="lg:hidden h-7 w-7 sm:h-8 sm:w-8 rounded-full shrink-0">
                 <Link to="/auth">
-                  <User className="h-3.5 w-3.5 mr-1" />
-                  เข้าสู่ระบบ
-                </Link>
-              </Button>
-              {/* Mobile: Icon only */}
-              <Button variant="default" size="icon" asChild className="sm:hidden h-8 w-8 rounded-full shrink-0">
-                <Link to="/auth">
-                  <User className="h-4 w-4" />
+                  <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Link>
               </Button>
             </>
