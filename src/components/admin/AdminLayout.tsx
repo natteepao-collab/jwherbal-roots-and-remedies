@@ -12,39 +12,63 @@ export const AdminLayout = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    let isMounted = true;
     
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!isMounted) return;
+        
+        if (!session) {
+          navigate("/auth", { replace: true });
+          return;
+        }
 
-    // Check if user is admin
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .eq("role", "admin")
-      .single();
+        // Check if user is admin
+        const { data: roleData, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .eq("role", "admin")
+          .single();
 
-    if (!roleData) {
-      toast({
-        title: "ไม่มีสิทธิ์เข้าถึง",
-        description: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
-        variant: "destructive",
-      });
-      await supabase.auth.signOut();
-      navigate("/");
-      return;
-    }
+        if (!isMounted) return;
 
-    setIsAdmin(true);
-    setLoading(false);
-  };
+        if (error || !roleData) {
+          toast({
+            title: "ไม่มีสิทธิ์เข้าถึง",
+            description: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+            variant: "destructive",
+          });
+          navigate("/", { replace: true });
+          return;
+        }
+
+        setIsAdmin(true);
+        setLoading(false);
+      } catch (err) {
+        console.error("Auth check error:", err);
+        if (isMounted) {
+          navigate("/auth", { replace: true });
+        }
+      }
+    };
+    
+    checkAuth();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session && isMounted) {
+        navigate("/auth", { replace: true });
+      }
+    });
+    
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   if (loading) {
     return (
