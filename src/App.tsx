@@ -75,11 +75,11 @@ const PublicRoutes = () => {
   );
 };
 
-// Admin routes - separate layout
+// Admin routes - separate layout with proper base path
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route element={<AdminLayout />}>
+      <Route path="/admin/dashboard" element={<AdminLayout />}>
         <Route index element={<AdminOverview />} />
         <Route path="articles" element={<AdminArticles />} />
         <Route path="users" element={<AdminUsers />} />
