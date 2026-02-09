@@ -70,7 +70,6 @@ const PublicRoutes = () => {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
@@ -108,15 +107,38 @@ const AppContent = () => {
   const location = useLocation();
   const isAdminDashboard = location.pathname.startsWith("/admin/dashboard");
   
+  // Admin dashboard has its own layout
   if (isAdminDashboard) {
     return <AdminRoutes />;
   }
   
+  // Public pages with MainLayout
   return (
     <MainLayout>
       <PublicRoutes />
     </MainLayout>
   );
+};
+
+// Wrapper to handle 404 for unmatched routes
+const AppWithNotFound = () => {
+  const location = useLocation();
+  const isAdminDashboard = location.pathname.startsWith("/admin/dashboard");
+  const isKnownRoute = [
+    "/", "/about", "/shop", "/cart", "/checkout", "/articles", 
+    "/community", "/contact", "/auth", "/products/vflow", 
+    "/reviews", "/faq", "/orders", "/admin"
+  ].some(route => location.pathname === route || location.pathname.startsWith(route + "/"));
+  
+  if (!isAdminDashboard && !isKnownRoute) {
+    return (
+      <MainLayout>
+        <NotFound />
+      </MainLayout>
+    );
+  }
+  
+  return <AppContent />;
 };
 
 const App = () => (
@@ -126,7 +148,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppContent />
+          <AppWithNotFound />
           <ChatbotWidget />
         </BrowserRouter>
       </TooltipProvider>
