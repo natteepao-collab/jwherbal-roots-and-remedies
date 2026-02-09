@@ -241,8 +241,12 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                       <SidebarMenuButton
                         asChild
+                        isActive={location.pathname.startsWith("/admin/dashboard")}
                         tooltip="จัดการระบบ"
-                        className="font-prompt"
+                        className={cn(
+                          "font-prompt transition-all duration-200",
+                          location.pathname.startsWith("/admin/dashboard") && "bg-primary text-primary-foreground hover:bg-primary/90"
+                        )}
                       >
                         <Link to="/admin/dashboard">
                           <Shield className="h-4 w-4" />
