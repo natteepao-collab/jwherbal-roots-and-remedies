@@ -11,16 +11,53 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, language } = await req.json();
+    const { messages, language, sessionId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch real data from database
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch products, articles, FAQ, contact info in parallel
+    // Get or create conversation
+    let conversationId: string;
+    if (sessionId) {
+      const { data: existing } = await supabase
+        .from("chat_conversations")
+        .select("id")
+        .eq("session_id", sessionId)
+        .single();
+
+      if (existing) {
+        conversationId = existing.id;
+      } else {
+        const { data: created } = await supabase
+          .from("chat_conversations")
+          .insert({ session_id: sessionId, language: language || "th" })
+          .select("id")
+          .single();
+        conversationId = created!.id;
+      }
+    } else {
+      const { data: created } = await supabase
+        .from("chat_conversations")
+        .insert({ session_id: crypto.randomUUID(), language: language || "th" })
+        .select("id")
+        .single();
+      conversationId = created!.id;
+    }
+
+    // Save the latest user message
+    const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
+    if (lastUserMsg) {
+      await supabase.from("chat_messages").insert({
+        conversation_id: conversationId,
+        role: "user",
+        content: lastUserMsg.content,
+      });
+    }
+
+    // Fetch real data from database
     const [productsRes, articlesRes, faqRes, contactRes, vflowRes] = await Promise.all([
       supabase.from("products").select("name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th").eq("is_active", true).limit(20),
       supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category").order("updated_at", { ascending: false }).limit(10),
@@ -32,8 +69,7 @@ serve(async (req) => {
     const lang = language || "th";
     const langSuffix = `_${lang}`;
 
-    // Build context from real data
-    const products = (productsRes.data || []).map(p => ({
+    const products = (productsRes.data || []).map((p: any) => ({
       name: p[`name${langSuffix}`] || p.name_th,
       price: p.price,
       description: p[`description${langSuffix}`] || p.description_th,
@@ -42,14 +78,14 @@ serve(async (req) => {
       suitableFor: p.suitable_for_th,
     }));
 
-    const articles = (articlesRes.data || []).map(a => ({
+    const articles = (articlesRes.data || []).map((a: any) => ({
       title: a[`title${langSuffix}`] || a.title_th,
       excerpt: a[`excerpt${langSuffix}`] || a.excerpt_th,
       slug: a.slug,
       category: a.category,
     }));
 
-    const faqs = (faqRes.data || []).map(f => ({
+    const faqs = (faqRes.data || []).map((f: any) => ({
       question: f[`question${langSuffix}`] || f.question_th,
       answer: f[`answer${langSuffix}`] || f.answer_th,
     }));
@@ -85,6 +121,7 @@ ${contact ? `โทร: ${contact.phone}, LINE: ${contact.line_id}, อีเม
 
 URL เว็บไซต์หลัก: /shop (สินค้า), /articles (บทความ), /products/vflow (V Flow), /faq (ถามตอบ), /contact (ติดต่อ), /reviews (รีวิว)`;
 
+    // Call AI with streaming
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -104,32 +141,72 @@ URL เว็บไซต์หลัก: /shop (สินค้า), /articles 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง" }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "ระบบไม่พร้อมให้บริการชั่วคราว" }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(JSON.stringify({ error: "เกิดข้อผิดพลาด กรุณาลองใหม่" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    // Stream response and collect full text to save
+    const reader = response.body!.getReader();
+    let fullAssistantText = "";
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            // Forward chunk to client
+            controller.enqueue(value);
+
+            // Parse to collect full text
+            const chunk = decoder.decode(value, { stream: true });
+            for (const line of chunk.split("\n")) {
+              if (!line.startsWith("data: ")) continue;
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(jsonStr);
+                const content = parsed.choices?.[0]?.delta?.content;
+                if (content) fullAssistantText += content;
+              } catch { /* partial */ }
+            }
+          }
+        } finally {
+          controller.close();
+          // Save assistant response to DB after streaming completes
+          if (fullAssistantText) {
+            await supabase.from("chat_messages").insert({
+              conversation_id: conversationId,
+              role: "assistant",
+              content: fullAssistantText,
+            });
+          }
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId },
     });
   } catch (e) {
     console.error("chatbot error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
