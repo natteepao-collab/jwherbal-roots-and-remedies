@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { SecondaryNavbar } from "./SecondaryNavbar";
 import { SubNavbar } from "./SubNavbar";
+import { DesktopQuickAccess } from "./DesktopQuickAccess";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -35,6 +36,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <AppSidebar />
         <SidebarInset className="flex flex-col w-full">
           <SecondaryNavbar />
+          <DesktopQuickAccess />
           <SubNavbar />
           <main className="flex-1 pb-14 sm:pb-16 lg:pb-0">
             {children}
