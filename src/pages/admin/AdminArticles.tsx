@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, Eye, Edit, Trash2, MoreHorizontal } from "lucide-react";
+import { Plus, Search, Eye, Edit, Trash2, MoreHorizontal, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ interface Article {
   image_url: string;
   published_date: string;
   likes: number;
+  is_featured: boolean;
 }
 
 const emptyArticle: Partial<Article> = {
@@ -175,6 +176,19 @@ const AdminArticles = () => {
     setArticleToDelete(null);
   };
 
+  const toggleFeatured = async (article: Article) => {
+    const { error } = await supabase
+      .from("articles")
+      .update({ is_featured: !article.is_featured } as any)
+      .eq("id", article.id);
+    if (error) {
+      toast({ title: "เกิดข้อผิดพลาด", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "สำเร็จ", description: article.is_featured ? "ยกเลิกบทความแนะนำ" : "ตั้งเป็นบทความแนะนำ" });
+      fetchArticles();
+    }
+  };
+
   const filteredArticles = articles.filter(
     (article) =>
       article.title_th.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -211,6 +225,7 @@ const AdminArticles = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">⭐</TableHead>
               <TableHead>ชื่อบทความ</TableHead>
               <TableHead>หมวดหมู่</TableHead>
               <TableHead>ผู้เขียน</TableHead>
@@ -222,21 +237,30 @@ const AdminArticles = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   กำลังโหลด...
                 </TableCell>
               </TableRow>
             ) : filteredArticles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   ไม่พบบทความ
                 </TableCell>
               </TableRow>
             ) : (
               filteredArticles.map((article) => (
                 <TableRow key={article.id}>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => toggleFeatured(article)}
+                    >
+                      <Star className={`h-4 w-4 ${article.is_featured ? "fill-amber-500 text-amber-500" : "text-muted-foreground"}`} />
+                    </Button>
+                  </TableCell>
                   <TableCell className="font-medium max-w-xs truncate">
-                    {article.title_th}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{article.category}</Badge>
@@ -257,6 +281,10 @@ const AdminArticles = () => {
                         <DropdownMenuItem onClick={() => window.open(`/articles/${article.slug}`, "_blank")}>
                           <Eye className="mr-2 h-4 w-4" />
                           ดูบทความ
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toggleFeatured(article)}>
+                          <Star className={`mr-2 h-4 w-4 ${article.is_featured ? "fill-amber-500 text-amber-500" : ""}`} />
+                          {article.is_featured ? "ยกเลิกแนะนำ" : "ตั้งเป็นแนะนำ"}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => { setSelectedArticle(article); setIsDialogOpen(true); }}>
                           <Edit className="mr-2 h-4 w-4" />
