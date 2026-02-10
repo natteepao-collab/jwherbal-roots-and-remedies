@@ -130,7 +130,6 @@ const ChatbotWidget = () => {
     const userMsg: MessageType = { id: Date.now(), role: "user", content: userMessage };
     setMessages((prev) => [...prev, userMsg]);
 
-    // Build conversation history for AI
     const history = [...messages, userMsg].map((m) => ({
       role: m.role,
       content: m.content,
@@ -138,6 +137,29 @@ const ChatbotWidget = () => {
 
     streamChat(history);
   };
+
+  const handleQuickQuestion = (question: string) => {
+    if (isLoading) return;
+    const userMsg: MessageType = { id: Date.now(), role: "user", content: question };
+    setMessages((prev) => [...prev, userMsg]);
+
+    const history = [...messages, userMsg].map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    streamChat(history);
+  };
+
+  const quickQuestions = [
+    { label: t("chatbot.quick.product", "สินค้าแนะนำ"), question: t("chatbot.quick.productQ", "สินค้าแนะนำของร้านมีอะไรบ้าง?") },
+    { label: t("chatbot.quick.vflow", "V Flow คืออะไร"), question: t("chatbot.quick.vflowQ", "V Flow คืออะไร มีสรรพคุณอะไรบ้าง?") },
+    { label: t("chatbot.quick.price", "ราคา/โปรโมชั่น"), question: t("chatbot.quick.priceQ", "ราคาสินค้าและโปรโมชั่นปัจจุบันเป็นอย่างไร?") },
+    { label: t("chatbot.quick.howto", "วิธีใช้งาน"), question: t("chatbot.quick.howtoQ", "วิธีดื่ม V Flow ที่ถูกต้องเป็นอย่างไร?") },
+    { label: t("chatbot.quick.contact", "ติดต่อแอดมิน"), question: t("chatbot.quick.contactQ", "ต้องการติดต่อแอดมินหรือสั่งซื้อสินค้า") },
+  ];
+
+  const showQuickButtons = messages.length <= 1 && !isLoading;
 
   return (
     <>
@@ -228,6 +250,23 @@ const ChatbotWidget = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Quick Question Buttons */}
+              {showQuickButtons && (
+                <div className="flex flex-wrap gap-2 mt-3 animate-fade-in">
+                  {quickQuestions.map((q, i) => (
+                    <Button
+                      key={i}
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full text-xs border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                      onClick={() => handleQuickQuestion(q.question)}
+                    >
+                      {q.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
           </ScrollArea>
 
