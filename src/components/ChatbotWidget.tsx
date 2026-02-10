@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, X, Send, ArrowLeft } from "lucide-react";
+import { MessageCircle, X, Send, ArrowLeft, HelpCircle, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ type ChatView = "menu" | "productInfo" | "pricing" | "howToUse" | "contactAdmin"
 const ChatbotWidget = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(true);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [currentView, setCurrentView] = useState<ChatView>("menu");
   const [inputValue, setInputValue] = useState("");
@@ -44,17 +45,23 @@ const ChatbotWidget = () => {
 
   const handleOpen = () => {
     setIsOpen(true);
+    setIsTabVisible(false);
     if (messages.length === 0) {
       addMessage(t("chatbot.greeting"), true);
     }
   };
 
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsTabVisible(true);
+  };
+
   const handleMenuClick = (view: ChatView) => {
     setCurrentView(view);
-    
+
     let userMessage = "";
     let botResponse = "";
-    
+
     switch (view) {
       case "productInfo":
         userMessage = t("chatbot.menu.productInfo");
@@ -73,7 +80,7 @@ const ChatbotWidget = () => {
         botResponse = t("chatbot.contactAdmin.description");
         break;
     }
-    
+
     if (userMessage) addMessage(userMessage, false);
     if (botResponse) showBotResponse(botResponse);
   };
@@ -90,11 +97,10 @@ const ChatbotWidget = () => {
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
-    
+
     addMessage(inputValue, false);
     setInputValue("");
-    
-    // Auto-response based on keywords
+
     const lowerInput = inputValue.toLowerCase();
     if (lowerInput.includes("ราคา") || lowerInput.includes("price") || lowerInput.includes("价格")) {
       setTimeout(() => handleMenuClick("pricing"), 500);
@@ -109,22 +115,42 @@ const ChatbotWidget = () => {
 
   return (
     <>
-      {/* Floating Button */}
-      {!isOpen && (
-        <Button
+      {/* Side Tab Toggle - visible when chat is closed */}
+      {!isOpen && isTabVisible && (
+        <button
           onClick={handleOpen}
-          size="icon"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-elegant z-50 hover:scale-110 transition-transform"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group"
+          aria-label="Open Help"
         >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
+          <div className="flex items-center gap-1.5 bg-primary text-primary-foreground pl-3 pr-1.5 py-3 rounded-l-xl shadow-lg transition-all duration-300 hover:pr-3 hover:shadow-xl hover:bg-primary/90">
+            <HelpCircle className="h-5 w-5" />
+            <span className="text-sm font-medium whitespace-nowrap">Help</span>
+            <ChevronLeft className="h-3.5 w-3.5 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+          </div>
+        </button>
       )}
 
-      {/* Chat Window */}
-      {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[80vh] shadow-elegant z-50 flex flex-col">
+      {/* Minimal re-open tab when tab is hidden */}
+      {!isOpen && !isTabVisible && (
+        <button
+          onClick={() => setIsTabVisible(true)}
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-primary/80 text-primary-foreground p-1.5 rounded-l-md shadow-md hover:bg-primary transition-colors"
+          aria-label="Show Help Tab"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
+
+      {/* Chat Window - slides in from right */}
+      <div
+        className={cn(
+          "fixed top-0 right-0 h-full w-96 max-w-[calc(100vw-1rem)] z-50 transition-transform duration-300 ease-out",
+          isOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        <Card className="h-full rounded-none rounded-l-2xl shadow-2xl flex flex-col border-l">
           {/* Header */}
-          <CardHeader className="border-b bg-primary text-primary-foreground py-4">
+          <CardHeader className="border-b bg-primary text-primary-foreground py-4 rounded-tl-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {currentView !== "menu" && (
@@ -137,15 +163,23 @@ const ChatbotWidget = () => {
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
                 )}
-                <div>
-                  <CardTitle className="text-lg">JWHERBAL Assistant</CardTitle>
-                  <p className="text-xs opacity-90">Online</p>
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                    <MessageCircle className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">JWHERBAL Help</CardTitle>
+                    <p className="text-[11px] opacity-80 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
+                      Online
+                    </p>
+                  </div>
                 </div>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 className="text-primary-foreground hover:bg-primary-foreground/20"
               >
                 <X className="h-5 w-5" />
@@ -160,26 +194,26 @@ const ChatbotWidget = () => {
                 <div
                   key={message.id}
                   className={cn(
-                    "flex",
+                    "flex animate-fade-in",
                     message.isBot ? "justify-start" : "justify-end"
                   )}
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] rounded-lg p-3 whitespace-pre-line",
+                      "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
                       message.isBot
-                        ? "bg-secondary text-foreground"
-                        : "bg-primary text-primary-foreground"
+                        ? "bg-secondary text-foreground rounded-bl-sm"
+                        : "bg-primary text-primary-foreground rounded-br-sm"
                     )}
                   >
                     {message.text}
                   </div>
                 </div>
               ))}
-              
+
               {showTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-secondary text-foreground rounded-lg p-3">
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-secondary text-foreground rounded-2xl rounded-bl-sm px-4 py-3">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                       <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -194,28 +228,28 @@ const ChatbotWidget = () => {
                 <div className="grid grid-cols-1 gap-2 mt-4">
                   <Button
                     variant="outline"
-                    className="justify-start h-auto py-3 text-left"
+                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
                     onClick={() => handleMenuClick("productInfo")}
                   >
                     {t("chatbot.menu.productInfo")}
                   </Button>
                   <Button
                     variant="outline"
-                    className="justify-start h-auto py-3 text-left"
+                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
                     onClick={() => handleMenuClick("pricing")}
                   >
                     {t("chatbot.menu.pricing")}
                   </Button>
                   <Button
                     variant="outline"
-                    className="justify-start h-auto py-3 text-left"
+                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
                     onClick={() => handleMenuClick("howToUse")}
                   >
                     {t("chatbot.menu.howToUse")}
                   </Button>
                   <Button
                     variant="outline"
-                    className="justify-start h-auto py-3 text-left"
+                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
                     onClick={() => handleMenuClick("contactAdmin")}
                   >
                     {t("chatbot.menu.talkToAdmin")}
@@ -228,14 +262,14 @@ const ChatbotWidget = () => {
                 <div className="grid grid-cols-1 gap-2 mt-4">
                   <Button
                     variant="default"
-                    className="justify-start h-auto py-3"
+                    className="justify-start h-auto py-3 rounded-xl"
                     onClick={handleLineContact}
                   >
                     {t("chatbot.contactAdmin.lineChat")}
                   </Button>
                   <Button
                     variant="outline"
-                    className="justify-start h-auto py-3"
+                    className="justify-start h-auto py-3 rounded-xl"
                     onClick={handleBackToMenu}
                   >
                     {t("chatbot.buttons.backToMenu")}
@@ -247,7 +281,7 @@ const ChatbotWidget = () => {
               {currentView !== "menu" && currentView !== "contactAdmin" && (
                 <Button
                   variant="outline"
-                  className="w-full mt-4"
+                  className="w-full mt-4 rounded-xl"
                   onClick={handleBackToMenu}
                 >
                   {t("chatbot.buttons.backToMenu")}
@@ -264,14 +298,22 @@ const ChatbotWidget = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder={t("chatbot.placeholder")}
-                className="flex-1"
+                className="flex-1 rounded-xl"
               />
-              <Button size="icon" onClick={handleSendMessage}>
+              <Button size="icon" onClick={handleSendMessage} className="rounded-xl">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 backdrop-blur-[2px]"
+          onClick={handleClose}
+        />
       )}
     </>
   );
