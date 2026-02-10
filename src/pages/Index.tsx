@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award, Flame, Sparkles } from "lucide-react";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -345,12 +346,15 @@ const Index = () => {
         return promoProducts.length > 0 ? (
           <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
             <div className="container mx-auto px-4 sm:px-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
-                  {currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销"}
-                </h2>
-                <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                    {currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销"}
+                  </h2>
+                  <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
+                </div>
+                <CountdownTimer />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {promoProducts.slice(0, 2).map((product: any, idx: number) => {
