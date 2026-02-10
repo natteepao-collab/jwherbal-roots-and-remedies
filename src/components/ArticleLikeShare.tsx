@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 interface ArticleLikeShareProps {
-  articleId: number;
+  articleId: number | string;
   articleTitle: string;
   articleUrl: string;
   initialLikes?: number;
