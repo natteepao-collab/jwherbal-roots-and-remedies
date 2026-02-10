@@ -1,6 +1,6 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Home, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -11,20 +11,92 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
+import { useEffect } from "react";
+
+const ArticleNavButtons = ({
+  prevSlug,
+  nextSlug,
+  prevLabel,
+  nextLabel,
+}: {
+  prevSlug?: string;
+  nextSlug?: string;
+  prevLabel?: string;
+  nextLabel?: string;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="mt-12 pt-8 border-t">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {prevSlug ? (
+          <Button variant="outline" asChild className="justify-start gap-2 h-auto py-3 rounded-xl">
+            <Link to={`/articles/${prevSlug}`}>
+              <ChevronLeft className="h-4 w-4 flex-shrink-0" />
+              <div className="text-left min-w-0">
+                <div className="text-[10px] text-muted-foreground">{t("articles.prevArticle", "บทความก่อนหน้า")}</div>
+                <div className="text-xs font-medium truncate">{prevLabel}</div>
+              </div>
+            </Link>
+          </Button>
+        ) : (
+          <div />
+        )}
+
+        <Button variant="outline" asChild className="justify-center gap-2 h-auto py-3 rounded-xl">
+          <Link to="/articles">
+            <Home className="h-4 w-4" />
+            <span className="text-sm">{t("articles.backToAll", "กลับไปหน้าบทความ")}</span>
+          </Link>
+        </Button>
+
+        {nextSlug ? (
+          <Button variant="outline" asChild className="justify-end gap-2 h-auto py-3 rounded-xl">
+            <Link to={`/articles/${nextSlug}`}>
+              <div className="text-right min-w-0">
+                <div className="text-[10px] text-muted-foreground">{t("articles.nextArticle", "บทความถัดไป")}</div>
+                <div className="text-xs font-medium truncate">{nextLabel}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 flex-shrink-0" />
+            </Link>
+          </Button>
+        ) : (
+          <div />
+        )}
+      </div>
+    </div>
+  );
+};
 
 const ArticleDetail = () => {
   const { slug } = useParams();
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language as "th" | "en" | "zh";
 
+  // Scroll to top on slug change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [slug]);
+
   // Try static data first
   const staticArticle = healthArticles.find((a) => a.slug === slug);
+
+  // Fetch all DB articles for prev/next navigation
+  const { data: allDbArticles = [] } = useQuery({
+    queryKey: ["all-articles-nav"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("id, slug, title_th, title_en, title_zh")
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // Fetch from DB if not found in static data
   const { data: dbArticle, isLoading } = useQuery({
     queryKey: ["article-detail", slug],
     queryFn: async () => {
-      // Try by slug first, then by id
       let { data, error } = await supabase
         .from("articles")
         .select("*")
@@ -69,8 +141,25 @@ const ArticleDetail = () => {
     return <Navigate to="/articles" replace />;
   }
 
+  // Find prev/next for DB articles
+  const getDbNavigation = (currentSlug: string) => {
+    const idx = allDbArticles.findIndex((a) => a.slug === currentSlug || a.id === currentSlug);
+    const prev = idx > 0 ? allDbArticles[idx - 1] : undefined;
+    const next = idx >= 0 && idx < allDbArticles.length - 1 ? allDbArticles[idx + 1] : undefined;
+    return {
+      prevSlug: prev?.slug,
+      prevLabel: prev ? getText(prev.title_th, prev.title_en, prev.title_zh) : undefined,
+      nextSlug: next?.slug,
+      nextLabel: next ? getText(next.title_th, next.title_en, next.title_zh) : undefined,
+    };
+  };
+
   // Render static article
   if (staticArticle) {
+    const staticIdx = healthArticles.findIndex((a) => a.slug === slug);
+    const prevStatic = staticIdx > 0 ? healthArticles[staticIdx - 1] : undefined;
+    const nextStatic = staticIdx < healthArticles.length - 1 ? healthArticles[staticIdx + 1] : undefined;
+
     const relatedArticles = healthArticles
       .filter((a) => a.id !== staticArticle.id && a.category[currentLang] === staticArticle.category[currentLang])
       .slice(0, 3);
@@ -123,8 +212,15 @@ const ArticleDetail = () => {
               </div>
             </article>
 
+            <ArticleNavButtons
+              prevSlug={prevStatic?.slug}
+              prevLabel={prevStatic?.title[currentLang]}
+              nextSlug={nextStatic?.slug}
+              nextLabel={nextStatic?.title[currentLang]}
+            />
+
             {relatedArticles.length > 0 && (
-              <section className="border-t pt-12">
+              <section className="border-t pt-12 mt-8">
                 <h2 className="text-2xl font-bold mb-6">{t("articles.relatedArticles")}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {relatedArticles.map((ra) => (
@@ -157,6 +253,7 @@ const ArticleDetail = () => {
   const title = getText(article.title_th, article.title_en, article.title_zh);
   const excerpt = getText(article.excerpt_th, article.excerpt_en, article.excerpt_zh);
   const content = getText(article.content_th, article.content_en, article.content_zh);
+  const nav = getDbNavigation(article.slug);
 
   return (
     <PageTransition>
@@ -204,6 +301,13 @@ const ArticleDetail = () => {
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
           </article>
+
+          <ArticleNavButtons
+            prevSlug={nav.prevSlug}
+            prevLabel={nav.prevLabel}
+            nextSlug={nav.nextSlug}
+            nextLabel={nav.nextLabel}
+          />
         </div>
       </main>
       <Footer />
