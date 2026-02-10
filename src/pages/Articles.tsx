@@ -72,8 +72,8 @@ const Articles = () => {
   const featuredArticles = articles.filter(a => a.is_featured);
   const allArticles = articles;
 
-  // Hero featured article (latest one)
-  const heroArticle = latestArticles[0];
+  // Hero: show first featured article, fallback to latest
+  const heroArticle = featuredArticles[0] || latestArticles[0];
 
   const ArticleCard = ({ article, index, size = "normal" }: { article: Article; index: number; size?: "normal" | "small" }) => (
     <motion.div
