@@ -15,7 +15,13 @@ export function DesktopQuickAccess() {
   const navigate = useNavigate();
 
   const handleClick = (item: typeof navItems[0], e: React.MouseEvent) => {
-    if (item.path === "/products/vflow") return; // normal link navigation
+    if (item.path === "/products/vflow") {
+      if (location.pathname === "/products/vflow") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
 
     e.preventDefault();
 
