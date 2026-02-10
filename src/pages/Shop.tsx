@@ -204,6 +204,7 @@ const Shop = () => {
                         description: getProductDescription(product),
                         rating: product.rating || 0,
                       }}
+                      productUuid={product.id}
                       promoKey={hasPromo ? product.id : undefined}
                       isAdmin={isAdmin}
                       isHidden={!product.is_active}

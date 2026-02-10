@@ -10,6 +10,7 @@ import ChatbotWidget from "@/components/ChatbotWidget";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Shop from "./pages/Shop";
+import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Articles from "./pages/Articles";
@@ -57,6 +58,7 @@ const PublicRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/about" element={<About />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/articles" element={<Articles />} />
