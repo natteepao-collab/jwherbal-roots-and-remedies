@@ -17,21 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { productImages } from "@/assets/products";
-
-// Map product names (partial match) to promotion keys
-const promoNameMap: Record<string, string> = {
-  "V Flow 60": "vflow-capsule",
-  "V Flow Herbal": "vflow-drink",
-  "วี โฟลว์ 60": "vflow-capsule",
-  "วี โฟลว์ เครื่องดื่ม": "vflow-drink",
-};
-
-const getPromoKey = (name: string): string | undefined => {
-  for (const [keyword, key] of Object.entries(promoNameMap)) {
-    if (name.toLowerCase().includes(keyword.toLowerCase())) return key;
-  }
-  return undefined;
-};
+import { promotions } from "@/data/promotions";
 
 interface Product {
   id: string;
@@ -46,6 +32,7 @@ interface Product {
   category: string;
   rating: number;
   stock: number;
+  is_active: boolean | null;
 }
 
 const Shop = () => {
@@ -55,39 +42,38 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("popular");
 
   // Mock admin state — replace with real auth check later
-  const [isAdmin] = useState<boolean>(false);
-  const [hiddenProducts, setHiddenProducts] = useState<Set<string>>(new Set());
-
-  const toggleVisibility = (id: string) => {
-    setHiddenProducts((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+  const [isAdmin] = useState<boolean>(true);
+  const { data: products, isLoading, refetch } = useQuery({
+    queryKey: ["products", isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from("products")
         .select("*")
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
+      // RLS only allows is_active=true for non-admin users
+      const { data, error } = await query;
       if (error) throw error;
       return data as Product[];
     },
   });
 
+  const toggleVisibility = async (id: string) => {
+    const product = products?.find((p) => p.id === id);
+    if (!product) return;
+    await supabase
+      .from("products")
+      .update({ is_active: !product.is_active })
+      .eq("id", id);
+    refetch();
+  };
+
   const categories = products
-    ? Array.from(new Set(products.map((p) => p.category)))
+    ? Array.from(new Set(products.filter(p => p.is_active).map((p) => p.category)))
     : [];
 
   const filteredProducts = products?.filter((product) => {
     const categoryMatch = selectedCategory === "all" || product.category === selectedCategory;
-    // Non-admins never see hidden products
-    if (!isAdmin && hiddenProducts.has(product.id)) return false;
+    // Non-admins won't see inactive products (RLS handles this)
     return categoryMatch;
   }) || [];
 
@@ -204,7 +190,8 @@ const Shop = () => {
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {sortedProducts.map((product) => {
                   const name = getProductName(product);
-                  const promoKey = getPromoKey(name) || getPromoKey(product.name_th) || getPromoKey(product.name_en);
+                  // Use product UUID directly as promo key
+                  const hasPromo = !!promotions[product.id];
                   return (
                     <ProductCard
                       key={product.id}
@@ -217,9 +204,9 @@ const Shop = () => {
                         description: getProductDescription(product),
                         rating: product.rating || 0,
                       }}
-                      promoKey={promoKey}
+                      promoKey={hasPromo ? product.id : undefined}
                       isAdmin={isAdmin}
-                      isHidden={hiddenProducts.has(product.id)}
+                      isHidden={!product.is_active}
                       onToggleVisibility={() => toggleVisibility(product.id)}
                     />
                   );

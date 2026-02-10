@@ -8,14 +8,14 @@ export interface PromotionTier {
 }
 
 export interface ProductPromotion {
-  productId: string; // matches supabase product id
+  productId: string;
   tiers: PromotionTier[];
 }
 
+// Keyed by actual Supabase product UUID
 export const promotions: Record<string, ProductPromotion> = {
-  // V Flow 60capsule — use a known product id or a placeholder
-  "vflow-capsule": {
-    productId: "vflow-capsule",
+  "a1f1c1d1-1111-4111-8111-111111111111": {
+    productId: "a1f1c1d1-1111-4111-8111-111111111111",
     tiers: [
       { id: "cap-1", quantity: 1, unit: "กระปุก", price: 1125, normalPrice: 1800 },
       { id: "cap-2", quantity: 2, unit: "กระปุก", price: 2120, normalPrice: 3600, isBestSeller: true },
@@ -23,9 +23,8 @@ export const promotions: Record<string, ProductPromotion> = {
       { id: "cap-6", quantity: 6, unit: "กระปุก", price: 5700, normalPrice: 10800 },
     ],
   },
-  // V Flow Herbal Drink
-  "vflow-drink": {
-    productId: "vflow-drink",
+  "b2f2c2d2-2222-4222-8222-222222222222": {
+    productId: "b2f2c2d2-2222-4222-8222-222222222222",
     tiers: [
       { id: "drink-1", quantity: 1, unit: "กล่อง", price: 1250, normalPrice: 2400 },
       { id: "drink-2", quantity: 2, unit: "กล่อง", price: 2250, normalPrice: 4800, isBestSeller: true },
@@ -35,14 +34,8 @@ export const promotions: Record<string, ProductPromotion> = {
   },
 };
 
-// Map supabase product IDs to promotion keys
-export const productPromotionMap: Record<string, string> = {
-  // Map your actual supabase product UUIDs here
-  // For now we map by name matching in the component
-};
-
-export const getLowestPrice = (promoKey: string): number | null => {
-  const promo = promotions[promoKey];
+export const getLowestPrice = (productId: string): number | null => {
+  const promo = promotions[productId];
   if (!promo) return null;
   return Math.min(...promo.tiers.map((t) => t.price));
 };
