@@ -61,6 +61,20 @@ const VFlowProduct = () => {
     },
   });
 
+  // Fetch V Flow page settings from DB
+  const { data: pageSettings } = useQuery({
+    queryKey: ["vflow-page-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vflow_page_settings" as any)
+        .select("*")
+        .limit(1)
+        .single();
+      if (error) throw error;
+      return data as any;
+    },
+  });
+
   // Fetch reviews for V Flow products
   const { data: vflowReviews } = useQuery({
     queryKey: ["vflow-reviews"],
@@ -93,6 +107,19 @@ const VFlowProduct = () => {
 
   const drinkProduct = vflowProducts?.find(p => p.id === VFLOW_DRINK_ID);
   const capsuleProduct = vflowProducts?.find(p => p.id === VFLOW_CAPSULE_ID);
+
+  // Use DB settings with vflowData as fallback
+  const ps = pageSettings || vflowData as any;
+  const highlightsList: string[] = ps.highlights || vflowData.highlights;
+  const painPointsList: { icon: string; text: string }[] = ps.pain_points || vflowData.painPoints;
+  const howToUseList: { step: number; text: string; icon: string }[] = ps.how_to_use || vflowData.howToUse;
+  const certificatesList: string[] = ps.certificates || vflowData.certificates;
+  const brandValuesList: string[] = ps.brand_values || vflowData.brandValues;
+  const faqsList: { question: string; answer: string }[] = ps.faqs || vflowData.faqs;
+  const researchTitle = ps.research_title || vflowData.research.title;
+  const researchDescription = ps.research_description || vflowData.research.description;
+  const researchPointsList: string[] = ps.research_points || vflowData.research.points;
+  const tipText = ps.tip || vflowData.tip;
 
   const handleSelectPackage = (product: any) => {
     const promo = promotions[product.id];
@@ -174,7 +201,7 @@ const VFlowProduct = () => {
                   <p className="text-muted-foreground leading-relaxed">
                     {drinkProduct
                       ? getText(drinkProduct.description_th, drinkProduct.description_en, drinkProduct.description_zh)
-                      : vflowData.description}
+                      : (ps.description || vflowData.description)}
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -212,7 +239,7 @@ const VFlowProduct = () => {
                   จุดเด่นของ V Flow
                 </motion.h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {vflowData.highlights.map((highlight, i) => (
+                  {highlightsList.map((highlight, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -323,14 +350,14 @@ const VFlowProduct = () => {
                 >
                   <Badge variant="outline" className="mb-4 text-xs tracking-wider">IRTC RESEARCH</Badge>
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                    {vflowData.research.title}
+                    {researchTitle}
                   </h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto mb-10">
-                    {vflowData.research.description}
+                    {researchDescription}
                   </p>
                 </motion.div>
                 <div className="grid md:grid-cols-3 gap-4">
-                  {vflowData.research.points.map((point, i) => (
+                  {researchPointsList.map((point, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -372,7 +399,7 @@ const VFlowProduct = () => {
                   <p className="text-muted-foreground">V Flow ช่วยเสริมสมดุลระบบเลือดจากภายใน</p>
                 </motion.div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                  {vflowData.painPoints.map((point, i) => (
+                  {painPointsList.map((point, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -450,7 +477,7 @@ const VFlowProduct = () => {
                   วิธีดื่ม V Flow
                 </motion.h2>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  {vflowData.howToUse.map((step, i) => (
+                  {howToUseList.map((step, i) => (
                     <motion.div
                       key={step.step}
                       initial="hidden"
@@ -470,7 +497,7 @@ const VFlowProduct = () => {
                 </div>
                 <div className="bg-muted/50 p-4 rounded-lg text-center">
                   <p className="text-sm text-muted-foreground">
-                    <strong>เคล็ดลับ:</strong> {vflowData.tip}
+                    <strong>เคล็ดลับ:</strong> {tipText}
                   </p>
                 </div>
               </div>
@@ -557,7 +584,7 @@ const VFlowProduct = () => {
                   มาตรฐานที่คุณมั่นใจได้
                 </motion.h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {vflowData.certificates.map((cert, i) => (
+                  {certificatesList.map((cert, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -594,7 +621,7 @@ const VFlowProduct = () => {
                   <p className="text-muted-foreground">ความจริงใจ ความปลอดภัย และคุณภาพ</p>
                 </motion.div>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {vflowData.brandValues.map((value, i) => (
+                  {brandValuesList.map((value, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -630,7 +657,7 @@ const VFlowProduct = () => {
                   คำถามที่พบบ่อย
                 </motion.h2>
                 <Accordion type="single" collapsible className="space-y-2">
-                  {vflowData.faqs.map((faq, i) => (
+                  {faqsList.map((faq, i) => (
                     <AccordionItem
                       key={i}
                       value={`item-${i}`}

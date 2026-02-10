@@ -1363,6 +1363,57 @@ export type Database = {
         }
         Relationships: []
       }
+      vflow_page_settings: {
+        Row: {
+          brand_values: Json
+          certificates: Json
+          description: string
+          faqs: Json
+          highlights: Json
+          how_to_use: Json
+          id: string
+          pain_points: Json
+          research_description: string
+          research_points: Json
+          research_title: string
+          tagline: string
+          tip: string
+          updated_at: string
+        }
+        Insert: {
+          brand_values?: Json
+          certificates?: Json
+          description?: string
+          faqs?: Json
+          highlights?: Json
+          how_to_use?: Json
+          id?: string
+          pain_points?: Json
+          research_description?: string
+          research_points?: Json
+          research_title?: string
+          tagline?: string
+          tip?: string
+          updated_at?: string
+        }
+        Update: {
+          brand_values?: Json
+          certificates?: Json
+          description?: string
+          faqs?: Json
+          highlights?: Json
+          how_to_use?: Json
+          id?: string
+          pain_points?: Json
+          research_description?: string
+          research_points?: Json
+          research_title?: string
+          tagline?: string
+          tip?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
