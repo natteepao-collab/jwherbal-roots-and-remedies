@@ -1,53 +1,42 @@
-import { useState } from "react";
-import { MessageCircle, X, Send, ArrowLeft, HelpCircle, ChevronLeft } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { MessageCircle, X, Send, HelpCircle, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type MessageType = {
   id: number;
-  text: string;
-  isBot: boolean;
-  timestamp: Date;
+  role: "user" | "assistant";
+  content: string;
 };
 
-type ChatView = "menu" | "productInfo" | "pricing" | "howToUse" | "contactAdmin";
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot`;
 
 const ChatbotWidget = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [messages, setMessages] = useState<MessageType[]>([]);
-  const [currentView, setCurrentView] = useState<ChatView>("menu");
   const [inputValue, setInputValue] = useState("");
-  const [showTyping, setShowTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const addMessage = (text: string, isBot: boolean = false) => {
-    const newMessage: MessageType = {
-      id: Date.now(),
-      text,
-      isBot,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-  };
-
-  const showBotResponse = (text: string, delay: number = 500) => {
-    setShowTyping(true);
-    setTimeout(() => {
-      setShowTyping(false);
-      addMessage(text, true);
-    }, delay);
-  };
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleOpen = () => {
     setIsOpen(true);
     setIsTabVisible(false);
     if (messages.length === 0) {
-      addMessage(t("chatbot.greeting"), true);
+      // Send initial greeting via AI
+      streamChat([{ role: "user", content: "สวัสดี" }], true);
     }
   };
 
@@ -56,66 +45,101 @@ const ChatbotWidget = () => {
     setIsTabVisible(true);
   };
 
-  const handleMenuClick = (view: ChatView) => {
-    setCurrentView(view);
+  const streamChat = async (chatMessages: { role: string; content: string }[], isGreeting = false) => {
+    setIsLoading(true);
+    let assistantContent = "";
 
-    let userMessage = "";
-    let botResponse = "";
+    // Add placeholder assistant message
+    const assistantId = Date.now();
+    setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
 
-    switch (view) {
-      case "productInfo":
-        userMessage = t("chatbot.menu.productInfo");
-        botResponse = t("chatbot.productInfo.description");
-        break;
-      case "pricing":
-        userMessage = t("chatbot.menu.pricing");
-        botResponse = t("chatbot.pricing.description");
-        break;
-      case "howToUse":
-        userMessage = t("chatbot.menu.howToUse");
-        botResponse = t("chatbot.howToUse.description");
-        break;
-      case "contactAdmin":
-        userMessage = t("chatbot.menu.talkToAdmin");
-        botResponse = t("chatbot.contactAdmin.description");
-        break;
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: chatMessages,
+          language: i18n.language,
+        }),
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        toast.error(errData.error || "เกิดข้อผิดพลาด กรุณาลองใหม่");
+        setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+        setIsLoading(false);
+        return;
+      }
+
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantContent += content;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
+              );
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Chat error:", e);
+      toast.error("ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่");
+      setMessages((prev) => prev.filter((m) => m.id !== assistantId));
     }
 
-    if (userMessage) addMessage(userMessage, false);
-    if (botResponse) showBotResponse(botResponse);
-  };
-
-  const handleBackToMenu = () => {
-    setCurrentView("menu");
-    showBotResponse(t("chatbot.greeting"));
-  };
-
-  const handleLineContact = () => {
-    window.open("https://line.me/R/ti/p/@jwherbal", "_blank");
-    addMessage(t("chatbot.contactAdmin.lineChat"), false);
+    setIsLoading(false);
   };
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
 
-    addMessage(inputValue, false);
+    const userMessage = inputValue.trim();
     setInputValue("");
 
-    const lowerInput = inputValue.toLowerCase();
-    if (lowerInput.includes("ราคา") || lowerInput.includes("price") || lowerInput.includes("价格")) {
-      setTimeout(() => handleMenuClick("pricing"), 500);
-    } else if (lowerInput.includes("วิธี") || lowerInput.includes("how") || lowerInput.includes("饮用")) {
-      setTimeout(() => handleMenuClick("howToUse"), 500);
-    } else if (lowerInput.includes("สินค้า") || lowerInput.includes("product") || lowerInput.includes("产品")) {
-      setTimeout(() => handleMenuClick("productInfo"), 500);
-    } else {
-      showBotResponse(t("chatbot.greeting"), 800);
-    }
+    const userMsg: MessageType = { id: Date.now(), role: "user", content: userMessage };
+    setMessages((prev) => [...prev, userMsg]);
+
+    // Build conversation history for AI
+    const history = [...messages, userMsg].map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    streamChat(history);
   };
 
   return (
     <>
-      {/* Side Tab Toggle - visible when chat is closed */}
+      {/* Side Tab Toggle */}
       {!isOpen && isTabVisible && (
         <button
           onClick={handleOpen}
@@ -128,7 +152,7 @@ const ChatbotWidget = () => {
         </button>
       )}
 
-      {/* Minimal re-open tab when tab is hidden */}
+      {/* Minimal re-open tab */}
       {!isOpen && !isTabVisible && (
         <button
           onClick={() => setIsTabVisible(true)}
@@ -139,7 +163,7 @@ const ChatbotWidget = () => {
         </button>
       )}
 
-      {/* Chat Window - slides in from right */}
+      {/* Chat Window */}
       <div
         className={cn(
           "fixed top-0 right-0 h-full w-96 max-w-[calc(100vw-1rem)] z-50 transition-transform duration-300 ease-out",
@@ -150,28 +174,16 @@ const ChatbotWidget = () => {
           {/* Header */}
           <CardHeader className="border-b bg-primary text-primary-foreground py-4 rounded-tl-2xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {currentView !== "menu" && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleBackToMenu}
-                    className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                )}
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                    <MessageCircle className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">JWHERBAL Help</CardTitle>
-                    <p className="text-[11px] opacity-80 flex items-center gap-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
-                      Online
-                    </p>
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                  <MessageCircle className="h-4 w-4" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">JWHERBAL Help</CardTitle>
+                  <p className="text-[11px] opacity-80 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
+                    Online
+                  </p>
                 </div>
               </div>
               <Button
@@ -186,105 +198,34 @@ const ChatbotWidget = () => {
           </CardHeader>
 
           {/* Messages Area */}
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={cn(
                     "flex animate-fade-in",
-                    message.isBot ? "justify-start" : "justify-end"
+                    message.role === "assistant" ? "justify-start" : "justify-end"
                   )}
                 >
                   <div
                     className={cn(
                       "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
-                      message.isBot
+                      message.role === "assistant"
                         ? "bg-secondary text-foreground rounded-bl-sm"
                         : "bg-primary text-primary-foreground rounded-br-sm"
                     )}
                   >
-                    {message.text}
+                    {message.content || (
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
-
-              {showTyping && (
-                <div className="flex justify-start animate-fade-in">
-                  <div className="bg-secondary text-foreground rounded-2xl rounded-bl-sm px-4 py-3">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Menu Buttons */}
-              {currentView === "menu" && messages.length > 0 && (
-                <div className="grid grid-cols-1 gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
-                    onClick={() => handleMenuClick("productInfo")}
-                  >
-                    {t("chatbot.menu.productInfo")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
-                    onClick={() => handleMenuClick("pricing")}
-                  >
-                    {t("chatbot.menu.pricing")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
-                    onClick={() => handleMenuClick("howToUse")}
-                  >
-                    {t("chatbot.menu.howToUse")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto py-3 text-left rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
-                    onClick={() => handleMenuClick("contactAdmin")}
-                  >
-                    {t("chatbot.menu.talkToAdmin")}
-                  </Button>
-                </div>
-              )}
-
-              {/* Contact Admin Buttons */}
-              {currentView === "contactAdmin" && (
-                <div className="grid grid-cols-1 gap-2 mt-4">
-                  <Button
-                    variant="default"
-                    className="justify-start h-auto py-3 rounded-xl"
-                    onClick={handleLineContact}
-                  >
-                    {t("chatbot.contactAdmin.lineChat")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto py-3 rounded-xl"
-                    onClick={handleBackToMenu}
-                  >
-                    {t("chatbot.buttons.backToMenu")}
-                  </Button>
-                </div>
-              )}
-
-              {/* Other View Back Button */}
-              {currentView !== "menu" && currentView !== "contactAdmin" && (
-                <Button
-                  variant="outline"
-                  className="w-full mt-4 rounded-xl"
-                  onClick={handleBackToMenu}
-                >
-                  {t("chatbot.buttons.backToMenu")}
-                </Button>
-              )}
             </div>
           </ScrollArea>
 
@@ -294,11 +235,12 @@ const ChatbotWidget = () => {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder={t("chatbot.placeholder")}
                 className="flex-1 rounded-xl"
+                disabled={isLoading}
               />
-              <Button size="icon" onClick={handleSendMessage} className="rounded-xl">
+              <Button size="icon" onClick={handleSendMessage} className="rounded-xl" disabled={isLoading}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
