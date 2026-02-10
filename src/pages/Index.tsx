@@ -99,6 +99,21 @@ const Index = () => {
     },
   });
 
+  // Fetch promotion settings
+  const { data: promoSettings } = useQuery({
+    queryKey: ["promotion-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("promotion_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 60_000,
+  });
+
   // Fetch latest articles from DB (updated_at desc)
   const { data: latestDbArticles } = useQuery({
     queryKey: ["home-latest-articles"],
@@ -341,7 +356,7 @@ const Index = () => {
       </section>
 
       {/* Monthly Promotion */}
-      {featuredProducts && featuredProducts.length > 0 && (() => {
+      {(promoSettings?.is_active !== false) && featuredProducts && featuredProducts.length > 0 && (() => {
         const promoProducts = featuredProducts.filter((p: any) => promotions[p.id]);
         return promoProducts.length > 0 ? (
           <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
@@ -350,7 +365,7 @@ const Index = () => {
                 <div className="flex items-center gap-2">
                   <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
-                    {currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销"}
+                    {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
                   </h2>
                   <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
                 </div>

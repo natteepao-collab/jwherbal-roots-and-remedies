@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CountdownTimerProps {
-  /** Target date to count down to. Defaults to end of current month. */
+  /** Override target date (ignores DB settings) */
   targetDate?: Date;
 }
 
@@ -25,14 +27,34 @@ function getTimeLeft(target: Date) {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function CountdownTimer({ targetDate }: CountdownTimerProps) {
-  const target = targetDate ?? getEndOfMonth();
+export function CountdownTimer({ targetDate: overrideDate }: CountdownTimerProps) {
+  const { data: settings } = useQuery({
+    queryKey: ["promotion-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("promotion_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 60_000,
+  });
+
+  const target = overrideDate
+    ? overrideDate
+    : settings?.is_monthly || !settings?.custom_end_date
+      ? getEndOfMonth()
+      : new Date(settings.custom_end_date);
+
   const [time, setTime] = useState(getTimeLeft(target));
 
   useEffect(() => {
+    setTime(getTimeLeft(target));
     const id = setInterval(() => setTime(getTimeLeft(target)), 1000);
     return () => clearInterval(id);
-  }, [target]);
+  }, [target.getTime()]);
 
   const units = [
     { value: time.days, label: "วัน" },
