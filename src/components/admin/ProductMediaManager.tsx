@@ -21,6 +21,7 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const { data: mediaItems, isLoading } = useQuery({
     queryKey: ["product-media", productId],
@@ -58,9 +59,8 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     onError: (e) => toast.error("ลบไม่สำเร็จ: " + e.message),
   });
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const processFiles = async (files: File[]) => {
+    if (files.length === 0) return;
 
     setUploading(true);
     setUploadProgress(0);
@@ -68,7 +68,7 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     const total = files.length;
     let completed = 0;
 
-    for (const file of Array.from(files)) {
+    for (const file of files) {
       const isVideo = file.type.startsWith("video/");
       const isImage = file.type.startsWith("image/");
 
@@ -107,7 +107,6 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
 
         const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
-        // Video always gets sort_order 0 (first)
         const sortOrder = isVideo ? 0 : (imageCount + completed + 1);
 
         const { error: dbError } = await supabase.from("product_images").insert({
@@ -131,10 +130,34 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     queryClient.invalidateQueries({ queryKey: ["product-media", productId] });
     setUploading(false);
     setUploadProgress(0);
-    toast.success("อัพโหลดสื่อเรียบร้อย");
+    if (completed > 0) toast.success("อัพโหลดสื่อเรียบร้อย");
+  };
 
-    // Reset input
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    await processFiles(Array.from(files));
     e.target.value = "";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    await processFiles(files);
   };
 
   // Sort: videos first
@@ -156,13 +179,17 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Upload area */}
-        <div>
+        {/* Upload area with drag & drop */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <Label htmlFor={`media-upload-${productId}`} className="cursor-pointer">
-            <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+            <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging ? "border-primary bg-primary/10" : "hover:border-primary/50"}`}>
+              <Upload className={`h-8 w-8 mx-auto mb-2 transition-colors ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
               <p className="text-sm text-muted-foreground">
-                คลิกเพื่ออัพโหลดรูปภาพหรือวิดีโอ
+                {isDragging ? "ปล่อยไฟล์เพื่ออัพโหลด" : "ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือก"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 รูปภาพ: {imageCount}/{MAX_IMAGES} • วิดีโอ: {hasVideo ? "1/1" : "0/1"}
