@@ -343,7 +343,7 @@ const Index = () => {
       {featuredProducts && featuredProducts.length > 0 && (() => {
         const promoProducts = featuredProducts.filter((p: any) => promotions[p.id]);
         return promoProducts.length > 0 ? (
-          <section className="py-8 md:py-12">
+          <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
             <div className="container mx-auto px-4 sm:px-6">
               <div className="flex items-center gap-2 mb-6">
                 <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
@@ -423,7 +423,7 @@ const Index = () => {
       })()}
 
       {/* Featured Products */}
-      <section className="py-10 md:py-16">
+      <section id="featured-products" className="py-10 md:py-16 scroll-mt-28">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.featuredProducts")}</h2>
@@ -462,7 +462,7 @@ const Index = () => {
       </section>
 
       {/* Latest Articles - from DB */}
-      <section className="py-10 md:py-16 bg-secondary">
+      <section id="latest-articles" className="py-10 md:py-16 bg-secondary scroll-mt-28">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.latestArticles")}</h2>
@@ -540,7 +540,7 @@ const Index = () => {
       </section>
 
       {/* Customer Reviews - from DB */}
-      <section id="reviews" className="py-10 md:py-16 bg-secondary">
+      <section id="reviews" className="py-10 md:py-16 bg-secondary scroll-mt-28">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.customerReviews")}</h2>
