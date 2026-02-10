@@ -336,6 +336,7 @@ export type Database = {
           excerpt_zh: string
           id: string
           image_url: string
+          is_featured: boolean
           likes: number | null
           published_date: string | null
           slug: string
@@ -356,6 +357,7 @@ export type Database = {
           excerpt_zh: string
           id?: string
           image_url: string
+          is_featured?: boolean
           likes?: number | null
           published_date?: string | null
           slug: string
@@ -376,6 +378,7 @@ export type Database = {
           excerpt_zh?: string
           id?: string
           image_url?: string
+          is_featured?: boolean
           likes?: number | null
           published_date?: string | null
           slug?: string
