@@ -46,6 +46,7 @@ import AdminFAQImages from "./pages/admin/AdminFAQImages";
 import AdminLogo from "./pages/admin/AdminLogo";
 import AdminAbout from "./pages/admin/AdminAbout";
 import AdminPromotions from "./pages/admin/AdminPromotions";
+import AdminVFlow from "./pages/admin/AdminVFlow";
 const queryClient = new QueryClient();
 
 // Public routes content - rendered inside MainLayout
@@ -99,6 +100,7 @@ const AdminRoutes = () => {
         <Route path="logo" element={<AdminLogo />} />
         <Route path="about" element={<AdminAbout />} />
         <Route path="promotions" element={<AdminPromotions />} />
+        <Route path="vflow" element={<AdminVFlow />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>

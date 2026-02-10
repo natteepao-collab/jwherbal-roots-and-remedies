@@ -18,7 +18,8 @@ import {
   Phone,
   HelpCircle,
   Building,
-  Flame
+  Flame,
+  Droplets
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,11 @@ const menuItems = [
     title: "โปรโมชั่น", 
     icon: Flame, 
     path: "/admin/dashboard/promotions" 
+  },
+  { 
+    title: "หน้า V Flow", 
+    icon: Droplets, 
+    path: "/admin/dashboard/vflow" 
   },
   { 
     title: "จัดการ Logo", 
