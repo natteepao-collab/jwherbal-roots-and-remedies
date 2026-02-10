@@ -7,7 +7,7 @@ const navItems = [
   { icon: Flame, label: "โปรโมชั่นประจำเดือน", sectionId: "monthly-promotion", path: "/" },
   { icon: FileText, label: "บทความล่าสุด", sectionId: "latest-articles", path: "/" },
   { icon: Star, label: "รีวิวจากผู้ใช้จริง", sectionId: "reviews", path: "/" },
-  { icon: Droplets, label: "V FLOW HERBAL DRINK", path: "/products/vflow" },
+  { icon: Droplets, label: "ผลิตภัณฑ์ VFLOW คืออะไร", path: "/products/vflow" },
 ];
 
 export function DesktopQuickAccess() {
