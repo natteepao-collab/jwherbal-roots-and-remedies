@@ -122,10 +122,8 @@ const ChatbotWidget = () => {
           className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group"
           aria-label="Open Help"
         >
-          <div className="flex items-center gap-1.5 bg-primary text-primary-foreground pl-3 pr-1.5 py-3 rounded-l-xl shadow-lg transition-all duration-300 hover:pr-3 hover:shadow-xl hover:bg-primary/90">
+          <div className="flex items-center justify-center bg-primary text-primary-foreground p-2.5 rounded-l-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-primary/90">
             <HelpCircle className="h-5 w-5" />
-            <span className="text-sm font-medium whitespace-nowrap">Help</span>
-            <ChevronLeft className="h-3.5 w-3.5 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
           </div>
         </button>
       )}
