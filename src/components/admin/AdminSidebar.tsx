@@ -17,7 +17,8 @@ import {
   CreditCard,
   Phone,
   HelpCircle,
-  Building
+  Building,
+  Flame
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -100,6 +101,11 @@ const menuItems = [
     title: "เกี่ยวกับเรา", 
     icon: Building, 
     path: "/admin/dashboard/about" 
+  },
+  { 
+    title: "โปรโมชั่น", 
+    icon: Flame, 
+    path: "/admin/dashboard/promotions" 
   },
   { 
     title: "จัดการ Logo", 

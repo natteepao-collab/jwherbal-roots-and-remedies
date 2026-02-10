@@ -966,6 +966,33 @@ export type Database = {
         }
         Relationships: []
       }
+      promotion_settings: {
+        Row: {
+          custom_end_date: string | null
+          id: string
+          is_active: boolean
+          is_monthly: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          custom_end_date?: string | null
+          id?: string
+          is_active?: boolean
+          is_monthly?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          custom_end_date?: string | null
+          id?: string
+          is_active?: boolean
+          is_monthly?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       review_images: {
         Row: {
           created_at: string
