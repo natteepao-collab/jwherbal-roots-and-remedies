@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const { i18n } = useTranslation();
   const lang = i18n.language as "th" | "en" | "zh";
   const [promoOpen, setPromoOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<{ url: string; type: string } | null>(null);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -35,7 +36,7 @@ const ProductDetail = () => {
     enabled: !!id,
   });
 
-  const { data: galleryImages } = useQuery({
+  const { data: galleryMedia } = useQuery({
     queryKey: ["product-images", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,7 +46,13 @@ const ProductDetail = () => {
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return data;
+      // Sort: videos first, then images
+      return (data || []).sort((a, b) => {
+        const aIsVideo = (a as any).media_type === "video" ? 0 : 1;
+        const bIsVideo = (b as any).media_type === "video" ? 0 : 1;
+        if (aIsVideo !== bIsVideo) return aIsVideo - bIsVideo;
+        return a.sort_order - b.sort_order;
+      });
     },
     enabled: !!id,
   });
@@ -99,6 +106,10 @@ const ProductDetail = () => {
   const promo = promotions[product.id];
   const lowestPrice = promo ? Math.min(...promo.tiers.map((t) => t.price)) : null;
 
+  // Determine what to show as the main media
+  const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
+  const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });
+
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
@@ -115,29 +126,59 @@ const ProductDetail = () => {
 
           {/* Product Hero */}
           <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-10">
-            {/* Image Section */}
+            {/* Media Section */}
             <div className="space-y-3">
               <div className="aspect-square rounded-2xl overflow-hidden bg-secondary border">
-                <img
-                  src={mainImage}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                />
+                {currentMedia.type === "video" ? (
+                  <video
+                    src={currentMedia.url}
+                    controls
+                    autoPlay
+                    muted
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={currentMedia.url}
+                    alt={name}
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
               {/* Gallery thumbnails */}
-              {galleryImages && galleryImages.length > 0 && (
+              {galleryMedia && galleryMedia.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
-                  {galleryImages.map((img) => (
-                    <div
-                      key={img.id}
-                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg overflow-hidden border flex-shrink-0 bg-secondary"
+                  {/* Main product image thumbnail */}
+                  <button
+                    onClick={() => setSelectedMedia({ url: mainImage, type: "image" })}
+                    className={`h-16 w-16 sm:h-20 sm:w-20 rounded-lg overflow-hidden border-2 flex-shrink-0 bg-secondary transition-all ${
+                      currentMedia.url === mainImage ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-muted-foreground/30"
+                    }`}
+                  >
+                    <img src={mainImage} alt={name} className="h-full w-full object-cover" />
+                  </button>
+                  {galleryMedia.map((media) => (
+                    <button
+                      key={media.id}
+                      onClick={() => setSelectedMedia({ url: media.image_url, type: (media as any).media_type || "image" })}
+                      className={`h-16 w-16 sm:h-20 sm:w-20 rounded-lg overflow-hidden border-2 flex-shrink-0 bg-secondary transition-all relative ${
+                        currentMedia.url === media.image_url ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-muted-foreground/30"
+                      }`}
                     >
-                      <img
-                        src={img.image_url}
-                        alt={img.title || ""}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
+                      {(media as any).media_type === "video" ? (
+                        <div className="h-full w-full flex items-center justify-center bg-black/80">
+                          <div className="w-6 h-6 border-2 border-white rounded-full flex items-center justify-center">
+                            <div className="w-0 h-0 border-l-[8px] border-l-white border-y-[5px] border-y-transparent ml-0.5" />
+                          </div>
+                        </div>
+                      ) : (
+                        <img
+                          src={media.image_url}
+                          alt={media.title || ""}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </button>
                   ))}
                 </div>
               )}
@@ -195,7 +236,6 @@ const ProductDetail = () => {
 
           {/* Detail Sections */}
           <div className="grid md:grid-cols-2 gap-6 mb-10">
-            {/* Product Details */}
             {detailContent && (
               <Card>
                 <CardContent className="p-5 sm:p-6">
@@ -209,8 +249,6 @@ const ProductDetail = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* Suitable For */}
             {suitableFor && (
               <Card>
                 <CardContent className="p-5 sm:p-6">
@@ -226,7 +264,6 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Usage Instructions */}
           {usage && (
             <Card className="mb-10">
               <CardContent className="p-5 sm:p-6">
@@ -244,7 +281,6 @@ const ProductDetail = () => {
 
         <Footer />
 
-        {/* Promotion Modal */}
         {promo && (
           <PromotionModal
             open={promoOpen}

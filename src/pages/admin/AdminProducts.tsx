@@ -22,9 +22,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { productImages } from "@/assets/products";
+import ProductMediaManager from "@/components/admin/ProductMediaManager";
 
 interface Product {
   id: string;
@@ -56,6 +57,7 @@ const AdminProducts = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [mediaProductId, setMediaProductId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name_th: "", name_en: "", name_zh: "",
     description_th: "", description_en: "", description_zh: "",
@@ -431,7 +433,15 @@ const AdminProducts = () => {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="จัดการสื่อ"
+                          onClick={() => setMediaProductId(mediaProductId === product.id ? null : product.id)}
+                        >
+                          <ImageIcon className="h-4 w-4 text-primary" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -455,6 +465,14 @@ const AdminProducts = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Media Manager */}
+      {mediaProductId && (
+        <ProductMediaManager
+          productId={mediaProductId}
+          productName={products?.find((p) => p.id === mediaProductId)?.name_th || ""}
+        />
+      )}
     </div>
   );
 };
