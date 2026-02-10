@@ -34,6 +34,15 @@ interface Product {
   description_th: string;
   description_en: string;
   description_zh: string;
+  detail_content_th: string;
+  detail_content_en: string;
+  detail_content_zh: string;
+  suitable_for_th: string;
+  suitable_for_en: string;
+  suitable_for_zh: string;
+  usage_instructions_th: string;
+  usage_instructions_en: string;
+  usage_instructions_zh: string;
   price: number;
   image_url: string;
   category: string;
@@ -48,17 +57,12 @@ const AdminProducts = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
-    name_th: "",
-    name_en: "",
-    name_zh: "",
-    description_th: "",
-    description_en: "",
-    description_zh: "",
-    price: 0,
-    image_url: "",
-    category: "",
-    stock: 0,
-    is_active: true,
+    name_th: "", name_en: "", name_zh: "",
+    description_th: "", description_en: "", description_zh: "",
+    detail_content_th: "", detail_content_en: "", detail_content_zh: "",
+    suitable_for_th: "", suitable_for_en: "", suitable_for_zh: "",
+    usage_instructions_th: "", usage_instructions_en: "", usage_instructions_zh: "",
+    price: 0, image_url: "", category: "", stock: 0, is_active: true,
   });
 
   const { data: products, isLoading } = useQuery({
@@ -91,7 +95,7 @@ const AdminProducts = () => {
         imageUrl = await uploadImage(imageFile);
       }
 
-      const productData = { ...data, image_url: imageUrl };
+      const { id: _id, ...productData } = { ...data, image_url: imageUrl };
 
       if (data.id) {
         const { error } = await supabase
@@ -130,17 +134,12 @@ const AdminProducts = () => {
 
   const resetForm = () => {
     setFormData({
-      name_th: "",
-      name_en: "",
-      name_zh: "",
-      description_th: "",
-      description_en: "",
-      description_zh: "",
-      price: 0,
-      image_url: "",
-      category: "",
-      stock: 0,
-      is_active: true,
+      name_th: "", name_en: "", name_zh: "",
+      description_th: "", description_en: "", description_zh: "",
+      detail_content_th: "", detail_content_en: "", detail_content_zh: "",
+      suitable_for_th: "", suitable_for_en: "", suitable_for_zh: "",
+      usage_instructions_th: "", usage_instructions_en: "", usage_instructions_zh: "",
+      price: 0, image_url: "", category: "", stock: 0, is_active: true,
     });
     setEditingProduct(null);
     setImageFile(null);
@@ -150,17 +149,13 @@ const AdminProducts = () => {
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     setFormData({
-      name_th: product.name_th,
-      name_en: product.name_en,
-      name_zh: product.name_zh,
-      description_th: product.description_th,
-      description_en: product.description_en,
-      description_zh: product.description_zh,
-      price: product.price,
-      image_url: product.image_url,
-      category: product.category,
-      stock: product.stock,
-      is_active: product.is_active,
+      name_th: product.name_th, name_en: product.name_en, name_zh: product.name_zh,
+      description_th: product.description_th, description_en: product.description_en, description_zh: product.description_zh,
+      detail_content_th: product.detail_content_th || "", detail_content_en: product.detail_content_en || "", detail_content_zh: product.detail_content_zh || "",
+      suitable_for_th: product.suitable_for_th || "", suitable_for_en: product.suitable_for_en || "", suitable_for_zh: product.suitable_for_zh || "",
+      usage_instructions_th: product.usage_instructions_th || "", usage_instructions_en: product.usage_instructions_en || "", usage_instructions_zh: product.usage_instructions_zh || "",
+      price: product.price, image_url: product.image_url, category: product.category,
+      stock: product.stock, is_active: product.is_active,
     });
     setIsDialogOpen(true);
   };
@@ -257,6 +252,45 @@ const AdminProducts = () => {
                     }
                     required
                   />
+                </div>
+              </div>
+
+              {/* Detail Content */}
+              <div className="border-t pt-4 mt-2">
+                <h3 className="font-semibold text-sm mb-3">รายละเอียดสินค้า (แสดงในหน้ารายละเอียด)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>รายละเอียดเพิ่มเติม (ไทย)</Label>
+                    <Textarea rows={4} value={formData.detail_content_th} onChange={(e) => setFormData({ ...formData, detail_content_th: e.target.value })} placeholder="• คุณสมบัติสินค้า&#10;• ส่วนประกอบ&#10;• มาตรฐาน" />
+                  </div>
+                  <div>
+                    <Label>รายละเอียดเพิ่มเติม (EN)</Label>
+                    <Textarea rows={4} value={formData.detail_content_en} onChange={(e) => setFormData({ ...formData, detail_content_en: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Suitable For */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>เหมาะกับ (ไทย)</Label>
+                  <Textarea rows={4} value={formData.suitable_for_th} onChange={(e) => setFormData({ ...formData, suitable_for_th: e.target.value })} placeholder="• กลุ่มเป้าหมาย 1&#10;• กลุ่มเป้าหมาย 2" />
+                </div>
+                <div>
+                  <Label>เหมาะกับ (EN)</Label>
+                  <Textarea rows={4} value={formData.suitable_for_en} onChange={(e) => setFormData({ ...formData, suitable_for_en: e.target.value })} />
+                </div>
+              </div>
+
+              {/* Usage Instructions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>วิธีใช้ (ไทย)</Label>
+                  <Input value={formData.usage_instructions_th} onChange={(e) => setFormData({ ...formData, usage_instructions_th: e.target.value })} placeholder="เช่น ทานวันละ 2 เม็ด ก่อนอาหารเช้า" />
+                </div>
+                <div>
+                  <Label>วิธีใช้ (EN)</Label>
+                  <Input value={formData.usage_instructions_en} onChange={(e) => setFormData({ ...formData, usage_instructions_en: e.target.value })} />
                 </div>
               </div>
 

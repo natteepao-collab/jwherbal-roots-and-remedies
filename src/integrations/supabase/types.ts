@@ -817,6 +817,47 @@ export type Database = {
         }
         Relationships: []
       }
+      product_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          product_id: string
+          sort_order: number
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          product_id: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          product_id?: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -824,6 +865,9 @@ export type Database = {
           description_en: string
           description_th: string
           description_zh: string
+          detail_content_en: string
+          detail_content_th: string
+          detail_content_zh: string
           id: string
           image_url: string
           is_active: boolean | null
@@ -833,7 +877,13 @@ export type Database = {
           price: number
           rating: number | null
           stock: number | null
+          suitable_for_en: string
+          suitable_for_th: string
+          suitable_for_zh: string
           updated_at: string
+          usage_instructions_en: string
+          usage_instructions_th: string
+          usage_instructions_zh: string
         }
         Insert: {
           category: string
@@ -841,6 +891,9 @@ export type Database = {
           description_en: string
           description_th: string
           description_zh: string
+          detail_content_en?: string
+          detail_content_th?: string
+          detail_content_zh?: string
           id?: string
           image_url: string
           is_active?: boolean | null
@@ -850,7 +903,13 @@ export type Database = {
           price: number
           rating?: number | null
           stock?: number | null
+          suitable_for_en?: string
+          suitable_for_th?: string
+          suitable_for_zh?: string
           updated_at?: string
+          usage_instructions_en?: string
+          usage_instructions_th?: string
+          usage_instructions_zh?: string
         }
         Update: {
           category?: string
@@ -858,6 +917,9 @@ export type Database = {
           description_en?: string
           description_th?: string
           description_zh?: string
+          detail_content_en?: string
+          detail_content_th?: string
+          detail_content_zh?: string
           id?: string
           image_url?: string
           is_active?: boolean | null
@@ -867,7 +929,13 @@ export type Database = {
           price?: number
           rating?: number | null
           stock?: number | null
+          suitable_for_en?: string
+          suitable_for_th?: string
+          suitable_for_zh?: string
           updated_at?: string
+          usage_instructions_en?: string
+          usage_instructions_th?: string
+          usage_instructions_zh?: string
         }
         Relationships: []
       }

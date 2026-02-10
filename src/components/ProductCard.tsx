@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Eye, EyeOff, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,13 +8,14 @@ import { useCart } from "@/contexts/CartContext";
 import type { Product } from "@/data/products";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { promotions, type PromotionTier } from "@/data/promotions";
+import { promotions } from "@/data/promotions";
 import PromotionModal from "@/components/PromotionModal";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
-  promoKey?: string; // key into promotions map
+  productUuid?: string; // actual supabase UUID for navigation
+  promoKey?: string;
   isAdmin?: boolean;
   isHidden?: boolean;
   onToggleVisibility?: () => void;
@@ -21,6 +23,7 @@ interface ProductCardProps {
 
 const ProductCard = ({
   product,
+  productUuid,
   promoKey,
   isAdmin = false,
   isHidden = false,
@@ -28,6 +31,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const { t } = useTranslation();
   const { addItem } = useCart();
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
   const promo = promoKey ? promotions[promoKey] : undefined;
@@ -35,7 +39,8 @@ const ProductCard = ({
     ? Math.min(...promo.tiers.map((t) => t.price))
     : null;
 
-  const handleClick = () => {
+  const handleSelectPackage = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (promo) {
       setModalOpen(true);
     } else {
@@ -49,13 +54,20 @@ const ProductCard = ({
     }
   };
 
+  const handleCardClick = () => {
+    if (productUuid) {
+      navigate(`/shop/${productUuid}`);
+    }
+  };
+
   return (
     <>
       <Card
         className={cn(
-          "group overflow-hidden transition-all hover:shadow-card-hover",
+          "group overflow-hidden transition-all hover:shadow-card-hover cursor-pointer",
           isHidden && "opacity-50"
         )}
+        onClick={handleCardClick}
       >
         <div className="aspect-square overflow-hidden bg-secondary relative">
           <img
@@ -63,7 +75,6 @@ const ProductCard = ({
             alt={product.name}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
-          {/* Admin visibility toggle */}
           {isAdmin && (
             <button
               onClick={(e) => {
@@ -79,7 +90,6 @@ const ProductCard = ({
               )}
             </button>
           )}
-          {/* Hidden badge */}
           {isHidden && isAdmin && (
             <Badge variant="secondary" className="absolute top-2 left-2 text-[10px]">
               ซ่อนอยู่
@@ -112,7 +122,7 @@ const ProductCard = ({
             )}
             <Button
               size="sm"
-              onClick={handleClick}
+              onClick={handleSelectPackage}
               className="gap-1 sm:gap-2 h-8 px-2 sm:px-3 text-xs"
             >
               {promo ? (
@@ -131,7 +141,6 @@ const ProductCard = ({
         </CardContent>
       </Card>
 
-      {/* Promotion Modal */}
       {promo && (
         <PromotionModal
           open={modalOpen}
