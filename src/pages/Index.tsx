@@ -17,13 +17,20 @@ import trustPharmacist from "@/assets/trust-pharmacist.jpg";
 import trustIngredients from "@/assets/trust-ingredients.jpg";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { getCommunityPostImage } from "@/lib/communityImages";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
   const featuredProducts = products.slice(0, 4);
-  const latestArticles = articles.slice(0, 3);
-  const popularPosts = communityPosts.slice(0, 2);
   const currentLanguage = i18n.language as "th" | "en" | "zh";
+
+  const getText = (th: string, en: string, zh: string) => {
+    switch (currentLanguage) {
+      case "en": return en || th;
+      case "zh": return zh || th;
+      default: return th;
+    }
+  };
 
   // Fetch trust data
   const { data: certifications } = useQuery({
@@ -71,6 +78,49 @@ const Index = () => {
         .select("*")
         .limit(1)
         .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch latest articles from DB (updated_at desc)
+  const { data: latestDbArticles } = useQuery({
+    queryKey: ["home-latest-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch latest community posts from DB (updated_at desc)
+  const { data: latestCommunityPosts } = useQuery({
+    queryKey: ["home-latest-community"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(2);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch latest reviews from DB (updated_at desc)
+  const { data: latestDbReviews } = useQuery({
+    queryKey: ["home-latest-reviews"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("is_approved", true)
+        .order("updated_at", { ascending: false })
+        .limit(3);
       if (error) throw error;
       return data;
     },
@@ -294,7 +344,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Latest Articles */}
+      {/* Latest Articles - from DB */}
       <section className="py-10 md:py-16 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 md:mb-8">
@@ -304,16 +354,23 @@ const Index = () => {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {latestArticles.map((article) => (
-              <Card key={article.id} className="hover:shadow-card-hover transition-shadow">
+            {(latestDbArticles && latestDbArticles.length > 0 ? latestDbArticles : articles.slice(0, 3)).map((article: any) => (
+              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
+                {(article.image_url) && (
+                  <img src={article.image_url} alt={article.title_th || article.title} className="w-full h-36 sm:h-44 md:h-48 object-cover" />
+                )}
                 <CardContent className="p-4 md:p-6">
                   <div className="text-xs text-primary font-medium mb-2">{article.category}</div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 md:mb-3 line-clamp-2">{article.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2 md:line-clamp-3">{article.excerpt}</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 md:mb-3 line-clamp-2">
+                    {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2 md:line-clamp-3">
+                    {article.excerpt_th ? getText(article.excerpt_th, article.excerpt_en, article.excerpt_zh) : article.excerpt}
+                  </p>
                   <div className="flex items-center justify-between text-xs sm:text-sm">
-                    <span className="text-muted-foreground">{article.readTime}</span>
+                    <span className="text-muted-foreground">{article.author || ""}</span>
                     <Button variant="link" asChild className="p-0 h-auto text-xs sm:text-sm">
-                      <Link to={`/articles/${article.id}`}>{t("articles.readMore")}</Link>
+                      <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -323,68 +380,86 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Community Highlights */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">{t("sections.communityHighlights")}</h2>
-            <Button variant="outline" asChild>
+      {/* Community Highlights - from DB */}
+      <section className="py-10 md:py-16">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.communityHighlights")}</h2>
+            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
               <Link to="/community">{t("sections.viewAll")}</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {popularPosts.map((post) => (
-              <Card key={post.id} className="hover:shadow-card-hover transition-shadow">
-                <CardContent className="p-6">
-                  <div className="text-xs text-primary font-medium mb-2">{post.category}</div>
-                  <h3 className="text-lg font-semibold mb-2">{post.title}</h3>
-                  <div className="flex items-center text-sm text-muted-foreground mb-3">
-                    <span>{post.author}</span>
-                    <span className="mx-2">•</span>
-                    <span>{post.date}</span>
-                    <span className="mx-2">•</span>
-                    <span>{post.comments} ความคิดเห็น</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {(latestCommunityPosts && latestCommunityPosts.length > 0 ? latestCommunityPosts : communityPosts.slice(0, 2)).map((post: any) => (
+              <Card key={post.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
+                <div className="flex gap-4 p-4 md:p-6">
+                  {(post.thumbnail) && (
+                    <img
+                      src={getCommunityPostImage(post.thumbnail)}
+                      alt={post.title_th || post.title}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-shrink-0"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-primary font-medium mb-1">{post.category}</div>
+                    <h3 className="text-sm sm:text-base font-semibold mb-1 line-clamp-2">
+                      {post.title_th ? getText(post.title_th, post.title_en, post.title_zh) : post.title}
+                    </h3>
+                    <div className="flex items-center text-xs text-muted-foreground mb-2">
+                      <span>{post.author_name || post.author}</span>
+                      <span className="mx-2">•</span>
+                      <span>{post.comments_count || post.comments || 0} {currentLanguage === "th" ? "ความคิดเห็น" : "comments"}</span>
+                    </div>
+                    <Button variant="link" asChild className="p-0 h-auto text-xs sm:text-sm">
+                      <Link to={`/community/${post.id}`}>{currentLanguage === "th" ? "อ่านกระทู้" : "Read post"}</Link>
+                    </Button>
                   </div>
-                  <Button variant="link" asChild className="p-0 h-auto">
-                    <Link to={`/community/${post.id}`}>อ่านกระทู้</Link>
-                  </Button>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Customer Reviews */}
-      <section id="reviews" className="py-16 bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">{t("sections.customerReviews")}</h2>
-            <Button variant="outline" asChild>
+      {/* Customer Reviews - from DB */}
+      <section id="reviews" className="py-10 md:py-16 bg-secondary">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.customerReviews")}</h2>
+            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
               <Link to="/reviews">{t("sections.viewAll")}</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.slice(0, 3).map((review) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {(latestDbReviews && latestDbReviews.length > 0 ? latestDbReviews : reviews.slice(0, 3)).map((review: any) => (
               <Card key={review.id} className="rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="flex items-start gap-3 mb-4">
-                    <img
-                      src={review.avatarUrl}
-                      alt={review.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-border"
-                    />
+                    {review.author_avatar || review.avatarUrl ? (
+                      <img
+                        src={review.author_avatar || review.avatarUrl}
+                        alt={review.author_name || review.name}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-border"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                        {(review.author_name || review.name || "?").charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{review.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {review.age} {currentLanguage === "th" ? "ปี" : currentLanguage === "en" ? "years old" : "岁"} • {review.occupation[currentLanguage]}
-                      </p>
+                      <h3 className="font-semibold text-foreground">{review.author_name || review.name}</h3>
+                      {review.occupation && (
+                        <p className="text-sm text-muted-foreground">
+                          {review.age} {currentLanguage === "th" ? "ปี" : "yrs"} • {review.occupation[currentLanguage]}
+                        </p>
+                      )}
                       <div className="flex gap-1 mt-1">
                         {[...Array(5)].map((_, index) => (
                           <Star
                             key={index}
                             className={`h-3 w-3 ${
-                              index < review.rating
+                              index < (review.rating || 0)
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "fill-muted text-muted"
                             }`}
@@ -394,7 +469,7 @@ const Index = () => {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
-                    {review.review[currentLanguage]}
+                    {review.comment || (review.review ? review.review[currentLanguage] : "")}
                   </p>
                 </CardContent>
               </Card>
