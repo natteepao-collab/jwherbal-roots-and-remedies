@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
+import { getArticleImage } from "@/assets/articles/index";
 
 const ArticleDetail = () => {
   const { slug } = useParams();
@@ -181,7 +182,7 @@ const ArticleDetail = () => {
 
           <article className="mb-12">
             {article.image_url && (
-              <img src={article.image_url} alt={title} className="w-full h-[400px] object-cover rounded-lg mb-8" />
+              <img src={getArticleImage(article.image_url)} alt={title} className="w-full aspect-video object-cover rounded-lg mb-8" />
             )}
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-4">
               {article.category}
