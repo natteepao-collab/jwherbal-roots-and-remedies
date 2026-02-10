@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, HelpCircle, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId] = useState(() => crypto.randomUUID());
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,6 +64,7 @@ const ChatbotWidget = () => {
         body: JSON.stringify({
           messages: chatMessages,
           language: i18n.language,
+          sessionId,
         }),
       });
 

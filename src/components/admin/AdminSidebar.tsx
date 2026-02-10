@@ -114,6 +114,11 @@ const menuItems = [
     path: "/admin/dashboard/vflow" 
   },
   { 
+    title: "ประวัติสนทนา", 
+    icon: MessageSquare, 
+    path: "/admin/dashboard/chat-history" 
+  },
+  { 
     title: "จัดการ Logo", 
     icon: ImageIcon, 
     path: "/admin/dashboard/logo" 
