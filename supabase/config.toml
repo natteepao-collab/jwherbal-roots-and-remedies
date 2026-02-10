@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.notify-new-question]
 verify_jwt = false
+
+[functions.chatbot]
+verify_jwt = false
