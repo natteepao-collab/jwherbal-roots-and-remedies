@@ -215,9 +215,6 @@ const Shop = () => {
               </div>
             )}
 
-            <div className="mt-6 md:mt-8 text-center text-xs sm:text-sm text-muted-foreground px-2">
-              <p>{t("shop.disclaimer")}</p>
-            </div>
           </div>
         </div>
       </main>
