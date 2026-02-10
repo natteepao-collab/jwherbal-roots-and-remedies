@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Package, ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ImageIcon, Star } from "lucide-react";
 import { toast } from "sonner";
 import { productImages } from "@/assets/products";
 import ProductMediaManager from "@/components/admin/ProductMediaManager";
@@ -50,6 +50,7 @@ interface Product {
   rating: number;
   stock: number;
   is_active: boolean;
+  is_featured: boolean;
 }
 
 const AdminProducts = () => {
@@ -128,6 +129,23 @@ const AdminProducts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("ลบสินค้าเรียบร้อย");
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
+
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: async (product: Product) => {
+      const { error } = await supabase
+        .from("products")
+        .update({ is_featured: !product.is_featured } as any)
+        .eq("id", product.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("อัปเดตสถานะแนะนำเรียบร้อย");
     },
     onError: (error) => {
       toast.error("เกิดข้อผิดพลาด: " + error.message);
@@ -396,6 +414,7 @@ const AdminProducts = () => {
                   <TableHead>ราคา</TableHead>
                   <TableHead>สต็อก</TableHead>
                   <TableHead>สถานะ</TableHead>
+                  <TableHead>แนะนำ</TableHead>
                   <TableHead>จัดการ</TableHead>
                 </TableRow>
               </TableHeader>
@@ -431,6 +450,16 @@ const AdminProducts = () => {
                       >
                         {product.is_active ? "เปิดใช้งาน" : "ปิดใช้งาน"}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={product.is_featured ? "ยกเลิกแนะนำ" : "ตั้งเป็นสินค้าแนะนำ"}
+                        onClick={() => toggleFeaturedMutation.mutate(product)}
+                      >
+                        <Star className={`h-4 w-4 ${product.is_featured ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

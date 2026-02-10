@@ -7,7 +7,7 @@ import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import BrandStoryGallery from "@/components/BrandStoryGallery";
-import { products } from "@/data/products";
+import { productImages } from "@/assets/products";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
@@ -21,7 +21,20 @@ import { getCommunityPostImage } from "@/lib/communityImages";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
-  const featuredProducts = products.slice(0, 4);
+  // Fetch featured products from DB (active + featured only)
+  const { data: featuredProducts } = useQuery({
+    queryKey: ["home-featured-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_featured", true)
+        .order("updated_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data;
+    },
+  });
   const currentLanguage = i18n.language as "th" | "en" | "zh";
 
   const getText = (th: string, en: string, zh: string) => {
@@ -334,9 +347,27 @@ const Index = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {featuredProducts && featuredProducts.length > 0 ? (
+              featuredProducts.map((product: any) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
+                    name: getText(product.name_th, product.name_en, product.name_zh),
+                    price: product.price,
+                    image: productImages[product.id] || product.image_url,
+                    category: product.category,
+                    description: getText(product.description_th, product.description_en, product.description_zh),
+                    rating: product.rating || 0,
+                  }}
+                  productUuid={product.id}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-muted-foreground py-8">
+                {currentLanguage === "th" ? "ยังไม่มีสินค้าแนะนำ" : currentLanguage === "en" ? "No featured products yet" : "暂无推荐产品"}
+              </p>
+            )}
           </div>
           <div className="mt-6 md:mt-8 text-center text-xs sm:text-sm text-muted-foreground px-2">
             <p>{t("shop.disclaimer")}</p>
