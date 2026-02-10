@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -193,32 +194,34 @@ export const AdminSidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
-          
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                "hover:bg-accent/50",
-                active 
-                  ? "bg-primary text-primary-foreground shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground",
-                collapsed && "justify-center px-2"
-              )}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && (
-                <span className="font-medium text-sm">{item.title}</span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+      <ScrollArea className="flex-1">
+        <nav className="p-3 space-y-1">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
+            
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                  "hover:bg-accent/50",
+                  active 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-muted-foreground hover:text-foreground",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                {!collapsed && (
+                  <span className="font-medium text-sm">{item.title}</span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+      </ScrollArea>
 
       {/* Footer */}
       <div className="p-3 border-t border-border">
