@@ -99,7 +99,7 @@ const ArticleDetail = () => {
             </Button>
 
             <article className="mb-12">
-              <img src={staticArticle.coverImage} alt={staticArticle.title[currentLang]} className="w-full h-[400px] object-cover rounded-lg mb-8" />
+              <img src={staticArticle.coverImage} alt={staticArticle.title[currentLang]} className="w-full max-h-[500px] object-contain rounded-lg mb-8 bg-muted" />
               <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-4">
                 {staticArticle.category[currentLang]}
               </div>
@@ -182,7 +182,7 @@ const ArticleDetail = () => {
 
           <article className="mb-12">
             {article.image_url && (
-              <img src={getArticleImage(article.image_url)} alt={title} className="w-full aspect-video object-cover rounded-lg mb-8" />
+              <img src={getArticleImage(article.image_url)} alt={title} className="w-full max-h-[500px] object-contain rounded-lg mb-8 bg-muted" />
             )}
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-4">
               {article.category}
