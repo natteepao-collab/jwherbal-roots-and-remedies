@@ -261,6 +261,7 @@ const AdminArticles = () => {
                     </Button>
                   </TableCell>
                   <TableCell className="font-medium max-w-xs truncate">
+                    {article.title_th}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{article.category}</Badge>
