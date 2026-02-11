@@ -260,9 +260,16 @@ const AdminArticles = () => {
                       <Star className={`h-4 w-4 ${article.is_featured ? "fill-amber-500 text-amber-500" : "text-muted-foreground"}`} />
                     </Button>
                   </TableCell>
-                  <TableCell className="font-medium max-w-xs truncate">
-                    {article.title_th}
-                  </TableCell>
+                   <TableCell className="font-medium max-w-xs">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={article.image_url}
+                        alt={article.title_th}
+                        className="h-10 w-10 rounded object-cover bg-muted flex-shrink-0"
+                      />
+                      <span className="truncate">{article.title_th}</span>
+                    </div>
+                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{article.category}</Badge>
                   </TableCell>
