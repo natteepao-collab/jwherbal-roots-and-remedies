@@ -21,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
+import { avatarOptions, resolveAvatar } from "@/lib/avatarUtils";
+import { cn } from "@/lib/utils";
 
 interface Review {
   id: string;
@@ -46,6 +48,7 @@ const Reviews = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [showAllDbReviews, setShowAllDbReviews] = useState(false);
   const [showAllStaticReviews, setShowAllStaticReviews] = useState(false);
 
@@ -152,6 +155,7 @@ const Reviews = () => {
         rating: newRating,
         comment: newComment,
         author_name: authorName,
+        author_avatar: selectedAvatar,
         is_approved: false,
       }).select().single();
       
@@ -179,6 +183,7 @@ const Reviews = () => {
       setIsDialogOpen(false);
       setNewRating(5);
       setNewComment("");
+      setSelectedAvatar(null);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -282,6 +287,30 @@ const Reviews = () => {
                       </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-6 py-4">
+                      {/* Avatar Selection */}
+                      <div>
+                        <Label className="text-muted-foreground">
+                          {currentLanguage === "th" ? "เลือกรูปโปรไฟล์" : currentLanguage === "en" ? "Choose your avatar" : "选择头像"}
+                        </Label>
+                        <div className="mt-3 grid grid-cols-5 gap-2 max-h-[180px] overflow-y-auto pr-1">
+                          {avatarOptions.map((av) => (
+                            <button
+                              key={av.key}
+                              type="button"
+                              onClick={() => setSelectedAvatar(av.key)}
+                              className={cn(
+                                "rounded-full overflow-hidden border-2 transition-all duration-200 hover:scale-105",
+                                selectedAvatar === av.key
+                                  ? "border-primary ring-2 ring-primary/30 scale-105"
+                                  : "border-transparent opacity-70 hover:opacity-100"
+                              )}
+                            >
+                              <img src={av.src} alt={av.key} className="w-full h-full object-cover aspect-square" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="text-center">
                         <Label className="text-muted-foreground">
                           {currentLanguage === "th" ? "ให้คะแนนความพึงพอใจ" : currentLanguage === "en" ? "Rate your satisfaction" : "评分"}
@@ -359,9 +388,9 @@ const Reviews = () => {
                       
                       <CardContent className={`p-6 ${displayedDbReviews.length === 1 ? 'p-8' : 'p-6'}`}>
                         <div className="flex items-start gap-4 mb-4">
-                          {review.author_avatar ? (
+                          {resolveAvatar(review.author_avatar) ? (
                             <img
-                              src={review.author_avatar}
+                              src={resolveAvatar(review.author_avatar)}
                               alt={review.author_name}
                               className={`rounded-full object-cover border-2 border-primary/20 shadow-md ${displayedDbReviews.length === 1 ? 'w-16 h-16' : 'w-14 h-14'}`}
                             />
