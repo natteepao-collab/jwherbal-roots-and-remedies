@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import jwherbalLogo from "@/assets/jwherbal-logo-new.png";
 import { toast } from "sonner";
 
 type MessageType = {
@@ -199,8 +200,8 @@ const ChatbotWidget = () => {
           <CardHeader className="border-b bg-primary text-primary-foreground py-4 rounded-tl-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                  <MessageCircle className="h-4 w-4" />
+              <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                  <img src={jwherbalLogo} alt="JWHERBAL" className="h-6 w-6 object-contain" />
                 </div>
                 <div>
                   <CardTitle className="text-base">JWHERBAL Help</CardTitle>
