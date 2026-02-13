@@ -28,6 +28,7 @@ interface AboutSettings {
   vision_subtitle_en: string;
   vision_subtitle_zh: string;
   vision_image_url: string | null;
+  mission_image_url: string | null;
   mission_subtitle_th: string;
   mission_subtitle_en: string;
   mission_subtitle_zh: string;
@@ -296,9 +297,10 @@ const AdminAbout = () => {
     toast.success("ลบสำเร็จ");
   };
 
-  const handleImageUpload = async (file: File) => {
+  const handleImageUpload = async (file: File, field: "vision_image_url" | "mission_image_url") => {
+    const prefix = field === "vision_image_url" ? "about-vision" : "about-mission";
     const fileExt = file.name.split('.').pop();
-    const fileName = `about-vision-${Date.now()}.${fileExt}`;
+    const fileName = `${prefix}-${Date.now()}.${fileExt}`;
     const { error } = await supabase.storage
       .from("site-assets")
       .upload(fileName, file, { upsert: true });
@@ -309,7 +311,7 @@ const AdminAbout = () => {
     }
     
     const { data: urlData } = supabase.storage.from("site-assets").getPublicUrl(fileName);
-    updateSetting("vision_image_url", urlData.publicUrl);
+    updateSetting(field, urlData.publicUrl);
     toast.success("อัพโหลดรูปภาพสำเร็จ");
   };
 
@@ -461,7 +463,7 @@ const AdminAbout = () => {
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleImageUpload(file);
+                        if (file) handleImageUpload(file, "vision_image_url");
                       }}
                     />
                   </label>
@@ -760,6 +762,41 @@ const AdminAbout = () => {
                 <Button onClick={saveSettings} disabled={isSaving} variant="outline" size="sm">
                   <Save className="h-4 w-4 mr-2" /> บันทึกคำอธิบาย
                 </Button>
+              </div>
+
+              {/* Mission Image Upload */}
+              <div className="space-y-4 p-4 border rounded-lg">
+                <Label className="font-medium">รูปภาพประกอบส่วนพันธกิจ</Label>
+                <div className="flex items-start gap-4">
+                  {settings?.mission_image_url && (
+                    <img src={settings.mission_image_url} alt="Mission" className="w-48 h-32 object-cover rounded-lg" />
+                  )}
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-secondary transition-colors">
+                    <Upload className="h-4 w-4" />
+                    <span>อัพโหลดรูปภาพ</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file, "mission_image_url");
+                      }}
+                    />
+                  </label>
+                </div>
+                {settings?.mission_image_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      updateSetting("mission_image_url", "");
+                      saveSettings();
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" /> ลบรูปภาพ
+                  </Button>
+                )}
               </div>
 
               <hr />

@@ -117,6 +117,7 @@ export type Database = {
           hero_title_th: string
           hero_title_zh: string
           id: string
+          mission_image_url: string | null
           mission_subtitle_en: string
           mission_subtitle_th: string
           mission_subtitle_zh: string
@@ -180,6 +181,7 @@ export type Database = {
           hero_title_th?: string
           hero_title_zh?: string
           id?: string
+          mission_image_url?: string | null
           mission_subtitle_en?: string
           mission_subtitle_th?: string
           mission_subtitle_zh?: string
@@ -243,6 +245,7 @@ export type Database = {
           hero_title_th?: string
           hero_title_zh?: string
           id?: string
+          mission_image_url?: string | null
           mission_subtitle_en?: string
           mission_subtitle_th?: string
           mission_subtitle_zh?: string

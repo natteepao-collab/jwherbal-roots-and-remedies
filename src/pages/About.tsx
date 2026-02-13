@@ -26,6 +26,7 @@ interface AboutSettings {
   vision_subtitle_en: string;
   vision_subtitle_zh: string;
   vision_image_url: string | null;
+  mission_image_url: string | null;
   story_title_th: string;
   story_title_en: string;
   story_title_zh: string;
@@ -260,7 +261,7 @@ const About = () => {
                   พันธกิจที่เรายึดมั่นในการพัฒนาผลิตภัณฑ์สมุนไพรคุณภาพสูงสำหรับทุกครอบครัว
                 </p>
                 <img
-                  src={teamExpertsImg}
+                  src={settings?.mission_image_url || teamExpertsImg}
                   alt="Our Expert Team"
                   className="rounded-2xl shadow-lg w-full hidden lg:block"
                 />
