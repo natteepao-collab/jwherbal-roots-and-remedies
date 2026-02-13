@@ -357,17 +357,11 @@ const AdminProducts = () => {
                   onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                 />
                 {formData.image_url && !imageFile && (
-                  productImages[editingProduct?.id || ''] ? (
-                    <img
-                      src={productImages[editingProduct?.id || '']}
-                      alt="Preview"
-                      className="mt-2 h-20 w-20 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="mt-2 h-20 w-20 rounded bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                      <Package className="h-8 w-8 text-primary/60" />
-                    </div>
-                  )
+                  <img
+                    src={productImages[editingProduct?.id || ''] || formData.image_url}
+                    alt="Preview"
+                    className="mt-2 h-20 w-20 object-cover rounded"
+                  />
                 )}
               </div>
 
@@ -422,9 +416,9 @@ const AdminProducts = () => {
                 {products?.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
-                      {productImages[product.id] ? (
+                      {(productImages[product.id] || product.image_url) ? (
                         <img
-                          src={productImages[product.id]}
+                          src={productImages[product.id] || product.image_url}
                           alt={product.name_th}
                           className="h-12 w-12 object-cover rounded"
                         />
