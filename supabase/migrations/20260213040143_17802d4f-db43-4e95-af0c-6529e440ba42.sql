@@ -1,0 +1,1 @@
+ALTER TABLE public.about_settings ADD COLUMN mission_image_url text DEFAULT NULL;
