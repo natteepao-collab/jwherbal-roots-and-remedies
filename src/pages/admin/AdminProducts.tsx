@@ -152,6 +152,23 @@ const AdminProducts = () => {
     },
   });
 
+  const togglePromotedMutation = useMutation({
+    mutationFn: async (product: Product) => {
+      const { error } = await supabase
+        .from("products")
+        .update({ is_promoted: !(product as any).is_promoted } as any)
+        .eq("id", product.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("อัปเดตสถานะโปรโมชั่นเรียบร้อย");
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       name_th: "", name_en: "", name_zh: "",
@@ -407,9 +424,10 @@ const AdminProducts = () => {
                   <TableHead>หมวดหมู่</TableHead>
                   <TableHead>ราคา</TableHead>
                   <TableHead>สต็อก</TableHead>
-                  <TableHead>สถานะ</TableHead>
-                  <TableHead>แนะนำ</TableHead>
-                  <TableHead>จัดการ</TableHead>
+                   <TableHead>สถานะ</TableHead>
+                   <TableHead>แนะนำ</TableHead>
+                   <TableHead>โปรโมชั่น</TableHead>
+                   <TableHead>จัดการ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -445,7 +463,7 @@ const AdminProducts = () => {
                         {product.is_active ? "เปิดใช้งาน" : "ปิดใช้งาน"}
                       </span>
                     </TableCell>
-                    <TableCell>
+                     <TableCell>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -454,6 +472,12 @@ const AdminProducts = () => {
                       >
                         <Star className={`h-4 w-4 ${product.is_featured ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
                       </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={(product as any).is_promoted ?? false}
+                        onCheckedChange={() => togglePromotedMutation.mutate(product)}
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
