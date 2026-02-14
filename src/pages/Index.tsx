@@ -371,90 +371,113 @@ const Index = () => {
       </section>
 
       {/* Monthly Promotion */}
-      {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (() => {
-        const promoProducts = promotedProducts.filter((p: any) => promotions[p.id]);
-        return promoProducts.length > 0 ? (
-          <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
-            <div className="container mx-auto px-4 sm:px-6">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6">
+      {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (
+        <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
+          <div className="container mx-auto px-4 sm:px-6">
+            {/* Header with countdown */}
+            <div className="relative mb-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                  <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                    <Flame className="h-6 w-6 text-destructive" />
+                  </motion.div>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
                     {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
                   </h2>
-                  <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
+                  <Sparkles className="h-5 w-5 text-primary animate-pulse" />
                 </div>
                 <CountdownTimer />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {promoProducts.slice(0, 2).map((product: any, idx: number) => {
-                  const promo = promotions[product.id];
-                  const lowestPrice = getLowestPrice(product.id);
-                  const bestTier = promo?.tiers.find(t => t.isBestSeller);
-                  const savings = bestTier ? Math.round(((bestTier.normalPrice - bestTier.price) / bestTier.normalPrice) * 100) : 0;
-                  return (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: idx * 0.15 }}
-                    >
-                      <Link to={`/shop/${product.id}`}>
-                        <Card className="group overflow-hidden border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-xl relative">
-                          {/* Animated badge */}
+            </div>
+
+            {/* Promoted Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {promotedProducts.map((product: any, idx: number) => {
+                const promo = promotions[product.id];
+                const lowestPrice = promo ? getLowestPrice(product.id) : null;
+                const bestTier = promo?.tiers.find((t: any) => t.isBestSeller);
+                const savings = bestTier ? Math.round(((bestTier.normalPrice - bestTier.price) / bestTier.normalPrice) * 100) : 0;
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.15 }}
+                  >
+                    <Link to={`/shop/${product.id}`}>
+                      <Card className="group overflow-hidden border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-xl relative h-full">
+                        {/* Savings badge */}
+                        {savings > 0 && (
                           <div className="absolute top-3 right-3 z-10">
                             <motion.div
                               animate={{ scale: [1, 1.1, 1] }}
                               transition={{ duration: 2, repeat: Infinity }}
-                              className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
+                              className="bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg"
                             >
                               {currentLanguage === "th" ? `ประหยัด ${savings}%` : `Save ${savings}%`}
                             </motion.div>
                           </div>
-                          <div className="flex flex-col sm:flex-row">
-                            <div className="sm:w-2/5 aspect-square sm:aspect-auto overflow-hidden bg-secondary">
-                              <img
-                                src={productImages[product.id] || product.image_url}
-                                alt={getText(product.name_th, product.name_en, product.name_zh)}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                              />
-                            </div>
-                            <CardContent className="flex-1 p-4 sm:p-6 flex flex-col justify-center">
-                              <div className="text-xs text-primary font-medium mb-1">{product.category}</div>
-                              <h3 className="text-base sm:text-lg font-bold text-foreground mb-2 line-clamp-2">
-                                {getText(product.name_th, product.name_en, product.name_zh)}
-                              </h3>
-                              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                                {getText(product.description_th, product.description_en, product.description_zh)}
-                              </p>
-                              <div className="flex items-end gap-2 mb-3">
-                                <span className="text-[10px] sm:text-xs text-muted-foreground">{currentLanguage === "th" ? "เริ่มต้นที่" : "From"}</span>
-                                <span className="text-lg sm:text-2xl font-bold text-primary">
-                                  ฿{lowestPrice?.toLocaleString("th-TH")}.-
-                                </span>
-                              </div>
-                              <motion.div
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                              >
-                                <Button size="sm" className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80">
-                                  <Sparkles className="h-4 w-4" />
-                                  {currentLanguage === "th" ? "ดูโปรโมชั่น" : "View Promotion"}
-                                </Button>
-                              </motion.div>
-                            </CardContent>
+                        )}
+                        {!promo && (
+                          <div className="absolute top-3 right-3 z-10">
+                            <motion.div
+                              animate={{ scale: [1, 1.05, 1] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg"
+                            >
+                              {currentLanguage === "th" ? "โปรโมชั่นพิเศษ" : "Special Offer"}
+                            </motion.div>
                           </div>
-                        </Card>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                        )}
+                        <div className="flex flex-col sm:flex-row">
+                          <div className="sm:w-2/5 aspect-square sm:aspect-auto overflow-hidden bg-secondary">
+                            <img
+                              src={productImages[product.id] || product.image_url}
+                              alt={getText(product.name_th, product.name_en, product.name_zh)}
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          </div>
+                          <CardContent className="flex-1 p-4 sm:p-6 flex flex-col justify-center">
+                            <div className="text-xs text-primary font-medium mb-1">{product.category}</div>
+                            <h3 className="text-base sm:text-lg font-bold text-foreground mb-2 line-clamp-2">
+                              {getText(product.name_th, product.name_en, product.name_zh)}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              {getText(product.description_th, product.description_en, product.description_zh)}
+                            </p>
+                            <div className="flex items-end gap-2 mb-3">
+                              {lowestPrice ? (
+                                <>
+                                  <span className="text-[10px] sm:text-xs text-muted-foreground">{currentLanguage === "th" ? "เริ่มต้นที่" : "From"}</span>
+                                  <span className="text-lg sm:text-2xl font-bold text-primary">
+                                    ฿{lowestPrice.toLocaleString("th-TH")}.-
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-lg sm:text-2xl font-bold text-primary">
+                                  ฿{product.price?.toLocaleString("th-TH")}.-
+                                </span>
+                              )}
+                            </div>
+                            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                              <Button size="sm" className="w-full gap-2">
+                                <Sparkles className="h-4 w-4" />
+                                {currentLanguage === "th" ? "ดูโปรโมชั่น" : "View Promotion"}
+                              </Button>
+                            </motion.div>
+                          </CardContent>
+                        </div>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
-          </section>
-        ) : null;
-      })()}
+          </div>
+        </section>
+      )}
 
       {/* Featured Products */}
       <section id="featured-products" className="py-10 md:py-16 scroll-mt-28">
