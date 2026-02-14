@@ -38,6 +38,21 @@ const Index = () => {
       return data;
     },
   });
+
+  // Fetch promoted products for monthly promotion section
+  const { data: promotedProducts } = useQuery({
+    queryKey: ["home-promoted-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_promoted", true)
+        .order("updated_at", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data;
+    },
+  });
   const currentLanguage = i18n.language as "th" | "en" | "zh";
 
   const getText = (th: string, en: string, zh: string) => {
@@ -356,8 +371,8 @@ const Index = () => {
       </section>
 
       {/* Monthly Promotion */}
-      {(promoSettings?.is_active !== false) && featuredProducts && featuredProducts.length > 0 && (() => {
-        const promoProducts = featuredProducts.filter((p: any) => promotions[p.id]);
+      {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (() => {
+        const promoProducts = promotedProducts.filter((p: any) => promotions[p.id]);
         return promoProducts.length > 0 ? (
           <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
             <div className="container mx-auto px-4 sm:px-6">

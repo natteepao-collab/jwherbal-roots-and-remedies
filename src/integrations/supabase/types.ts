@@ -943,6 +943,7 @@ export type Database = {
           image_url: string
           is_active: boolean | null
           is_featured: boolean
+          is_promoted: boolean
           name_en: string
           name_th: string
           name_zh: string
@@ -970,6 +971,7 @@ export type Database = {
           image_url: string
           is_active?: boolean | null
           is_featured?: boolean
+          is_promoted?: boolean
           name_en: string
           name_th: string
           name_zh: string
@@ -997,6 +999,7 @@ export type Database = {
           image_url?: string
           is_active?: boolean | null
           is_featured?: boolean
+          is_promoted?: boolean
           name_en?: string
           name_th?: string
           name_zh?: string
