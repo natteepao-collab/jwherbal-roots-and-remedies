@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Star, Users, Pill, Coffee } from "lucide-react";
 import { productImages } from "@/assets/products";
-import { promotions } from "@/data/promotions";
+import { usePromotionTiers, getTiersByProduct } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
 import { useState } from "react";
 
@@ -103,8 +103,10 @@ const ProductDetail = () => {
   const suitableFor = getText(product.suitable_for_th || "", product.suitable_for_en || "", product.suitable_for_zh || "");
   const usage = getText(product.usage_instructions_th || "", product.usage_instructions_en || "", product.usage_instructions_zh || "");
   const mainImage = productImages[product.id] || product.image_url;
-  const promo = promotions[product.id];
-  const lowestPrice = promo ? Math.min(...promo.tiers.map((t) => t.price)) : null;
+  const { data: allTiers } = usePromotionTiers();
+  const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
+  const hasTiers = productTiers.length > 0;
+  const lowestPrice = hasTiers ? Math.min(...productTiers.map((t) => t.price)) : null;
 
   // Determine what to show as the main media
   const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
@@ -227,9 +229,9 @@ const ProductDetail = () => {
               <Button
                 size="lg"
                 className="w-full h-12 text-base gap-2"
-                onClick={() => promo ? setPromoOpen(true) : null}
+                onClick={() => hasTiers ? setPromoOpen(true) : null}
               >
-                {promo ? "เลือกแพ็กเกจ" : "เพิ่มลงตะกร้า"}
+                {hasTiers ? "เลือกแพ็กเกจ" : "เพิ่มลงตะกร้า"}
               </Button>
             </div>
           </div>
@@ -281,14 +283,14 @@ const ProductDetail = () => {
 
         <Footer />
 
-        {promo && (
+        {hasTiers && (
           <PromotionModal
             open={promoOpen}
             onOpenChange={setPromoOpen}
             productName={name}
             productImage={mainImage}
             productId={parseInt(product.id.replace(/-/g, "").slice(0, 8), 16)}
-            tiers={promo.tiers}
+            tiers={productTiers}
           />
         )}
       </div>

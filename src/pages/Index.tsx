@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import BrandStoryGallery from "@/components/BrandStoryGallery";
 import { productImages } from "@/assets/products";
-import { promotions, getLowestPrice } from "@/data/promotions";
+import { usePromotionTiers, getTiersByProduct, getLowestTierPrice } from "@/hooks/usePromotionTiers";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
@@ -53,6 +53,7 @@ const Index = () => {
       return data;
     },
   });
+  const { data: allTiers } = usePromotionTiers();
   const currentLanguage = i18n.language as "th" | "en" | "zh";
 
   const getText = (th: string, en: string, zh: string) => {
@@ -394,10 +395,10 @@ const Index = () => {
             {/* Promoted Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {promotedProducts.map((product: any, idx: number) => {
-                const promo = promotions[product.id];
-                const lowestPrice = promo ? getLowestPrice(product.id) : null;
-                const bestTier = promo?.tiers.find((t: any) => t.isBestSeller);
-                const savings = bestTier ? Math.round(((bestTier.normalPrice - bestTier.price) / bestTier.normalPrice) * 100) : 0;
+                const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
+                const lowestPrice = getLowestTierPrice(allTiers || [], product.id);
+                const bestTier = productTiers.find((t: any) => t.is_best_seller);
+                const savings = bestTier ? Math.round(((bestTier.normal_price - bestTier.price) / bestTier.normal_price) * 100) : 0;
                 return (
                   <motion.div
                     key={product.id}
@@ -420,7 +421,7 @@ const Index = () => {
                             </motion.div>
                           </div>
                         )}
-                        {!promo && (
+                        {productTiers.length === 0 && (
                           <div className="absolute top-3 right-3 z-10">
                             <motion.div
                               animate={{ scale: [1, 1.05, 1] }}
@@ -503,7 +504,7 @@ const Index = () => {
                     rating: product.rating || 0,
                   }}
                   productUuid={product.id}
-                  promoKey={promotions[product.id] ? product.id : undefined}
+                  tiers={allTiers ? getTiersByProduct(allTiers, product.id) : undefined}
                 />
               ))
             ) : (
