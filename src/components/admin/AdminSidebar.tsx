@@ -110,6 +110,11 @@ const menuItems = [
     path: "/admin/dashboard/promotions" 
   },
   { 
+    title: "แพ็กเกจราคา", 
+    icon: Package, 
+    path: "/admin/dashboard/promotion-tiers" 
+  },
+  { 
     title: "หน้า V Flow", 
     icon: Droplets, 
     path: "/admin/dashboard/vflow" 

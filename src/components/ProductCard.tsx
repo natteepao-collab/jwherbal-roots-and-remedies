@@ -8,14 +8,14 @@ import { useCart } from "@/contexts/CartContext";
 import type { Product } from "@/data/products";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { promotions } from "@/data/promotions";
+import type { PromotionTier } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
-  productUuid?: string; // actual supabase UUID for navigation
-  promoKey?: string;
+  productUuid?: string;
+  tiers?: PromotionTier[];
   isAdmin?: boolean;
   isHidden?: boolean;
   onToggleVisibility?: () => void;
@@ -24,7 +24,7 @@ interface ProductCardProps {
 const ProductCard = ({
   product,
   productUuid,
-  promoKey,
+  tiers,
   isAdmin = false,
   isHidden = false,
   onToggleVisibility,
@@ -34,14 +34,12 @@ const ProductCard = ({
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const promo = promoKey ? promotions[promoKey] : undefined;
-  const lowestPrice = promo
-    ? Math.min(...promo.tiers.map((t) => t.price))
-    : null;
+  const hasTiers = tiers && tiers.length > 0;
+  const lowestPrice = hasTiers ? Math.min(...tiers.map((t) => t.price)) : null;
 
   const handleSelectPackage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (promo) {
+    if (hasTiers) {
       setModalOpen(true);
     } else {
       addItem({
@@ -125,7 +123,7 @@ const ProductCard = ({
               onClick={handleSelectPackage}
               className="gap-1 sm:gap-2 h-8 px-2 sm:px-3 text-xs"
             >
-              {promo ? (
+              {hasTiers ? (
                 <>
                   <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden md:inline">เลือกแพ็กเกจ</span>
@@ -141,14 +139,14 @@ const ProductCard = ({
         </CardContent>
       </Card>
 
-      {promo && (
+      {hasTiers && (
         <PromotionModal
           open={modalOpen}
           onOpenChange={setModalOpen}
           productName={product.name}
           productImage={product.image}
           productId={product.id}
-          tiers={promo.tiers}
+          tiers={tiers}
         />
       )}
     </>

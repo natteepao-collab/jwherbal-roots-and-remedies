@@ -17,7 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { productImages } from "@/assets/products";
-import { promotions } from "@/data/promotions";
+import { usePromotionTiers, getTiersByProduct } from "@/hooks/usePromotionTiers";
 
 interface Product {
   id: string;
@@ -40,6 +40,7 @@ const Shop = () => {
   const currentLang = i18n.language as "th" | "en" | "zh";
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("popular");
+  const { data: allTiers } = usePromotionTiers();
 
   // Mock admin state — replace with real auth check later
   const [isAdmin] = useState<boolean>(true);
@@ -190,8 +191,7 @@ const Shop = () => {
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {sortedProducts.map((product) => {
                   const name = getProductName(product);
-                  // Use product UUID directly as promo key
-                  const hasPromo = !!promotions[product.id];
+                  const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
                   return (
                     <ProductCard
                       key={product.id}
@@ -205,7 +205,7 @@ const Shop = () => {
                         rating: product.rating || 0,
                       }}
                       productUuid={product.id}
-                      promoKey={hasPromo ? product.id : undefined}
+                      tiers={productTiers.length > 0 ? productTiers : undefined}
                       isAdmin={isAdmin}
                       isHidden={!product.is_active}
                       onToggleVisibility={() => toggleVisibility(product.id)}

@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
 import { vflowData } from "@/data/vflow";
-import { promotions } from "@/data/promotions";
+import { usePromotionTiers, getTiersByProduct } from "@/hooks/usePromotionTiers";
 import { productImages } from "@/assets/products";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +60,7 @@ const VFlowProduct = () => {
       return data;
     },
   });
+  const { data: allTiers } = usePromotionTiers();
 
   // Fetch V Flow page settings from DB
   const { data: pageSettings } = useQuery({
@@ -122,8 +123,8 @@ const VFlowProduct = () => {
   const tipText = ps.tip || vflowData.tip;
 
   const handleSelectPackage = (product: any) => {
-    const promo = promotions[product.id];
-    if (promo) {
+    const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
+    if (productTiers.length > 0) {
       setSelectedPromoProduct(product);
       setModalOpen(true);
     } else {
@@ -277,8 +278,8 @@ const VFlowProduct = () => {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   {[drinkProduct, capsuleProduct].filter(Boolean).map((product: any, idx) => {
-                    const promo = promotions[product.id];
-                    const lowestPrice = promo ? Math.min(...promo.tiers.map((t: any) => t.price)) : null;
+                    const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
+                    const lowestPrice = productTiers.length > 0 ? Math.min(...productTiers.map((t: any) => t.price)) : null;
                     return (
                       <motion.div
                         key={product.id}
@@ -321,7 +322,7 @@ const VFlowProduct = () => {
                             <div className="flex gap-2">
                               <Button className="flex-1 gap-2" onClick={() => handleSelectPackage(product)}>
                                 <Package className="h-4 w-4" />
-                                {promo ? "เลือกแพ็กเกจ" : "เพิ่มลงตะกร้า"}
+                                {productTiers.length > 0 ? "เลือกแพ็กเกจ" : "เพิ่มลงตะกร้า"}
                               </Button>
                               <Button variant="outline" asChild>
                                 <Link to={`/shop/${product.id}`}>ดูรายละเอียด</Link>
@@ -707,16 +708,19 @@ const VFlowProduct = () => {
         </div>
       </>
 
-      {selectedPromoProduct && promotions[selectedPromoProduct.id] && (
-        <PromotionModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          productName={getText(selectedPromoProduct.name_th, selectedPromoProduct.name_en, selectedPromoProduct.name_zh)}
-          productImage={productImages[selectedPromoProduct.id] || selectedPromoProduct.image_url}
-          productId={parseInt(selectedPromoProduct.id.replace(/-/g, "").slice(0, 8), 16)}
-          tiers={promotions[selectedPromoProduct.id].tiers}
-        />
-      )}
+      {selectedPromoProduct && (() => {
+        const promoTiers = allTiers ? getTiersByProduct(allTiers, selectedPromoProduct.id) : [];
+        return promoTiers.length > 0 ? (
+          <PromotionModal
+            open={modalOpen}
+            onOpenChange={setModalOpen}
+            productName={getText(selectedPromoProduct.name_th, selectedPromoProduct.name_en, selectedPromoProduct.name_zh)}
+            productImage={productImages[selectedPromoProduct.id] || selectedPromoProduct.image_url}
+            productId={parseInt(selectedPromoProduct.id.replace(/-/g, "").slice(0, 8), 16)}
+            tiers={promoTiers}
+          />
+        ) : null;
+      })()}
     </PageTransition>
   );
 };

@@ -6,7 +6,7 @@ import { ShoppingCart, Star, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { PromotionTier } from "@/data/promotions";
+import type { PromotionTier } from "@/hooks/usePromotionTiers";
 import { cn } from "@/lib/utils";
 
 interface PromotionModalProps {
@@ -28,7 +28,7 @@ const PromotionModal = ({
 }: PromotionModalProps) => {
   const { t } = useTranslation();
   const { addItem } = useCart();
-  const bestSellerTier = tiers.find((t) => t.isBestSeller);
+  const bestSellerTier = tiers.find((t) => t.is_best_seller);
   const [selectedTier, setSelectedTier] = useState<string>(
     bestSellerTier?.id || tiers[0]?.id || ""
   );
@@ -72,8 +72,8 @@ const PromotionModal = ({
           <p className="text-sm font-medium text-muted-foreground">เลือกแพ็กเกจ</p>
           {tiers.map((tier) => {
             const isSelected = selectedTier === tier.id;
-            const savings = tier.normalPrice - tier.price;
-            const discountPct = Math.round((savings / tier.normalPrice) * 100);
+            const savings = tier.normal_price - tier.price;
+            const discountPct = Math.round((savings / tier.normal_price) * 100);
 
             return (
               <button
@@ -82,16 +82,16 @@ const PromotionModal = ({
                 className={cn(
                   "w-full text-left rounded-xl border-2 p-3 sm:p-4 transition-all relative",
                   isSelected
-                    ? tier.isBestSeller
+                    ? tier.is_best_seller
                       ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                       : "border-primary bg-primary/5"
-                    : tier.isBestSeller
+                    : tier.is_best_seller
                       ? "border-primary/40 hover:border-primary/60"
                       : "border-border hover:border-primary/30"
                 )}
               >
                 {/* Best Seller badge */}
-                {tier.isBestSeller && (
+                {tier.is_best_seller && (
                   <Badge className="absolute -top-2.5 right-3 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 gap-1">
                     <Star className="h-3 w-3 fill-current" />
                     Best Seller
@@ -117,7 +117,7 @@ const PromotionModal = ({
                         {tier.quantity} {tier.unit}
                       </p>
                       <p className="text-xs text-muted-foreground line-through">
-                        ฿{formatPrice(tier.normalPrice)}
+                        ฿{formatPrice(tier.normal_price)}
                       </p>
                     </div>
                   </div>
