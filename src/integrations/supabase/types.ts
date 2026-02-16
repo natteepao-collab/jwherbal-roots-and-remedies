@@ -1067,6 +1067,56 @@ export type Database = {
         }
         Relationships: []
       }
+      promotion_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_best_seller: boolean
+          normal_price: number
+          price: number
+          product_id: string
+          quantity: number
+          sort_order: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_best_seller?: boolean
+          normal_price: number
+          price: number
+          product_id: string
+          quantity?: number
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_best_seller?: boolean
+          normal_price?: number
+          price?: number
+          product_id?: string
+          quantity?: number
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotion_tiers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_images: {
         Row: {
           created_at: string
