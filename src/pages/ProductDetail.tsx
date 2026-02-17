@@ -46,7 +46,6 @@ const ProductDetail = () => {
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      // Sort: videos first, then images
       return (data || []).sort((a, b) => {
         const aIsVideo = (a as any).media_type === "video" ? 0 : 1;
         const bIsVideo = (b as any).media_type === "video" ? 0 : 1;
@@ -56,6 +55,8 @@ const ProductDetail = () => {
     },
     enabled: !!id,
   });
+
+  const { data: allTiers } = usePromotionTiers();
 
   if (isLoading) {
     return (
@@ -103,7 +104,6 @@ const ProductDetail = () => {
   const suitableFor = getText(product.suitable_for_th || "", product.suitable_for_en || "", product.suitable_for_zh || "");
   const usage = getText(product.usage_instructions_th || "", product.usage_instructions_en || "", product.usage_instructions_zh || "");
   const mainImage = productImages[product.id] || product.image_url;
-  const { data: allTiers } = usePromotionTiers();
   const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
   const hasTiers = productTiers.length > 0;
   const lowestPrice = hasTiers ? Math.min(...productTiers.map((t) => t.price)) : null;
