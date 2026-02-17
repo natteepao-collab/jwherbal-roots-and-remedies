@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import vflowProductImg from "@/assets/vflow-product-transparent.png";
+import vflowCapsuleInfo from "@/assets/products/vflow-capsule-info.jpg";
+import vflowDrinkInfo from "@/assets/products/vflow-drink-info.jpg";
 import PromotionModal from "@/components/PromotionModal";
 import { useState } from "react";
 
@@ -275,6 +277,30 @@ const VFlowProduct = () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">เลือกผลิตภัณฑ์ V Flow</h2>
                   <p className="text-muted-foreground">มีให้เลือก 2 รูปแบบ ตามไลฟ์สไตล์ของคุณ</p>
                 </motion.div>
+
+                {/* Product Info Images */}
+                <div className="grid md:grid-cols-2 gap-6 mb-10">
+                  {[
+                    { src: vflowCapsuleInfo, alt: "V Flow Capsule - ข้อมูลผลิตภัณฑ์แคปซูล" },
+                    { src: vflowDrinkInfo, alt: "V Flow Herbal Drink - ข้อมูลเครื่องดื่มสมุนไพร" },
+                  ].map((img, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      custom={idx}
+                    >
+                      <img
+                        src={img.src}
+                        alt={img.alt}
+                        className="w-full h-auto rounded-xl shadow-md"
+                        loading="lazy"
+                      />
+                    </motion.div>
+                  ))}
+                </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   {[drinkProduct, capsuleProduct].filter(Boolean).map((product: any, idx) => {
