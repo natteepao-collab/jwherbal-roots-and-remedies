@@ -55,6 +55,12 @@ interface AboutSettings {
   achievement_satisfaction_label_th: string;
   achievement_satisfaction_label_en: string;
   achievement_satisfaction_label_zh: string;
+  values_title_th: string;
+  values_title_en: string;
+  values_title_zh: string;
+  values_subtitle_th: string;
+  values_subtitle_en: string;
+  values_subtitle_zh: string;
 }
 
 interface MissionItem {
@@ -69,11 +75,36 @@ interface MissionItem {
   description_zh: string;
 }
 
+interface ValueItem {
+  id: string;
+  icon: string;
+  title_th: string;
+  title_en: string;
+  title_zh: string;
+  description_th: string;
+  description_en: string;
+  description_zh: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+const getIconComponent = (iconName: string) => {
+  switch (iconName) {
+    case "leaf": return Leaf;
+    case "shield": return Shield;
+    case "heart": return Heart;
+    case "target": return Target;
+    case "award": return Award;
+    default: return Leaf;
+  }
+};
+
 const About = () => {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as "th" | "en" | "zh";
   const [settings, setSettings] = useState<AboutSettings | null>(null);
   const [missionItems, setMissionItems] = useState<MissionItem[]>([]);
+  const [valueItems, setValueItems] = useState<ValueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -82,13 +113,15 @@ const About = () => {
 
   const fetchData = async () => {
     try {
-      const [settingsRes, missionRes] = await Promise.all([
+      const [settingsRes, missionRes, valuesRes] = await Promise.all([
         supabase.from("about_settings").select("*").maybeSingle(),
-        supabase.from("about_mission_items").select("*").order("sort_order", { ascending: true })
+        supabase.from("about_mission_items").select("*").order("sort_order", { ascending: true }),
+        supabase.from("about_values").select("*").eq("is_active", true).order("sort_order", { ascending: true })
       ]);
 
       if (settingsRes.data) setSettings(settingsRes.data);
       if (missionRes.data) setMissionItems(missionRes.data.filter(item => item.is_active));
+      if (valuesRes.data) setValueItems(valuesRes.data);
     } catch (error) {
       console.error("Error fetching about data:", error);
     } finally {
@@ -106,29 +139,6 @@ const About = () => {
         return thText;
     }
   };
-
-  const values = [
-    {
-      icon: Leaf,
-      titleKey: "about.values.natural.title",
-      descKey: "about.values.natural.desc",
-    },
-    {
-      icon: Shield,
-      titleKey: "about.values.quality.title",
-      descKey: "about.values.quality.desc",
-    },
-    {
-      icon: Heart,
-      titleKey: "about.values.care.title",
-      descKey: "about.values.care.desc",
-    },
-    {
-      icon: Target,
-      titleKey: "about.values.innovation.title",
-      descKey: "about.values.innovation.desc",
-    },
-  ];
 
   const certifications = [
     { name: "อย. (FDA)", icon: Award },
@@ -338,6 +348,7 @@ const About = () => {
       )}
 
       {/* Values Section - Grid Cards */}
+      {valueItems.length > 0 && (
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -345,9 +356,11 @@ const About = () => {
               <Heart className="h-4 w-4" />
               <span>Values</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("about.values.title")}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {settings ? getLocalizedText(settings.values_title_th, settings.values_title_en, settings.values_title_zh) : t("about.values.title")}
+            </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t("about.values.subtitle")}
+              {settings ? getLocalizedText(settings.values_subtitle_th, settings.values_subtitle_en, settings.values_subtitle_zh) : t("about.values.subtitle")}
             </p>
           </div>
 
@@ -364,16 +377,20 @@ const About = () => {
 
             {/* Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {values.map((value, index) => {
-                const Icon = value.icon;
+              {valueItems.map((value) => {
+                const Icon = getIconComponent(value.icon);
                 return (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-none bg-card">
+                  <Card key={value.id} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-none bg-card">
                     <CardContent className="p-6">
                       <div className="w-14 h-14 mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
                         <Icon className="h-7 w-7 text-primary group-hover:text-primary-foreground transition-colors" />
                       </div>
-                      <h3 className="font-bold text-lg mb-2">{t(value.titleKey)}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{t(value.descKey)}</p>
+                      <h3 className="font-bold text-lg mb-2">
+                        {getLocalizedText(value.title_th, value.title_en, value.title_zh)}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {getLocalizedText(value.description_th, value.description_en, value.description_zh)}
+                      </p>
                     </CardContent>
                   </Card>
                 );
@@ -382,6 +399,7 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Certifications Section - Minimal */}
       <section className="py-20 md:py-28 bg-secondary/30">
