@@ -15,6 +15,7 @@ const LanguageSwitcher = () => {
     { code: "th", label: "TH" },
     { code: "en", label: "EN" },
     { code: "zh", label: "中文" },
+    { code: "ja", label: "JP" },
   ];
 
   const currentLanguage = languages.find((lang) => lang.code === i18n.language) || languages[0];

@@ -266,9 +266,57 @@
       "point4": "创建一个分享健康知识和经验的社区"
     }
   },
+  "faq": {
+    "title": "常见问题",
+    "description": "关于我们产品和服务的常见问题",
+    "searchPlaceholder": "搜索问题...",
+    "noResults": "未找到问题",
+    "categories": {
+      "all": "全部",
+      "general": "一般",
+      "product": "产品",
+      "delivery": "配送",
+      "payment": "支付"
+    }
+  },
+  "reviews": {
+    "title": "用户评价",
+    "description": "使用过我们产品的客户评价",
+    "writeReview": "写评价",
+    "loginToReview": "请登录后写评价",
+    "rating": "评分",
+    "verified": "已购买",
+    "helpful": "有帮助",
+    "noReviews": "暂无评价",
+    "overallRating": "综合评分",
+    "basedOn": "条评价"
+  },
+  "checkout": {
+    "title": "结账",
+    "customerInfo": "客户信息",
+    "name": "姓名",
+    "email": "电子邮件",
+    "phone": "电话号码",
+    "address": "收货地址",
+    "paymentMethod": "支付方式",
+    "placeOrder": "下单",
+    "orderSuccess": "订单提交成功",
+    "uploadSlip": "上传付款凭证",
+    "slipUploaded": "凭证已上传"
+  },
+  "orderHistory": {
+    "title": "订单历史",
+    "noOrders": "暂无订单",
+    "orderId": "订单编号",
+    "date": "日期",
+    "status": "状态",
+    "total": "总计",
+    "viewDetail": "查看详情"
+  },
   "language": {
     "th": "ไทย",
     "en": "English",
-    "zh": "中文"
+    "zh": "中文",
+    "ja": "日本語"
   }
 }
