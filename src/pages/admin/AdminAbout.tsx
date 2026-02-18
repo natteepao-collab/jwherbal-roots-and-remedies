@@ -29,6 +29,8 @@ interface AboutSettings {
   vision_subtitle_zh: string;
   vision_image_url: string | null;
   mission_image_url: string | null;
+  story_image_url: string | null;
+  values_image_url: string | null;
   mission_subtitle_th: string;
   mission_subtitle_en: string;
   mission_subtitle_zh: string;
@@ -297,8 +299,14 @@ const AdminAbout = () => {
     toast.success("ลบสำเร็จ");
   };
 
-  const handleImageUpload = async (file: File, field: "vision_image_url" | "mission_image_url") => {
-    const prefix = field === "vision_image_url" ? "about-vision" : "about-mission";
+  const handleImageUpload = async (file: File, field: "vision_image_url" | "mission_image_url" | "story_image_url" | "values_image_url") => {
+    const prefixMap: Record<string, string> = {
+      vision_image_url: "about-vision",
+      mission_image_url: "about-mission",
+      story_image_url: "about-story",
+      values_image_url: "about-values",
+    };
+    const prefix = prefixMap[field] || "about";
     const fileExt = file.name.split('.').pop();
     const fileName = `${prefix}-${Date.now()}.${fileExt}`;
     const { error } = await supabase.storage
@@ -944,6 +952,45 @@ const AdminAbout = () => {
                 </div>
               ))}
 
+              {/* Story Image Upload */}
+              <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                <Label className="font-medium">รูปภาพประกอบส่วนเรื่องราว (Our Story Image)</Label>
+                <div className="flex items-start gap-4 flex-wrap">
+                  {settings?.story_image_url ? (
+                    <img src={settings.story_image_url} alt="Story" className="w-48 h-32 object-cover rounded-lg border" />
+                  ) : (
+                    <div className="w-48 h-32 rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm bg-background">
+                      ยังไม่มีรูปภาพ
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-secondary transition-colors">
+                      <Upload className="h-4 w-4" />
+                      <span>อัพโหลดรูปภาพใหม่</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file, "story_image_url");
+                        }}
+                      />
+                    </label>
+                    {settings?.story_image_url && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => updateSetting("story_image_url", "")}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" /> ลบรูปภาพ
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <Button onClick={saveSettings} disabled={isSaving}>
                 {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                 บันทึกทั้งหมด
@@ -998,6 +1045,45 @@ const AdminAbout = () => {
                 <Button onClick={saveSettings} disabled={isSaving} variant="outline" size="sm">
                   <Save className="h-4 w-4 mr-2" /> บันทึกหัวข้อ
                 </Button>
+              </div>
+
+              {/* Values Image Upload */}
+              <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                <Label className="font-medium">รูปภาพประกอบส่วนค่านิยม (Values Image)</Label>
+                <div className="flex items-start gap-4 flex-wrap">
+                  {settings?.values_image_url ? (
+                    <img src={settings.values_image_url} alt="Values" className="w-48 h-32 object-cover rounded-lg border" />
+                  ) : (
+                    <div className="w-48 h-32 rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm bg-background">
+                      ยังไม่มีรูปภาพ
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-secondary transition-colors">
+                      <Upload className="h-4 w-4" />
+                      <span>อัพโหลดรูปภาพใหม่</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file, "values_image_url");
+                        }}
+                      />
+                    </label>
+                    {settings?.values_image_url && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => updateSetting("values_image_url", "")}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" /> ลบรูปภาพ
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <hr />
