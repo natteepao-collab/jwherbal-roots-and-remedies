@@ -27,6 +27,8 @@ interface AboutSettings {
   vision_subtitle_zh: string;
   vision_image_url: string | null;
   mission_image_url: string | null;
+  story_image_url: string | null;
+  values_image_url: string | null;
   story_title_th: string;
   story_title_en: string;
   story_title_zh: string;
@@ -337,7 +339,7 @@ const About = () => {
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-tl from-primary/20 to-transparent rounded-3xl blur-2xl" />
                 <img
-                  src={companyStoryImg}
+                  src={settings.story_image_url || companyStoryImg}
                   alt="Company Story"
                   className="relative w-full rounded-2xl shadow-2xl"
                 />
@@ -369,7 +371,7 @@ const About = () => {
             <div className="relative hidden lg:block">
               <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-transparent rounded-3xl blur-2xl" />
               <img
-                src={valuesNatureImg}
+                src={settings?.values_image_url || valuesNatureImg}
                 alt="Natural Values"
                 className="relative w-full rounded-2xl shadow-2xl"
               />

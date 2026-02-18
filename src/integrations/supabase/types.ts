@@ -121,6 +121,7 @@ export type Database = {
           mission_subtitle_en: string
           mission_subtitle_th: string
           mission_subtitle_zh: string
+          story_image_url: string | null
           story_paragraph1_en: string
           story_paragraph1_th: string
           story_paragraph1_zh: string
@@ -134,6 +135,7 @@ export type Database = {
           story_title_th: string
           story_title_zh: string
           updated_at: string
+          values_image_url: string | null
           values_subtitle_en: string
           values_subtitle_th: string
           values_subtitle_zh: string
@@ -185,6 +187,7 @@ export type Database = {
           mission_subtitle_en?: string
           mission_subtitle_th?: string
           mission_subtitle_zh?: string
+          story_image_url?: string | null
           story_paragraph1_en?: string
           story_paragraph1_th?: string
           story_paragraph1_zh?: string
@@ -198,6 +201,7 @@ export type Database = {
           story_title_th?: string
           story_title_zh?: string
           updated_at?: string
+          values_image_url?: string | null
           values_subtitle_en?: string
           values_subtitle_th?: string
           values_subtitle_zh?: string
@@ -249,6 +253,7 @@ export type Database = {
           mission_subtitle_en?: string
           mission_subtitle_th?: string
           mission_subtitle_zh?: string
+          story_image_url?: string | null
           story_paragraph1_en?: string
           story_paragraph1_th?: string
           story_paragraph1_zh?: string
@@ -262,6 +267,7 @@ export type Database = {
           story_title_th?: string
           story_title_zh?: string
           updated_at?: string
+          values_image_url?: string | null
           values_subtitle_en?: string
           values_subtitle_th?: string
           values_subtitle_zh?: string
