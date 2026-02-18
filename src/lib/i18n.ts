@@ -26,7 +26,7 @@ export const initializeI18n = async () => {
     });
 
   // Load all languages
-  await Promise.all(["th", "en", "zh"].map(loadLanguage));
+  await Promise.all(["th", "en", "zh", "ja"].map(loadLanguage));
   
   return i18n;
 };

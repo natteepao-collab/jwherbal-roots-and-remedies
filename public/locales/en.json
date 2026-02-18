@@ -266,9 +266,57 @@
       "point4": "Create a community for sharing health knowledge and experiences"
     }
   },
+  "faq": {
+    "title": "FAQ",
+    "description": "Frequently asked questions about our products and services",
+    "searchPlaceholder": "Search questions...",
+    "noResults": "No questions found",
+    "categories": {
+      "all": "All",
+      "general": "General",
+      "product": "Product",
+      "delivery": "Delivery",
+      "payment": "Payment"
+    }
+  },
+  "reviews": {
+    "title": "Customer Reviews",
+    "description": "Reviews from customers who have used our products",
+    "writeReview": "Write a Review",
+    "loginToReview": "Please log in to write a review",
+    "rating": "Rating",
+    "verified": "Verified Purchase",
+    "helpful": "Helpful",
+    "noReviews": "No reviews yet",
+    "overallRating": "Overall Rating",
+    "basedOn": "reviews"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "customerInfo": "Customer Information",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "address": "Delivery Address",
+    "paymentMethod": "Payment Method",
+    "placeOrder": "Place Order",
+    "orderSuccess": "Order placed successfully",
+    "uploadSlip": "Upload Payment Slip",
+    "slipUploaded": "Slip uploaded"
+  },
+  "orderHistory": {
+    "title": "Order History",
+    "noOrders": "No orders found",
+    "orderId": "Order ID",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "viewDetail": "View Details"
+  },
   "language": {
     "th": "ไทย",
     "en": "English",
-    "zh": "中文"
+    "zh": "中文",
+    "ja": "日本語"
   }
 }

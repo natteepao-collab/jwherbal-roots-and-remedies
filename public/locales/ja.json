@@ -1,0 +1,322 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "about": "会社概要",
+    "shop": "商品",
+    "articles": "記事",
+    "community": "コミュニティ",
+    "contact": "お問い合わせ",
+    "cart": "カート",
+    "reviews": "口コミ",
+    "faq": "よくある質問"
+  },
+  "hero": {
+    "title": "健康はVFLOWから始まる",
+    "subtitle": "あなたと大切な方の健康のための高品質なハーブ製品",
+    "vflowButton": "V Flow - おすすめ商品",
+    "shopButton": "商品を見る"
+  },
+  "features": {
+    "natural": {
+      "title": "100%天然ハーブ",
+      "description": "厳選された高品質なハーブ、安全で認定済み"
+    },
+    "community": {
+      "title": "コミュニティ体験共有",
+      "description": "健康愛好家と経験を語り合う"
+    },
+    "articles": {
+      "title": "知識記事",
+      "description": "健康知識とハーブのヒント"
+    }
+  },
+  "sections": {
+    "featuredProducts": "おすすめ商品",
+    "latestArticles": "最新記事",
+    "communityHighlights": "コミュニティのハイライト",
+    "viewAll": "すべて見る",
+    "customerReviews": "お客様の声"
+  },
+  "shop": {
+    "title": "全商品",
+    "categories": "カテゴリー",
+    "all": "すべて",
+    "showing": "表示中",
+    "products": "商品",
+    "sortBy": "並び替え：",
+    "popular": "人気順",
+    "rating": "評価が高い順",
+    "priceLow": "価格：低い順",
+    "priceHigh": "価格：高い順",
+    "disclaimer": "* 商品画像はイメージです。実際の商品は開発中です"
+  },
+  "cart": {
+    "title": "ショッピングカート",
+    "empty": "カートは空です",
+    "emptyDescription": "商品をカートに追加してショッピングを始めましょう",
+    "continueShopping": "買い物を続ける",
+    "orderSummary": "注文概要",
+    "subtotal": "小計",
+    "shipping": "送料",
+    "shippingFree": "無料",
+    "total": "合計",
+    "checkout": "決済する",
+    "clearCart": "カートを空にする",
+    "checkoutInProgress": "決済システムは開発中です"
+  },
+  "product": {
+    "addToCart": "カートに追加",
+    "added": "カートに追加しました"
+  },
+  "articles": {
+    "title": "健康記事",
+    "description": "ハーブと健康管理に関する知識と情報",
+    "readMore": "続きを読む",
+    "share": "シェア",
+    "liked": "いいね済み！",
+    "unliked": "いいねを解除",
+    "shareSuccess": "シェアしました",
+    "backToAll": "記事一覧に戻る",
+    "relatedArticles": "関連記事"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "description": "ご質問やご不明な点がございましたら、お気軽にお問い合わせください",
+    "formTitle": "メッセージを送る",
+    "name": "お名前",
+    "namePlaceholder": "お名前を入力してください",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "phonePlaceholder": "08x-xxx-xxxx",
+    "message": "メッセージ",
+    "messagePlaceholder": "メッセージを入力してください...",
+    "send": "送信する",
+    "sent": "メッセージを送信しました。できるだけ早くご連絡いたします",
+    "contactInfo": "連絡先情報",
+    "phoneLabel": "電話",
+    "hours": "月〜金 9:00-18:00",
+    "emailLabel": "メール",
+    "addressLabel": "住所",
+    "address": "バンコク自然区ハーブ街健康路123/45号 10100",
+    "socialMedia": "ソーシャルメディア",
+    "followUs": "フォローしてください"
+  },
+  "auth": {
+    "login": "ログイン",
+    "signup": "新規登録",
+    "loginTitle": "ログイン",
+    "loginDescription": "アカウントにログインしてください",
+    "signupTitle": "新規登録",
+    "signupDescription": "新しいアカウントを作成してください",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "fullName": "お名前",
+    "forgotPassword": "パスワードを忘れた方",
+    "loginButton": "ログイン",
+    "signupButton": "新規登録",
+    "loggingIn": "ログイン中...",
+    "signingUp": "登録中...",
+    "loginSuccess": "ログインしました",
+    "signupSuccess": "登録が完了しました",
+    "backToHome": "ホームに戻る"
+  },
+  "footer": {
+    "description": "健康は天然ハーブから始まります。あなたの健康のための高品質なハーブ製品",
+    "quickLinks": "クイックリンク",
+    "products": "商品",
+    "healthArticles": "健康記事",
+    "community": "コミュニティ",
+    "customerService": "カスタマーサービス",
+    "contactUs": "お問い合わせ",
+    "privacyPolicy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "contact": "お問い合わせ",
+    "rights": "All Rights Reserved."
+  },
+  "community": {
+    "title": "コミュニティ",
+    "description": "ハーブと健康に関する経験や知識を共有しましょう",
+    "newPost": "新しい投稿を作成",
+    "loginToPost": "投稿するにはログインしてください",
+    "topics": "トピック",
+    "author": "投稿者",
+    "stats": "統計",
+    "activity": "アクティビティ",
+    "searchPlaceholder": "投稿を検索...",
+    "pinnedPosts": "ピン留め投稿",
+    "trendingTopics": "トレンドトピック",
+    "noResults": "投稿が見つかりません",
+    "tryDifferentSearch": "別のキーワードまたはカテゴリを試してください",
+    "locale": "ja-JP",
+    "categories": { "all": "すべて" },
+    "tags": { "herbs": "ハーブ", "elderly": "高齢者", "caregiving": "介護", "health": "健康" },
+    "posts": {
+      "post1": { "title": "生姜で高齢者のめまいを軽減", "preview": "娘が毎朝お母さんに温かい生姜水を飲ませてめまいが減った経験をシェア", "author": "ナパさん（娘、45歳）" },
+      "post2": { "title": "黒木耳で血液循環が改善", "preview": "62歳のおじさんが週3回飲んでしびれが消えたレビュー", "author": "プラシットさん（おじ、62歳）" },
+      "post3": { "title": "なつめで高齢者の睡眠が深くなった", "preview": "70歳のおばあさんがなつめ茶を飲んで睡眠が改善された経験", "author": "チャンおばあさん（70歳）" },
+      "post4": { "title": "タイハーブで高血圧の親の介護方法", "preview": "簡単なハーブティーレシピ集", "author": "ソムチャイさん（息子、52歳）" },
+      "post5": { "title": "血液が濃い高齢者向けハーブ", "preview": "レモングラス茶、生姜、木耳の効能を解説", "author": "マニットさん（ハーブ師、58歳）" },
+      "post6": { "title": "息子が65歳の父にV Flowを飲ませた記録", "preview": "14日間で頭重感が軽減した報告", "author": "ウィチャイさん（息子、43歳）" },
+      "post7": { "title": "3つのハーブで血中脂肪を下げる方法", "preview": "ターメリック・レモン・木耳", "author": "ワンナさん（ブロガー、50歳）" },
+      "post8": { "title": "心臓を養うハーブレシピ集", "preview": "階段で疲れやすい高齢者に適しています", "author": "スカンヤさん（看護師、55歳）" },
+      "post9": { "title": "一年中手足が冷たいお母さんのケア", "preview": "温水とハーブで血液を養う技術", "author": "ラッタナさん（娘、48歳）" },
+      "post10": { "title": "紅花茶は本当に血圧を下げる？", "preview": "タイ伝統医学の原則に基づいた分析", "author": "ソムマイ先生（伝統医、60歳）" },
+      "post11": { "title": "長時間座って足がよくしびれる高齢者のハーブ解決策", "preview": "休憩、足の運動+ハーブ飲料を推奨", "author": "スパポンさん（会社員、53歳）" },
+      "post12": { "title": "消化不良の高齢者向けハーブ水レシピ", "preview": "タマリンド、マルメロ、温水を推奨", "author": "ソムサックドクター（47歳）" },
+      "post13": { "title": "高齢者の視力を養うハーブ", "preview": "クコの実・人参・ゴツコラ", "author": "シリポン先生（退職教師、65歳）" },
+      "post14": { "title": "子どもが知るべき高齢者の血液濃度の観察方法", "preview": "注意すべき初期症状", "author": "タナコーン医師（医師、56歳）" },
+      "post15": { "title": "術後の父をハーブ食で介護した経験", "preview": "消化しやすく回復を助ける簡単メニュー", "author": "ピムジャイさん（健康コーチ、42歳）" },
+      "post16": { "title": "高齢者のストレスとリラックスハーブ", "preview": "夕食後にジャスミン茶を飲む", "author": "タナポルさん（栄養士、38歳）" },
+      "post17": { "title": "寝る前に生姜を飲むのは良い？", "preview": "高齢者が深く眠れて体が温まったケース", "author": "スニー看護師（退職、60歳）" },
+      "post18": { "title": "立ち上がるとめまいがする高齢者のケア方法", "preview": "血液循環を改善する技術", "author": "ソムサックさん（健康ライター、51歳）" },
+      "post19": { "title": "ハーブで75歳のお母さんがよく歩けるように", "preview": "生姜水+軽い運動", "author": "ウライおばあさん（75歳）" },
+      "post20": { "title": "愛情ある子どもからの高齢者介護テクニック", "preview": "ハーブ+食事+体力をつける活動", "author": "プレーさん（家族介護者、46歳）" }
+    }
+  },
+  "chatbot": {
+    "greeting": "こんにちは！😊 JWHERBALへようこそ。\n何かお手伝いできることはありますか？",
+    "menu": {
+      "productInfo": "商品情報（V Flow）",
+      "pricing": "価格・プロモーション",
+      "howToUse": "飲み方・注意事項",
+      "talkToAdmin": "スタッフに相談する"
+    },
+    "productInfo": {
+      "title": "V Flow ハーブドリンク",
+      "description": "V Flow ハーブドリンクは生姜、なつめ、黒木耳を原料とした100%天然ハーブサプリメントです。\n\n✔ 血液循環の改善をサポート\n✔ 血液が濃い方、手足が冷たい方、めまいのある方に適しています\n✔ 砂糖不使用\n✔ 毎朝食前に1袋飲むだけ\n\n詳細情報や飲み方をご覧になりますか？",
+      "viewDetails": "詳細情報",
+      "viewHowToUse": "飲み方"
+    },
+    "pricing": {
+      "title": "価格・プロモーション",
+      "description": "V Flow は1箱（14袋）890バーツです。\n\n2箱以上ご購入の場合は特別割引があります 🎁\n\nご希望の場合は：",
+      "talkToAdmin": "スタッフに最新プロモーションを確認する",
+      "viewOrderMethod": "注文方法を確認する"
+    },
+    "howToUse": {
+      "title": "V Flowの飲み方",
+      "description": "推奨する飲み方：\n\n1️⃣ V Flowの袋を1袋開ける\n2️⃣ 150〜200mlのお湯に溶かす\n3️⃣ よくかき混ぜる\n4️⃣ 朝食前に飲む\n\n天然ハーブで砂糖不使用のため、毎日飲んでも安全です。\n\n持病がある方は医師にご相談ください 💚"
+    },
+    "healthWarning": "この情報は一般的なアドバイスであり、医師の診断に代わるものではありません。\n\n重篤な疾患をお持ちの方や薬を服用中の方は、ご使用前に必ず医師にご相談ください。",
+    "contactAdmin": {
+      "title": "スタッフに相談",
+      "description": "詳細についてスタッフにおつなぎします 😊",
+      "lineChat": "LINEでスタッフとチャット",
+      "requestCallback": "折り返し電話を依頼する",
+      "leaveContact": "お名前と電話番号をお知らせください。"
+    },
+    "buttons": {
+      "backToMenu": "メニューに戻る",
+      "close": "閉じる",
+      "send": "送信"
+    },
+    "placeholder": "メッセージを入力...",
+    "typingIndicator": "入力中..."
+  },
+  "about": {
+    "pageTitle": "会社概要",
+    "metaDescription": "JWHERBAL BY JWGROUP - 高品質なハーブと健康製品のリーダー",
+    "hero": {
+      "title": "JWHERBALについて",
+      "subtitle": "すべての人のより良い生活の質のために、高品質なハーブと健康製品を提供することに努めています"
+    },
+    "story": {
+      "title": "私たちのストーリー",
+      "paragraph1": "JWHERBAL BY JWGROUPは、タイのハーブの知恵を高品質で安全な製品に発展させるという思いから設立されました。",
+      "paragraph2": "ハーブ製品の研究開発における10年以上の経験を通じて、全国5万人以上のお客様の信頼を得てきました。",
+      "paragraph3": "すべての製品は、信頼できる原材料を使用し、研究者とハーブ専門家と協力して開発され、最高の品質と安全性を確保しています。"
+    },
+    "values": {
+      "title": "私たちの価値観",
+      "subtitle": "事業運営と製品創造における原則",
+      "natural": {
+        "title": "100%天然",
+        "desc": "有害な化学物質を含まない高品質な天然ハーブのみを使用"
+      },
+      "quality": {
+        "title": "高品質基準",
+        "desc": "FDA、GMP、HALAL、ISO 9001の基準で認定"
+      },
+      "care": {
+        "title": "お客様第一",
+        "desc": "お客様の満足度と健康を最優先に考えています"
+      },
+      "innovation": {
+        "title": "イノベーション",
+        "desc": "研究者と協力して最大の効果を持つ新しいフォーミュラを開発"
+      }
+    },
+    "achievements": {
+      "title": "実績",
+      "years": "年の経験",
+      "customers": "信頼のお客様",
+      "products": "高品質製品",
+      "satisfaction": "満足度"
+    },
+    "certifications": {
+      "title": "品質認定",
+      "subtitle": "すべての製品は信頼できる機関によって認定されています"
+    },
+    "mission": {
+      "title": "ミッション",
+      "point1": "国際基準を満たす高品質なハーブ製品を提供する",
+      "point2": "タイのハーブとその正しい使い方に関する知識を広める",
+      "point3": "国際的な認知を得るためのタイハーブの研究開発を支援する",
+      "point4": "健康に関する知識と経験を共有するコミュニティを創る"
+    }
+  },
+  "faq": {
+    "title": "よくある質問",
+    "description": "製品やサービスについてよくある質問",
+    "searchPlaceholder": "質問を検索...",
+    "noResults": "質問が見つかりません",
+    "categories": {
+      "all": "すべて",
+      "general": "一般",
+      "product": "製品",
+      "delivery": "配送",
+      "payment": "支払い"
+    }
+  },
+  "reviews": {
+    "title": "お客様の声",
+    "description": "実際にご使用になったお客様のレビュー",
+    "writeReview": "レビューを書く",
+    "loginToReview": "レビューを書くにはログインしてください",
+    "rating": "評価",
+    "verified": "購入済み",
+    "helpful": "役に立った",
+    "noReviews": "まだレビューがありません",
+    "overallRating": "総合評価",
+    "basedOn": "件のレビューに基づく"
+  },
+  "checkout": {
+    "title": "ご注文手続き",
+    "customerInfo": "お客様情報",
+    "name": "お名前",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "address": "お届け先住所",
+    "paymentMethod": "お支払い方法",
+    "placeOrder": "注文する",
+    "orderSuccess": "ご注文ありがとうございます",
+    "uploadSlip": "振込証明書をアップロード",
+    "slipUploaded": "アップロード完了"
+  },
+  "orderHistory": {
+    "title": "注文履歴",
+    "noOrders": "注文履歴がありません",
+    "orderId": "注文番号",
+    "date": "日付",
+    "status": "ステータス",
+    "total": "合計",
+    "viewDetail": "詳細を見る"
+  },
+  "language": {
+    "th": "ไทย",
+    "en": "English",
+    "zh": "中文",
+    "ja": "日本語"
+  }
+}
