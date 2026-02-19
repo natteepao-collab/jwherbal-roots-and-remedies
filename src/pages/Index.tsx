@@ -193,18 +193,28 @@ const Index = () => {
           className="absolute inset-0 bg-cover bg-center animate-ken-burns"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-background/95 via-background/85 to-background/70" />
+          <div className="absolute inset-0 bg-gradient-to-b lg:bg-gradient-to-r from-background/95 via-background/85 to-background/70" />
         </div>
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
-            <div className="max-w-2xl space-y-4 md:space-y-6 text-center lg:text-left">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
+          {/* Mobile Layout: Image on top */}
+          <div className="flex flex-col lg:hidden items-center text-center">
+            <div className="flex justify-center items-center mb-6">
+              <div className="relative animate-fade-in-up">
+                <img 
+                  src={vflowProduct} 
+                  alt="V Flow Herbal Drink Product" 
+                  className="w-48 sm:w-56 md:w-72 h-auto object-contain drop-shadow-2xl animate-float"
+                />
+              </div>
+            </div>
+            <div className="max-w-2xl space-y-4 md:space-y-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground animate-fade-in-up animation-delay-200 leading-tight">
                 {t("hero.title")}
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-400 max-w-lg mx-auto">
                 {t("hero.subtitle")}
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up animation-delay-400 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up animation-delay-600 justify-center">
                 <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform w-full sm:w-auto">
                   <Link to="/products/vflow">
                     {t("hero.vflowButton")}
@@ -216,16 +226,38 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            {/* Product image - visible on mobile too, smaller */}
-            <div className="flex justify-center items-center mt-6 lg:mt-0">
+          </div>
+          
+          {/* Desktop Layout: 2 columns */}
+          <div className="hidden lg:grid grid-cols-2 gap-8 items-center">
+            <div className="max-w-2xl space-y-6 text-left">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
+                {t("hero.title")}
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg">
+                {t("hero.subtitle")}
+              </p>
+              <div className="flex flex-row gap-4 animate-fade-in-up animation-delay-400 justify-start">
+                <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform">
+                  <Link to="/products/vflow">
+                    {t("hero.vflowButton")}
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild className="hover:scale-105 transition-transform">
+                  <Link to="/shop">{t("hero.shopButton")}</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-center items-center">
               <div className="relative animate-fade-in-right">
                 <img 
                   src={vflowProduct} 
                   alt="V Flow Herbal Drink Product" 
-                  className="w-48 sm:w-64 md:w-80 lg:w-full lg:max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
+                  className="w-80 lg:w-full lg:max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
                 />
                 {/* Steam Effect */}
-                <div className="steam-container hidden md:block">
+                <div className="steam-container">
                   <span className="steam steam-1"></span>
                   <span className="steam steam-2"></span>
                   <span className="steam steam-3"></span>
