@@ -263,14 +263,14 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
               {/* Left - Header */}
-              <div className="lg:sticky lg:top-32">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <div className="lg:sticky lg:top-32 flex flex-col">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 self-start">
                   <Target className="h-4 w-4" />
                   <span>Mission</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">{t("about.mission.title")}</h2>
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                  พันธกิจที่เรายึดมั่นในการพัฒนาผลิตภัณฑ์สมุนไพรคุณภาพสูงสำหรับทุกครอบครัว
+                  {settings ? getLocalizedText(settings.values_subtitle_th, settings.values_subtitle_en, settings.values_subtitle_zh) : "พันธกิจที่เรายึดมั่นในการพัฒนาผลิตภัณฑ์สมุนไพรคุณภาพสูงสำหรับทุกครอบครัว"}
                 </p>
                 <img
                   src={settings?.mission_image_url || teamExpertsImg}
