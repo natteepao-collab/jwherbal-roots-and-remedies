@@ -24,6 +24,8 @@ interface GalleryItem {
   sort_order: number;
   is_active: boolean;
   created_at: string;
+  focal_x?: number;
+  focal_y?: number;
 }
 
 const AdminBrandStoryGallery = () => {
@@ -32,6 +34,9 @@ const AdminBrandStoryGallery = () => {
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [focalX, setFocalX] = useState(0.5);
+  const [focalY, setFocalY] = useState(0.5);
+  const [isDraggingFocal, setIsDraggingFocal] = useState(false);
   const [formData, setFormData] = useState({
     title_th: "",
     title_en: "",
@@ -66,6 +71,8 @@ const AdminBrandStoryGallery = () => {
         is_active: editingItem.is_active,
       });
       setImagePreview(editingItem.image_url);
+      setFocalX(typeof (editingItem as any).focal_x === 'number' ? (editingItem as any).focal_x : 0.5);
+      setFocalY(typeof (editingItem as any).focal_y === 'number' ? (editingItem as any).focal_y : 0.5);
     } else {
       resetForm();
     }
@@ -111,6 +118,8 @@ const AdminBrandStoryGallery = () => {
       const itemData = {
         ...formData,
         image_url: imageUrl,
+        focal_x: focalX,
+        focal_y: focalY,
         updated_at: new Date().toISOString(),
       };
 
@@ -229,19 +238,160 @@ const AdminBrandStoryGallery = () => {
               {/* Image Upload */}
               <div className="space-y-4">
                 <Label>รูปภาพ</Label>
-                <div className="aspect-video rounded-lg overflow-hidden bg-muted border-2 border-dashed border-border flex items-center justify-center">
+                <div className="aspect-video rounded-lg overflow-hidden bg-muted border-2 border-dashed border-border flex items-center justify-center relative">
                   {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                    <div
+                      className="w-full h-full relative"
+                      onMouseDown={(e) => { setIsDraggingFocal(true); e.preventDefault(); }}
+                      onMouseUp={() => setIsDraggingFocal(false)}
+                      onMouseLeave={() => setIsDraggingFocal(false)}
+                      onMouseMove={(e) => {
+                        if (!isDraggingFocal) return;
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        const x = (e.clientX - rect.left) / rect.width;
+                        const y = (e.clientY - rect.top) / rect.height;
+                        setFocalX(Math.min(1, Math.max(0, x)));
+                        setFocalY(Math.min(1, Math.max(0, y)));
+                      }}
+                      onClick={(e) => {
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        const x = (e.clientX - rect.left) / rect.width;
+                        const y = (e.clientY - rect.top) / rect.height;
+                        setFocalX(Math.min(1, Math.max(0, x)));
+                        setFocalY(Math.min(1, Math.max(0, y)));
+                      }}
+                    >
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                      />
+                      {/* Focal marker */}
+                      <div
+                        className="absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white bg-primary/80 shadow-lg pointer-events-none"
+                        style={{ left: `${focalX * 100}%`, top: `${focalY * 100}%` }}
+                      />
+                    </div>
                   ) : (
                     <div className="text-center p-8">
                       <Image className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">อัปโหลดรูปภาพ (16:9)</p>
                     </div>
                   )}
+                </div>
+
+                {/* Responsive Crop Previews */}
+                <div className="mt-4">
+                  <Label>ตัวอย่างการครอป (Preview)</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">Desktop (16:9)</div>
+                      <div className="aspect-[16/9] rounded-lg overflow-hidden bg-black/5 flex items-center justify-center">
+                        <img
+                          src={imagePreview || ''}
+                          alt="desktop preview"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">Tablet (4:3)</div>
+                      <div className="aspect-[4/3] rounded-lg overflow-hidden bg-black/5 flex items-center justify-center">
+                        <img
+                          src={imagePreview || ''}
+                          alt="tablet preview"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">Mobile (9:16)</div>
+                      <div className="aspect-[9/16] rounded-lg overflow-hidden bg-black/5 flex items-center justify-center">
+                        <img
+                          src={imagePreview || ''}
+                          alt="mobile preview"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">Wide (21:9)</div>
+                      <div className="aspect-[21/9] rounded-lg overflow-hidden bg-black/5 flex items-center justify-center">
+                        <img
+                          src={imagePreview || ''}
+                          alt="wide preview"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                  <div className="space-y-2">
+                    <div className="text-sm text-muted-foreground">คลิกหรือลากบนรูปเพื่อปรับตำแหน่งการครอป (Focal point)</div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={Math.round(focalX * 100)}
+                        onChange={(e) => setFocalX(Number(e.target.value) / 100)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 text-xs text-muted-foreground">X (%)</div>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={Math.round(focalX * 100)}
+                        onChange={(e) => setFocalX(Math.min(100, Math.max(0, Number(e.target.value))) / 100)}
+                        className="w-24 rounded border px-2 py-1"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={Math.round(focalY * 100)}
+                        onChange={(e) => setFocalY(Number(e.target.value) / 100)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 text-xs text-muted-foreground">Y (%)</div>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={Math.round(focalY * 100)}
+                        onChange={(e) => setFocalY(Math.min(100, Math.max(0, Number(e.target.value))) / 100)}
+                        className="w-24 rounded border px-2 py-1"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="text-sm text-muted-foreground">การควบคุมแบบละเอียด</div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => { setFocalX(0.5); setFocalY(0.5); }}>
+                        รีเซ็ต
+                      </Button>
+                      <Button size="sm" onClick={() => { navigator.clipboard?.writeText(`${Math.round(focalX*100)},${Math.round(focalY*100)}`); toast.success('คัดลอกค่า focal เป็น % แล้ว'); }}>
+                        คัดลอกค่า
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="image-upload" className="cursor-pointer">
@@ -380,6 +530,7 @@ const AdminBrandStoryGallery = () => {
                   src={item.image_url}
                   alt={item.title_th}
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: `${(item as any).focal_x ? (item as any).focal_x * 100 : 50}% ${(item as any).focal_y ? (item as any).focal_y * 100 : 50}%` }}
                 />
                 {!item.is_active && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
