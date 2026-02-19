@@ -155,72 +155,96 @@ const VFlowProduct = () => {
         <div className="min-h-screen bg-background">
 
           {/* Hero */}
-          <section className="relative py-16 md:py-24 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.03] to-transparent" />
-            <div className="container px-4 relative">
-              <div className="grid gap-10 md:grid-cols-2 md:gap-16 items-center max-w-6xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
-                  className="flex justify-center"
-                >
-                  <img
-                    src={vflowProductImg}
-                    alt="V Flow Herbal Products"
-                    className="w-64 md:w-80 lg:w-96 h-auto object-contain drop-shadow-xl"
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="space-y-6"
-                >
-                  <div>
-                    <Badge variant="outline" className="mb-3 text-xs tracking-wider">
-                      IRTC RESEARCH
-                    </Badge>
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
-                      V FLOW
-                    </h1>
-                    <p className="text-lg text-muted-foreground mt-2">
-                      ผลิตภัณฑ์สมุนไพรเพื่อการไหลเวียนโลหิตที่ดี
-                    </p>
-                  </div>
-
-                  {drinkProduct && (
-                    <div className="flex items-center gap-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-primary text-primary" />
-                      ))}
-                      <span className="text-sm text-muted-foreground">
-                        ({drinkProduct.rating}/5)
-                      </span>
+          <section className="relative min-h-screen sm:min-h-auto py-8 sm:py-12 md:py-20 lg:py-28 overflow-hidden flex items-center">
+            {/* Decorative background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/[0.02]" />
+            
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-primary/[0.08] rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-primary/[0.06] rounded-full blur-3xl" />
+            
+            <div className="container px-4 sm:px-6 relative z-10 w-full">
+              <div className="max-w-6xl mx-auto">
+                {/* Main Content Layout - Fully Responsive */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 items-center">
+                  {/* Left Column: Text Content */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7 }}
+                    className="space-y-4 sm:space-y-5 md:space-y-6 flex flex-col justify-center"
+                  >
+                    {/* Main heading - Prominent for mobile */}
+                    <div className="space-y-2">
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter leading-tight">
+                        สุขภาพดี เริ่มที่
+                        <br />
+                        <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">V FLOW</span>
+                      </h1>
                     </div>
-                  )}
 
-                  <p className="text-muted-foreground leading-relaxed">
-                    {drinkProduct
-                      ? getText(drinkProduct.description_th, drinkProduct.description_en, drinkProduct.description_zh)
-                      : (ps.description || vflowData.description)}
-                  </p>
+                    {/* Main description */}
+                    <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed font-medium max-w-md">
+                      ผลิตภัณฑ์สมุนไพรเพื่อการไหลเวียนโลหิตที่ดี สูตรเข้มข้นจากธรรมชาติ
+                    </p>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button size="lg" className="gap-2" onClick={() => {
-                      const el = document.getElementById("vflow-products");
-                      el?.scrollIntoView({ behavior: "smooth" });
-                    }}>
-                      <ShoppingCart className="h-4 w-4" />
-                      ดูผลิตภัณฑ์ทั้งหมด
-                    </Button>
-                    <Button size="lg" variant="outline" className="gap-2" onClick={handleLineOrder}>
-                      <MessageCircle className="h-4 w-4" />
-                      สั่งผ่านไลน์
-                    </Button>
-                  </div>
-                </motion.div>
+                    {/* Rating - Visible on all sizes */}
+                    {drinkProduct && (
+                      <div className="hidden sm:flex items-center gap-3 pt-1">
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="h-5 w-5 sm:h-6 sm:w-6 fill-primary text-primary" />
+                          ))}
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">
+                          ({drinkProduct.rating}/5 rating)
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Primary CTA Button - Very Prominent */}
+                    <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="pt-2">
+                      <Button 
+                        size="lg"
+                        className="w-full gap-3 font-bold text-lg sm:text-xl shadow-2xl hover:shadow-2xl transition-all duration-300 rounded-2xl h-16 sm:h-20 md:h-20" 
+                        onClick={() => {
+                          const el = document.getElementById("vflow-products");
+                          el?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                      >
+                        <span>V Flow - สินค้าแนะนำ</span>
+                        <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7" />
+                      </Button>
+                    </motion.div>
+
+                    {/* Secondary CTA - Simpler design */}
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        variant="ghost"
+                        className="w-full font-semibold text-base sm:text-lg text-foreground hover:bg-foreground/10 transition-all duration-300 rounded-xl h-14 sm:h-16" 
+                        onClick={handleLineOrder}
+                      >
+                        เลือกยบสินค้า
+                      </Button>
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Right Column: Product Image */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 40 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                    className="w-full flex items-center justify-center mt-8 sm:mt-6 lg:mt-0 order-2 lg:order-2"
+                  >
+                    <div className="w-full max-w-xs sm:max-w-sm lg:max-w-md xl:max-w-lg flex items-center justify-center">
+                      <img
+                        src={vflowProductImg}
+                        alt="V Flow Herbal Products"
+                        className="max-w-full h-auto max-h-[45vh] sm:max-h-[55vh] lg:max-h-[75vh] object-contain drop-shadow-2xl"
+                      />
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </section>

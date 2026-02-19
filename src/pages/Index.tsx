@@ -131,15 +131,16 @@ const Index = () => {
     staleTime: 60_000,
   });
 
-  // Fetch latest articles from DB (updated_at desc)
+  // Fetch featured articles from DB (6 articles with is_featured = true)
   const { data: latestDbArticles } = useQuery({
-    queryKey: ["home-latest-articles"],
+    queryKey: ["home-featured-articles"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
         .select("*")
-        .order("updated_at", { ascending: false })
-        .limit(3);
+        .eq("is_featured", true)
+        .order("published_date", { ascending: false })
+        .limit(6);
       if (error) throw error;
       return data;
     },
@@ -329,11 +330,11 @@ const Index = () => {
           {/* Expert Consultation */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+              <div className="rounded-2xl overflow-hidden shadow-2xl min-h-[320px] flex items-center justify-center bg-secondary">
                 <img
                   src={expertInfo?.image_url || trustPharmacist}
                   alt="Expert pharmacist consultation"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                  className="max-w-full h-auto max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[70vh] object-contain mx-auto transition-transform duration-700 hover:scale-105"
                 />
               </div>
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
@@ -374,27 +375,41 @@ const Index = () => {
 
       {/* Monthly Promotion */}
       {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (
-        <section id="monthly-promotion" className="py-8 md:py-12 scroll-mt-28">
+        <section id="monthly-promotion" className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-destructive/5 via-background to-primary/5 scroll-mt-28">
           <div className="container mx-auto px-4 sm:px-6">
-            {/* Header with countdown */}
-            <div className="relative mb-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              <div className="relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                <div className="flex items-center gap-2">
-                  <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                    <Flame className="h-6 w-6 text-destructive" />
+            {/* Header Card with countdown */}
+            <div className="relative mb-6 sm:mb-8 md:mb-10 p-4 sm:p-6 md:p-8 rounded-2xl bg-white/50 dark:bg-foreground/5 border border-destructive/20 backdrop-blur-sm overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-destructive/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative">
+                {/* Top section: Title with icon */}
+                <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-5">
+                  <motion.div 
+                    animate={{ rotate: [0, -15, 15, -10, 10, 0], scale: [1, 1.2, 1] }} 
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="flex-shrink-0 mt-0.5"
+                  >
+                    <Flame className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-destructive drop-shadow-lg" />
                   </motion.div>
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-                    {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
-                  </h2>
-                  <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight">
+                      {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
+                    </h2>
+                    <p className="text-2xs sm:text-xs md:text-sm text-muted-foreground mt-1 leading-snug">
+                      {currentLanguage === "th" ? "ลดราคาส่วนลดสูงสุดสำหรับสิค้าเลือกสรร" : currentLanguage === "en" ? "Maximum discounts on selected items" : "精选产品最大优惠"}
+                    </p>
+                  </div>
                 </div>
+                
+                {/* Countdown Timer */}
                 <CountdownTimer />
               </div>
             </div>
 
-            {/* Promoted Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {/* Promoted Products Grid - Deal-focused layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {promotedProducts.map((product: any, idx: number) => {
                 const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
                 const lowestPrice = getLowestTierPrice(allTiers || [], product.id);
@@ -406,71 +421,68 @@ const Index = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.15 }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
                   >
-                    <Link to={`/shop/${product.id}`}>
-                      <Card className="group overflow-hidden border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-xl relative h-full">
-                        {/* Savings badge */}
-                        {savings > 0 && (
-                          <div className="absolute top-3 right-3 z-10">
-                            <motion.div
-                              animate={{ scale: [1, 1.1, 1] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                              className="bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-                            >
-                              {currentLanguage === "th" ? `ประหยัด ${savings}%` : `Save ${savings}%`}
-                            </motion.div>
-                          </div>
-                        )}
-                        {productTiers.length === 0 && (
-                          <div className="absolute top-3 right-3 z-10">
-                            <motion.div
-                              animate={{ scale: [1, 1.05, 1] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                              className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-                            >
-                              {currentLanguage === "th" ? "โปรโมชั่นพิเศษ" : "Special Offer"}
-                            </motion.div>
-                          </div>
-                        )}
-                        <div className="flex flex-col sm:flex-row">
-                          <div className="sm:w-2/5 aspect-square sm:aspect-auto overflow-hidden bg-secondary">
-                            <img
-                              src={productImages[product.id] || product.image_url}
-                              alt={getText(product.name_th, product.name_en, product.name_zh)}
-                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            />
-                          </div>
-                          <CardContent className="flex-1 p-4 sm:p-6 flex flex-col justify-center">
-                            <div className="text-xs text-primary font-medium mb-1">{product.category}</div>
-                            <h3 className="text-base sm:text-lg font-bold text-foreground mb-2 line-clamp-2">
-                              {getText(product.name_th, product.name_en, product.name_zh)}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                              {getText(product.description_th, product.description_en, product.description_zh)}
-                            </p>
-                            <div className="flex items-end gap-2 mb-3">
-                              {lowestPrice ? (
-                                <>
-                                  <span className="text-[10px] sm:text-xs text-muted-foreground">{currentLanguage === "th" ? "เริ่มต้นที่" : "From"}</span>
-                                  <span className="text-lg sm:text-2xl font-bold text-primary">
-                                    ฿{lowestPrice.toLocaleString("th-TH")}.-
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-lg sm:text-2xl font-bold text-primary">
-                                  ฿{product.price?.toLocaleString("th-TH")}.-
-                                </span>
-                              )}
+                    <Link to={`/shop/${product.id}`} className="block h-full">
+                      <Card className="group overflow-hidden border-2 border-primary/30 hover:border-destructive/50 transition-all duration-300 hover:shadow-2xl relative h-full flex flex-col bg-gradient-to-br from-white/80 to-background dark:from-foreground/10 dark:to-background">
+                        {/* Hot Deal Badge */}
+                        <motion.div
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute top-3 right-3 z-20"
+                        >
+                          <div className="bg-gradient-to-br from-destructive to-destructive/80 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-black shadow-lg drop-shadow">
+                            <div className="flex items-center gap-1">
+                              <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span>{savings > 0 ? `${savings}%` : "สุดคุ้ม"}</span>
                             </div>
-                            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                              <Button size="sm" className="w-full gap-2">
-                                <Sparkles className="h-4 w-4" />
-                                {currentLanguage === "th" ? "ดูโปรโมชั่น" : "View Promotion"}
-                              </Button>
-                            </motion.div>
-                          </CardContent>
+                          </div>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
+                          <img
+                            src={productImages[product.id] || product.image_url}
+                            alt={getText(product.name_th, product.name_en, product.name_zh)}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          {/* Price Tag Overlay */}
+                          <div className="absolute bottom-0 right-0 bg-gradient-to-l from-black/80 to-transparent px-3 sm:px-4 py-2 sm:py-3 text-right">
+                            {lowestPrice && bestTier ? (
+                              <div className="space-y-0.5">
+                                <div className="text-2xs sm:text-xs text-white/70 line-through">
+                                  ฿{bestTier.normal_price?.toLocaleString("th-TH")}
+                                </div>
+                                <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
+                                  ฿{lowestPrice.toLocaleString("th-TH")}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
+                                ฿{product.price?.toLocaleString("th-TH")}
+                              </div>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Content Section */}
+                        <CardContent className="p-3 sm:p-4 flex-1 flex flex-col">
+                          <div className="text-2xs sm:text-xs text-primary font-bold uppercase tracking-wider mb-1">{product.category}</div>
+                          <h3 className="text-sm sm:text-base font-bold text-foreground mb-2 line-clamp-2 flex-grow group-hover:text-primary transition-colors">
+                            {getText(product.name_th, product.name_en, product.name_zh)}
+                          </h3>
+                          <p className="text-2xs sm:text-xs text-muted-foreground mb-3 line-clamp-2">
+                            {getText(product.description_th, product.description_en, product.description_zh)}
+                          </p>
+
+                          {/* CTA Button */}
+                          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="mt-auto">
+                            <Button size="sm" className="w-full gap-1.5 font-bold text-xs sm:text-sm bg-destructive hover:bg-destructive/90 shadow-lg hover:shadow-xl transition-all">
+                              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+                              ดูดีล
+                            </Button>
+                          </motion.div>
+                        </CardContent>
                       </Card>
                     </Link>
                   </motion.div>
@@ -517,8 +529,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Latest Articles - from DB */}
-      <section id="latest-articles" className="py-10 md:py-16 bg-secondary scroll-mt-28">
+      {/* Featured Articles - from DB with 1:1 aspect ratio */}
+      <section id="featured-articles" className="py-10 md:py-16 bg-secondary scroll-mt-28">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.latestArticles")}</h2>
@@ -526,23 +538,22 @@ const Index = () => {
               <Link to="/articles">{t("sections.viewAll")}</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {(latestDbArticles && latestDbArticles.length > 0 ? latestDbArticles : articles.slice(0, 3)).map((article: any) => (
-              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
+            {(latestDbArticles && latestDbArticles.length > 0 ? latestDbArticles : articles.slice(0, 6)).map((article: any) => (
+              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
                 {(article.image_url) && (
-                  <img src={article.image_url} alt={article.title_th || article.title} className="w-full h-36 sm:h-44 md:h-48 object-cover" />
+                  <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
+                    <img src={article.image_url} alt={article.title_th || article.title} className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" />
+                  </Link>
                 )}
-                <CardContent className="p-4 md:p-6">
-                  <div className="text-xs text-primary font-medium mb-2">{article.category}</div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 md:mb-3 line-clamp-2">
+                <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
+                  <div className="text-2xs text-primary font-medium mb-1 md:mb-2">{article.category}</div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 line-clamp-2 flex-grow">
                     {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2 md:line-clamp-3">
-                    {article.excerpt_th ? getText(article.excerpt_th, article.excerpt_en, article.excerpt_zh) : article.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between text-xs sm:text-sm">
-                    <span className="text-muted-foreground">{article.author || ""}</span>
-                    <Button variant="link" asChild className="p-0 h-auto text-xs sm:text-sm">
+                  <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
+                    <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
+                    <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
                       <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
                     </Button>
                   </div>

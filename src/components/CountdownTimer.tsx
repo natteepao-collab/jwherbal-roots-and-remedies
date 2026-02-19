@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Clock } from "lucide-react";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CountdownTimerProps {
@@ -64,20 +65,28 @@ export function CountdownTimer({ targetDate: overrideDate }: CountdownTimerProps
   ];
 
   return (
-    <div className="flex items-center gap-2">
-      <Clock className="h-4 w-4 text-destructive animate-pulse" />
-      <span className="text-xs font-medium text-muted-foreground mr-1">หมดเขตใน</span>
-      <div className="flex gap-1">
+    <div className="w-full flex flex-col gap-3 sm:gap-4">
+      {/* Label */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-destructive animate-pulse flex-shrink-0" />
+        <span className="text-sm sm:text-base font-bold text-muted-foreground">หมดเขตใน</span>
+      </div>
+      {/* Timer boxes */}
+      <div className="flex gap-2 sm:gap-3 md:gap-4 justify-center sm:justify-start flex-wrap sm:flex-nowrap">
         {units.map((u) => (
-          <div
+          <motion.div
             key={u.label}
-            className="flex flex-col items-center bg-foreground/5 rounded px-1.5 py-0.5 min-w-[36px]"
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 0.5, repeat: Infinity }}
+            className="flex flex-col items-center flex-1 min-w-[60px] sm:min-w-[70px] md:min-w-[80px]"
           >
-            <span className="text-sm font-bold tabular-nums text-foreground leading-tight">
-              {pad(u.value)}
-            </span>
-            <span className="text-[9px] text-muted-foreground leading-tight">{u.label}</span>
-          </div>
+            <div className="w-full bg-gradient-to-br from-destructive/15 to-destructive/10 hover:from-destructive/20 hover:to-destructive/15 rounded-xl px-3 sm:px-4 py-3 sm:py-4 border-2 border-destructive/25 transition-all duration-300 backdrop-blur-sm shadow-md hover:shadow-lg text-center">
+              <span className="block text-xl sm:text-2xl md:text-3xl font-black tabular-nums text-destructive leading-none">
+                {pad(u.value)}
+              </span>
+            </div>
+            <span className="text-xs sm:text-sm text-muted-foreground leading-tight font-semibold mt-2">{u.label}</span>
+          </motion.div>
         ))}
       </div>
     </div>
