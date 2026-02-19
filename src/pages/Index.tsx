@@ -21,6 +21,7 @@ import trustIngredients from "@/assets/trust-ingredients.jpg";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage } from "@/lib/communityImages";
+import { resolveAvatar } from "@/lib/avatarUtils";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -608,14 +609,14 @@ const Index = () => {
               <Card key={review.id} className="rounded-xl shadow-md hover:shadow-lg transition-shadow">
                 <CardContent className="p-4 md:p-6">
                   <div className="flex items-start gap-3 mb-4">
-                    {review.author_avatar || review.avatarUrl ? (
+                  {resolveAvatar(review.author_avatar) || review.avatarUrl ? (
                       <img
-                        src={review.author_avatar || review.avatarUrl}
+                        src={resolveAvatar(review.author_avatar) || review.avatarUrl}
                         alt={review.author_name || review.name}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-border"
+                        className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 shadow-sm"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg shadow-sm">
                         {(review.author_name || review.name || "?").charAt(0).toUpperCase()}
                       </div>
                     )}
