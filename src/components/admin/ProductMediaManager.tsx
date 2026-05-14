@@ -116,7 +116,7 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
           sort_order: sortOrder,
           is_active: true,
           title: file.name,
-        });
+        } as any);
         if (dbError) throw dbError;
 
         completed++;

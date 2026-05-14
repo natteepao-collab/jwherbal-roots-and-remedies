@@ -126,7 +126,7 @@ const AdminBrandStoryGallery = () => {
       if (editingItem) {
         const { error } = await supabase
           .from("brand_story_gallery")
-          .update(itemData)
+          .update(itemData as any)
           .eq("id", editingItem.id);
         if (error) throw error;
       } else {
@@ -137,7 +137,7 @@ const AdminBrandStoryGallery = () => {
         
         const { error } = await supabase
           .from("brand_story_gallery")
-          .insert({ ...itemData, sort_order: maxSortOrder });
+          .insert({ ...itemData, sort_order: maxSortOrder } as any);
         if (error) throw error;
       }
     },
