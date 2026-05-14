@@ -358,7 +358,7 @@ const AdminOrders = () => {
         open={selectedOrder !== null}
         onOpenChange={() => setSelectedOrder(null)}
       >
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>รายละเอียดคำสั่งซื้อ</DialogTitle>
           </DialogHeader>
