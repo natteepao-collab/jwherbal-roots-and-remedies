@@ -401,13 +401,29 @@ const AdminOrders = () => {
                       })}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleViewOrder(order)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleViewOrder(order)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {order.status === "cancelled" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setDeleteTarget(order);
+                              setDeletePassword("");
+                            }}
+                            title="ลบคำสั่งซื้อที่ถูกยกเลิก"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
