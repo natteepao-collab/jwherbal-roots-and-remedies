@@ -173,14 +173,13 @@ const AdminOrders = () => {
       const { error } = await supabase.functions.invoke("send-admin-notification", {
         body: {
           type: notifType,
+          force: true,
           data: {
             order_id: selectedOrder.id,
             customer_name: selectedOrder.customer_name,
             total_amount: Number(selectedOrder.total_amount),
             ...(isSlip ? { slip_url: selectedOrder.payment_slip_url ?? "" } : {}),
-            // bust dedupe by appending timestamp marker
-            _retry: Date.now(),
-          } as any,
+          },
         },
       });
       if (error) throw error;
