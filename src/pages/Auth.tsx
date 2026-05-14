@@ -11,6 +11,14 @@ import { supabase } from "@/integrations/supabase/client";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,8 +27,37 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast({
+        title: "ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว",
+        description: `กรุณาตรวจสอบอีเมล ${forgotEmail} เพื่อดำเนินการต่อ`,
+      });
+      setForgotOpen(false);
+      setForgotEmail("");
+    } catch (err: any) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: err.message || "ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้",
+        variant: "destructive",
+      });
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -183,7 +220,21 @@ const Auth = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">รหัสผ่าน</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">รหัสผ่าน</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotEmail(email);
+                        setForgotOpen(true);
+                      }}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      ลืมรหัสผ่าน?
+                    </button>
+                  )}
+                </div>
                 <Input
                   id="password"
                   type="password"
@@ -196,7 +247,21 @@ const Auth = () => {
               </div>
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error}
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotEmail(email);
+                          setForgotOpen(true);
+                        }}
+                        className="ml-2 underline font-medium"
+                      >
+                        รีเซ็ตรหัสผ่าน
+                      </button>
+                    )}
+                  </AlertDescription>
                 </Alert>
               )}
               <Button type="submit" className="w-full" disabled={loading}>
@@ -265,6 +330,44 @@ const Auth = () => {
       </div>
       <Footer />
     </div>
+
+    <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>ลืมรหัสผ่าน</DialogTitle>
+          <DialogDescription>
+            กรอกอีเมลของคุณ ระบบจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="forgotEmail">อีเมล</Label>
+            <Input
+              id="forgotEmail"
+              type="email"
+              placeholder="your@email.com"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setForgotOpen(false)}
+              disabled={forgotLoading}
+            >
+              ยกเลิก
+            </Button>
+            <Button type="submit" disabled={forgotLoading}>
+              {forgotLoading ? "กำลังส่ง..." : "ส่งลิงก์รีเซ็ต"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
     </PageTransition>
   );
 };

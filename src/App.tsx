@@ -20,6 +20,7 @@ import Community from "./pages/Community";
 import CommunityPost from "./pages/CommunityPost";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
 import FAQ from "./pages/FAQ";
@@ -71,6 +72,7 @@ const PublicRoutes = () => {
         <Route path="/community/:id" element={<CommunityPost />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/products/vflow" element={<VFlowProduct />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />
