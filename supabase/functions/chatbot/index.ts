@@ -7,6 +7,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function notifyNewChat(messages: any[], language: string) {
+  try {
+    const token = Deno.env.get("LINE_NOTIFY_TOKEN");
+    if (!token) return;
+    const firstUserMsg = messages.find((m: any) => m.role === "user")?.content || "(ไม่มีข้อความ)";
+    const text = `\n💬 มีลูกค้าเริ่มแชทใหม่ใน JWHERBAL Help!\n\n🌐 ภาษา: ${language}\n❓ ข้อความแรก: ${firstUserMsg}\n\n📅 ${new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}\n\n⚠️ กรุณาตรวจสอบเพื่อให้ลูกค้าได้รับการตอบกลับ`;
+    await fetch("https://notify-api.line.me/api/notify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${token}`,
+      },
+      body: `message=${encodeURIComponent(text)}`,
+    });
+  } catch (e) {
+    console.error("notifyNewChat error:", e);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -37,6 +56,7 @@ serve(async (req) => {
           .select("id")
           .single();
         conversationId = created!.id;
+        await notifyNewChat(messages, language || "th");
       }
     } else {
       const { data: created } = await supabase
@@ -45,6 +65,7 @@ serve(async (req) => {
         .select("id")
         .single();
       conversationId = created!.id;
+      await notifyNewChat(messages, language || "th");
     }
 
     // Save the latest user message
