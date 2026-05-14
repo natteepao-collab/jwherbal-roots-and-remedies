@@ -214,6 +214,25 @@ ${stars}
         </div>
         <p style="margin-top:20px;"><a href="${deepLink}" style="background:#2563eb;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">ตรวจสอบสลิป</a></p>
       </div>`;
+    } else if (type === "order_cancelled") {
+      deepLink = ADMIN_ORDER_URL;
+      lineMessage = `❌ คำสั่งซื้อถูกยกเลิก
+📦 หมายเลข: ${data.order_id?.slice(0, 8).toUpperCase()}
+👤 ลูกค้า: ${data.customer_name ?? "-"}
+💰 ยอดรวม: ฿${data.total_amount?.toLocaleString() ?? "-"}
+🛠 ยกเลิกโดย: ${data.cancelled_by ?? "Admin"}
+📅 เวลา: ${new Date().toLocaleString("th-TH")}`;
+      emailSubject = `❌ คำสั่งซื้อถูกยกเลิก - ${data.order_id?.slice(0, 8).toUpperCase()}`;
+      emailHtml = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+        <h1 style="color:#dc2626;">❌ คำสั่งซื้อถูกยกเลิก</h1>
+        <div style="background:#fef2f2;padding:20px;border-radius:8px;border:1px solid #fecaca;">
+          <p><strong>หมายเลข:</strong> ${data.order_id?.slice(0, 8).toUpperCase()}</p>
+          <p><strong>ลูกค้า:</strong> ${data.customer_name ?? "-"}</p>
+          <p><strong>ยอดรวม:</strong> ฿${data.total_amount?.toLocaleString() ?? "-"}</p>
+          <p><strong>ยกเลิกโดย:</strong> ${data.cancelled_by ?? "Admin"}</p>
+        </div>
+        <p style="margin-top:20px;"><a href="${deepLink}" style="background:#dc2626;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">ดูคำสั่งซื้อ</a></p>
+      </div>`;
     }
 
     const refId = data.order_id ?? data.review_id;
