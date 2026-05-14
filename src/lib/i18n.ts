@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { setAutoTranslateLanguage } from "@/lib/autoTranslate";
 
 // Load translations dynamically
 const loadLanguage = async (lang: string) => {
@@ -27,7 +28,15 @@ export const initializeI18n = async () => {
 
   // Load all languages
   await Promise.all(["th", "en", "zh", "ja"].map(loadLanguage));
-  
+
+  // Hook auto-translate to language changes
+  i18n.on("languageChanged", (lng) => {
+    setAutoTranslateLanguage(lng);
+  });
+
+  // Apply for initial language (in case it's persisted as non-Thai elsewhere)
+  setAutoTranslateLanguage(i18n.language);
+
   return i18n;
 };
 
