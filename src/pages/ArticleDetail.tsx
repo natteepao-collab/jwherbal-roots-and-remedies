@@ -12,6 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
 import { useEffect } from "react";
+import DOMPurify from "dompurify";
+
+const renderSafeHtml = (raw: string) => ({
+  __html: DOMPurify.sanitize(raw.replace(/\n/g, "<br />"), { USE_PROFILES: { html: true } }),
+});
 
 const ArticleNavButtons = ({
   prevSlug,
