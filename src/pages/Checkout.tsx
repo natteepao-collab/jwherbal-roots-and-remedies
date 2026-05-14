@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { QrCode, ArrowLeft, CheckCircle, Building2, Copy } from "lucide-react";
+import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
 
 interface PaymentSettings {
   promptpay_number: string;
@@ -65,6 +65,41 @@ const Checkout = () => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("promptpay");
   const [user, setUser] = useState<{ id: string } | null>(null);
+  const [slipUploading, setSlipUploading] = useState(false);
+  const [slipUrl, setSlipUrl] = useState<string | null>(null);
+
+  const handleSlipUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !orderId) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("ไฟล์ต้องไม่เกิน 5MB");
+      return;
+    }
+    setSlipUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${orderId}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("payment-slips")
+        .upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("payment-slips").getPublicUrl(path);
+      const { error: dbErr } = await supabase
+        .from("orders")
+        .update({
+          payment_slip_url: urlData.publicUrl,
+          payment_slip_uploaded_at: new Date().toISOString(),
+        } as any)
+        .eq("id", orderId);
+      if (dbErr) throw dbErr;
+      setSlipUrl(urlData.publicUrl);
+      toast.success("อัปโหลดสลิปสำเร็จ! ทีมงานกำลังตรวจสอบ");
+    } catch (err: any) {
+      toast.error("อัปโหลดไม่สำเร็จ: " + err.message);
+    } finally {
+      setSlipUploading(false);
+    }
+  };
 
   // Fetch payment settings
   const { data: paymentSettings } = useQuery({
