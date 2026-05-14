@@ -202,6 +202,35 @@ const AdminContact = () => {
           </CardContent>
         </Card>
 
+        {/* Chat Notification */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              การแจ้งเตือนแชท
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label htmlFor="chat_line_notify_enabled" className="text-base">
+                  แจ้งเตือน LINE เมื่อมีลูกค้าเริ่มแชทใหม่
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  ส่งข้อความไปยัง LINE Notify ทุกครั้งที่ลูกค้าเริ่มสนทนาใน JWHERBAL Help
+                </p>
+              </div>
+              <Switch
+                id="chat_line_notify_enabled"
+                checked={!!formData.chat_line_notify_enabled}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, chat_line_notify_enabled: checked })
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Social Media */}
         <Card>
           <CardHeader>
