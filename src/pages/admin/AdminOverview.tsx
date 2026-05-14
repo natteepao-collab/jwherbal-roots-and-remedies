@@ -100,14 +100,16 @@ const AdminOverview = () => {
     ]);
 
     const totalViews = communityRes.data?.reduce((sum, post) => sum + (post.views || 0), 0) || 0;
-    const totalRevenue = ordersRes.data?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
+    // ไม่นับคำสั่งซื้อที่ถูกยกเลิกในยอดรวมและจำนวน
+    const activeOrders = (ordersRes.data || []).filter((o) => o.status !== "cancelled");
+    const totalRevenue = activeOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
 
     setStats({
       articles: articlesRes.count || 0,
       users: usersRes.count || 0,
       communityPosts: communityRes.count || 0,
       totalViews,
-      totalOrders: ordersRes.data?.length || 0,
+      totalOrders: activeOrders.length,
       totalRevenue,
       pendingOrders: pendingOrdersRes.count || 0,
       totalProducts: productsRes.count || 0,
