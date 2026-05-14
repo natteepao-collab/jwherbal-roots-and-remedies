@@ -325,14 +325,18 @@ const AdminOrders = () => {
                     <TableCell>
                       <Select
                         value={order.status}
-                        onValueChange={(value) =>
+                        onValueChange={(value) => {
+                          if (value === "cancelled" && order.status !== "cancelled") {
+                            setCancelTarget(order);
+                            return;
+                          }
                           updateStatusMutation.mutate({
                             id: order.id,
                             field: "status",
                             value,
                             order,
-                          })
-                        }
+                          });
+                        }}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
