@@ -822,6 +822,8 @@ export type Database = {
           customer_phone: string
           id: string
           payment_method: string
+          payment_slip_uploaded_at: string | null
+          payment_slip_url: string | null
           payment_status: string
           status: string
           total_amount: number
@@ -836,6 +838,8 @@ export type Database = {
           customer_phone: string
           id?: string
           payment_method?: string
+          payment_slip_uploaded_at?: string | null
+          payment_slip_url?: string | null
           payment_status?: string
           status?: string
           total_amount: number
@@ -850,6 +854,8 @@ export type Database = {
           customer_phone?: string
           id?: string
           payment_method?: string
+          payment_slip_uploaded_at?: string | null
+          payment_slip_url?: string | null
           payment_status?: string
           status?: string
           total_amount?: number
