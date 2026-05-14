@@ -330,6 +330,44 @@ const Auth = () => {
       </div>
       <Footer />
     </div>
+
+    <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>ลืมรหัสผ่าน</DialogTitle>
+          <DialogDescription>
+            กรอกอีเมลของคุณ ระบบจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="forgotEmail">อีเมล</Label>
+            <Input
+              id="forgotEmail"
+              type="email"
+              placeholder="your@email.com"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setForgotOpen(false)}
+              disabled={forgotLoading}
+            >
+              ยกเลิก
+            </Button>
+            <Button type="submit" disabled={forgotLoading}>
+              {forgotLoading ? "กำลังส่ง..." : "ส่งลิงก์รีเซ็ต"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
     </PageTransition>
   );
 };
