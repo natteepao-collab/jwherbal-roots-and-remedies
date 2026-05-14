@@ -651,6 +651,7 @@ export type Database = {
       contact_settings: {
         Row: {
           address: string
+          chat_line_notify_enabled: boolean
           email: string
           facebook_url: string
           id: string
@@ -665,6 +666,7 @@ export type Database = {
         }
         Insert: {
           address?: string
+          chat_line_notify_enabled?: boolean
           email?: string
           facebook_url?: string
           id?: string
@@ -679,6 +681,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          chat_line_notify_enabled?: boolean
           email?: string
           facebook_url?: string
           id?: string
