@@ -319,6 +319,7 @@ const AdminOrders = () => {
                             id: order.id,
                             field: "status",
                             value,
+                            order,
                           })
                         }
                       >
