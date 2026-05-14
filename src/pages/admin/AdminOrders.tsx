@@ -24,10 +24,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+
+interface NotificationLog {
+  id: string;
+  notification_type: string;
+  channel: string;
+  status: string;
+  dedupe_key: string | null;
+  error_message: string | null;
+  created_at: string;
+}
 
 interface OrderItem {
   id: string;
