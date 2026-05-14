@@ -540,7 +540,9 @@ const AdminOrders = () => {
                 <p className="font-semibold mb-2">สลิปการชำระเงิน</p>
                 {selectedOrder.payment_slip_url ? (
                   <div className="space-y-2">
-                    {slipSignedUrl ? (
+                    {isAdmin === false ? (
+                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
+                    ) : slipSignedUrl ? (
                       <a href={slipSignedUrl} target="_blank" rel="noopener noreferrer">
                         <img
                           src={slipSignedUrl}
@@ -548,11 +550,22 @@ const AdminOrders = () => {
                           className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
                         />
                       </a>
-                    ) : isAdmin === false ? (
-                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic text-center">กำลังโหลดสลิป...</p>
-                    )}
+                    ) : slipError ? (
+                      <div className="flex flex-col items-center gap-2 py-4">
+                        <p className="text-sm text-destructive italic text-center">โหลดสลิปไม่สำเร็จ: {slipError}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSlipRetry((n) => n + 1)}
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                          ลองใหม่
+                        </Button>
+                      </div>
+                    ) : slipLoading || isAdmin === null ? (
+                      <Skeleton className="h-64 w-full max-w-sm mx-auto rounded-lg" />
+                    ) : null}
                     {selectedOrder.payment_slip_uploaded_at && (
                       <p className="text-xs text-muted-foreground text-center">
                         แนบเมื่อ {format(new Date(selectedOrder.payment_slip_uploaded_at), "d MMM yyyy HH:mm", { locale: th })}
