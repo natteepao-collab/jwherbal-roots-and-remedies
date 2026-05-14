@@ -38,6 +38,7 @@ import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send,
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
