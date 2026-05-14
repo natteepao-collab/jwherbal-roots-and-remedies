@@ -220,7 +220,21 @@ const Auth = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">รหัสผ่าน</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">รหัสผ่าน</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotEmail(email);
+                        setForgotOpen(true);
+                      }}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      ลืมรหัสผ่าน?
+                    </button>
+                  )}
+                </div>
                 <Input
                   id="password"
                   type="password"
