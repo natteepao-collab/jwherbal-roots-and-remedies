@@ -532,6 +532,8 @@ const AdminOrders = () => {
                           className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
                         />
                       </a>
+                    ) : isAdmin === false ? (
+                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
                     ) : (
                       <p className="text-sm text-muted-foreground italic text-center">กำลังโหลดสลิป...</p>
                     )}
