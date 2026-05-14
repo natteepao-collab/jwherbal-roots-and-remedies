@@ -18,6 +18,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -95,6 +105,7 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders", filter],
@@ -314,14 +325,18 @@ const AdminOrders = () => {
                     <TableCell>
                       <Select
                         value={order.status}
-                        onValueChange={(value) =>
+                        onValueChange={(value) => {
+                          if (value === "cancelled" && order.status !== "cancelled") {
+                            setCancelTarget(order);
+                            return;
+                          }
                           updateStatusMutation.mutate({
                             id: order.id,
                             field: "status",
                             value,
                             order,
-                          })
-                        }
+                          });
+                        }}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
@@ -538,6 +553,38 @@ const AdminOrders = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={cancelTarget !== null} onOpenChange={(o) => !o && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ยืนยันการยกเลิกคำสั่งซื้อ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              คุณกำลังจะยกเลิกคำสั่งซื้อของ <strong>{cancelTarget?.customer_name}</strong>
+              {" "}ยอดรวม <strong>฿{cancelTarget?.total_amount.toLocaleString()}</strong>
+              <br />การกระทำนี้จะส่งแจ้งเตือนไปยังแอดมินทันที และไม่สามารถย้อนกลับได้โดยอัตโนมัติ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ไม่ใช่</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (cancelTarget) {
+                  updateStatusMutation.mutate({
+                    id: cancelTarget.id,
+                    field: "status",
+                    value: "cancelled",
+                    order: cancelTarget,
+                  });
+                }
+                setCancelTarget(null);
+              }}
+            >
+              ยืนยันยกเลิก
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
