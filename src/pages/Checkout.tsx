@@ -360,9 +360,8 @@ const Checkout = () => {
                   </p>
                   {slipUrl ? (
                     <div className="space-y-2">
-                      <img src={slipUrl} alt="สลิปการชำระเงิน" className="max-h-64 rounded-lg border mx-auto" />
                       <p className="text-sm text-green-600 text-center font-medium">
-                        ✓ อัปโหลดสลิปเรียบร้อยแล้ว
+                        ✓ อัปโหลดสลิปเรียบร้อยแล้ว ทีมงานกำลังตรวจสอบ
                       </p>
                       <Label htmlFor="slip-upload" className="cursor-pointer">
                         <div className="text-center text-sm text-primary underline">เปลี่ยนสลิป</div>
