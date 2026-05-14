@@ -108,6 +108,28 @@ const AdminOrders = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const DELETE_PASSWORD = "696969";
+
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // ลบ order_items ก่อน แล้วค่อยลบ order
+      const { error: itemsError } = await supabase.from("order_items").delete().eq("order_id", id);
+      if (itemsError) throw itemsError;
+      const { error } = await supabase.from("orders").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast.success("ลบคำสั่งซื้อเรียบร้อย");
+      setDeleteTarget(null);
+      setDeletePassword("");
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders", filter],
