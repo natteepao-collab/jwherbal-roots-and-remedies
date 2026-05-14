@@ -625,6 +625,63 @@ const AdminOrders = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteTarget(null);
+            setDeletePassword("");
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-600">ยืนยันการลบคำสั่งซื้อถาวร?</AlertDialogTitle>
+            <AlertDialogDescription>
+              คุณกำลังจะลบคำสั่งซื้อของ <strong>{deleteTarget?.customer_name}</strong>
+              {" "}ยอดรวม <strong>฿{deleteTarget?.total_amount.toLocaleString()}</strong>
+              <br />
+              การกระทำนี้ <strong>ไม่สามารถย้อนกลับได้</strong> กรุณากรอกรหัสยืนยันเพื่อดำเนินการต่อ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="delete-password">รหัสยืนยัน</Label>
+            <Input
+              id="delete-password"
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="กรอกรหัสยืนยัน"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && deletePassword === DELETE_PASSWORD && deleteTarget) {
+                  deleteOrderMutation.mutate(deleteTarget.id);
+                }
+              }}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={deletePassword !== DELETE_PASSWORD || deleteOrderMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (deletePassword !== DELETE_PASSWORD) {
+                  toast.error("รหัสยืนยันไม่ถูกต้อง");
+                  return;
+                }
+                if (deleteTarget) {
+                  deleteOrderMutation.mutate(deleteTarget.id);
+                }
+              }}
+            >
+              ลบถาวร
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
