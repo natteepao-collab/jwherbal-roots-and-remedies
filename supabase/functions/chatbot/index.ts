@@ -7,8 +7,15 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function notifyNewChat(messages: any[], language: string) {
+async function notifyNewChat(supabase: any, messages: any[], language: string) {
   try {
+    const { data: cfg } = await supabase
+      .from("contact_settings")
+      .select("chat_line_notify_enabled")
+      .limit(1)
+      .single();
+    if (cfg && cfg.chat_line_notify_enabled === false) return;
+
     const token = Deno.env.get("LINE_NOTIFY_TOKEN");
     if (!token) return;
     const firstUserMsg = messages.find((m: any) => m.role === "user")?.content || "(ไม่มีข้อความ)";
