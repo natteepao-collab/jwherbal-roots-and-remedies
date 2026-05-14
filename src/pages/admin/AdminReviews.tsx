@@ -22,7 +22,7 @@ import { Star, Check, X, Trash2, MessageSquare, User, Reply, Eye } from "lucide-
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import { avatarImages } from "@/assets/avatars";
+import { resolveAvatar } from "@/lib/avatarUtils";
 
 interface Review {
   id: string;
