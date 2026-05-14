@@ -81,21 +81,24 @@ const Checkout = () => {
       const path = `${orderId}/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("payment-slips")
-        .upload(path, file, { upsert: true });
+        .upload(path, file, { upsert: false });
       if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("payment-slips").getPublicUrl(path);
+      // Store the storage path (private bucket — no public URL)
       const { error: dbErr } = await supabase
         .from("orders")
         .update({
-          payment_slip_url: urlData.publicUrl,
+          payment_slip_url: path,
           payment_slip_uploaded_at: new Date().toISOString(),
         } as any)
         .eq("id", orderId);
       if (dbErr) throw dbErr;
-      setSlipUrl(urlData.publicUrl);
+      setSlipUrl(path);
 
-      // Notify admin via LINE/email (best-effort)
+      // Notify admin via LINE/email (best-effort) — include a 7-day signed URL
       try {
+        const { data: signed } = await supabase.storage
+          .from("payment-slips")
+          .createSignedUrl(path, 60 * 60 * 24 * 7);
         const { data: orderRow } = await supabase
           .from("orders")
           .select("customer_name, total_amount")
@@ -108,7 +111,7 @@ const Checkout = () => {
               order_id: orderId,
               customer_name: orderRow?.customer_name,
               total_amount: Number(orderRow?.total_amount ?? orderTotal),
-              slip_url: urlData.publicUrl,
+              slip_url: signed?.signedUrl ?? "",
             },
           },
         });
