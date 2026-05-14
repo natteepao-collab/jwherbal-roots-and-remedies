@@ -151,9 +151,58 @@ const AdminOrders = () => {
     },
   });
 
+  const { data: notifLogs, refetch: refetchLogs } = useQuery({
+    queryKey: ["notification-logs", selectedOrder?.id],
+    enabled: !!selectedOrder?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notification_logs" as any)
+        .select("*")
+        .eq("reference_id", selectedOrder!.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as unknown as NotificationLog[];
+    },
+  });
+
+  const retryMutation = useMutation({
+    mutationFn: async (notifType: string) => {
+      if (!selectedOrder) throw new Error("no order");
+      const isSlip = notifType === "slip_uploaded";
+      const { error } = await supabase.functions.invoke("send-admin-notification", {
+        body: {
+          type: notifType,
+          data: {
+            order_id: selectedOrder.id,
+            customer_name: selectedOrder.customer_name,
+            total_amount: Number(selectedOrder.total_amount),
+            ...(isSlip ? { slip_url: selectedOrder.payment_slip_url ?? "" } : {}),
+            // bust dedupe by appending timestamp marker
+            _retry: Date.now(),
+          } as any,
+        },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("ส่งแจ้งเตือนซ้ำเรียบร้อย");
+      refetchLogs();
+    },
+    onError: (e: any) => toast.error("ส่งซ้ำไม่สำเร็จ: " + e.message),
+  });
+
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
     fetchOrderItems(order.id);
+  };
+
+  const statusBadge = (s: string) => {
+    if (s === "success") return <Badge className="bg-green-100 text-green-800 hover:bg-green-100"><CheckCircle2 className="h-3 w-3 mr-1" />สำเร็จ</Badge>;
+    if (s === "failed") return <Badge className="bg-red-100 text-red-800 hover:bg-red-100"><XCircle className="h-3 w-3 mr-1" />ล้มเหลว</Badge>;
+    if (s === "skipped") return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100"><MinusCircle className="h-3 w-3 mr-1" />ข้าม</Badge>;
+    if (s === "deduped") return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">ซ้ำ (กันส่งซ้ำ)</Badge>;
+    return <Badge variant="outline">{s}</Badge>;
   };
 
   return (
