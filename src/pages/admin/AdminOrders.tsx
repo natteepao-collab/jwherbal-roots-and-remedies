@@ -105,6 +105,7 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders", filter],
