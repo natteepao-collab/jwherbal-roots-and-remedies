@@ -112,6 +112,9 @@ const AdminOrders = () => {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [slipSignedUrl, setSlipSignedUrl] = useState<string | null>(null);
+  const [slipLoading, setSlipLoading] = useState(false);
+  const [slipError, setSlipError] = useState<string | null>(null);
+  const [slipRetry, setSlipRetry] = useState(0);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const DELETE_PASSWORD = "696969";
 
@@ -139,30 +142,42 @@ const AdminOrders = () => {
   useEffect(() => {
     let cancelled = false;
     const slipRef = selectedOrder?.payment_slip_url;
+    setSlipError(null);
     if (!slipRef) {
       setSlipSignedUrl(null);
+      setSlipLoading(false);
       return;
     }
     // Hard guard: never request a signed URL unless verified admin
     if (isAdmin !== true) {
       setSlipSignedUrl(null);
+      setSlipLoading(false);
       return;
     }
     // Legacy rows may still hold a full http(s) URL — use as-is
     if (/^https?:\/\//i.test(slipRef)) {
       setSlipSignedUrl(slipRef);
+      setSlipLoading(false);
       return;
     }
+    setSlipLoading(true);
     (async () => {
-      const { data } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from("payment-slips")
         .createSignedUrl(slipRef, 60 * 60);
-      if (!cancelled) setSlipSignedUrl(data?.signedUrl ?? null);
+      if (cancelled) return;
+      if (error || !data?.signedUrl) {
+        setSlipSignedUrl(null);
+        setSlipError(error?.message ?? "ไม่สามารถสร้างลิงก์สลิปได้");
+      } else {
+        setSlipSignedUrl(data.signedUrl);
+      }
+      setSlipLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [selectedOrder?.payment_slip_url, isAdmin]);
+  }, [selectedOrder?.payment_slip_url, isAdmin, slipRetry]);
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
