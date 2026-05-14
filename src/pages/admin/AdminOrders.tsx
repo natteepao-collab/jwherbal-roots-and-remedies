@@ -261,7 +261,7 @@ const AdminOrders = () => {
             order_id: selectedOrder.id,
             customer_name: selectedOrder.customer_name,
             total_amount: Number(selectedOrder.total_amount),
-            ...(isSlip ? { slip_url: selectedOrder.payment_slip_url ?? "" } : {}),
+            ...(isSlip ? { slip_url: slipSignedUrl ?? selectedOrder.payment_slip_url ?? "" } : {}),
           },
         },
       });
@@ -498,13 +498,17 @@ const AdminOrders = () => {
                 <p className="font-semibold mb-2">สลิปการชำระเงิน</p>
                 {selectedOrder.payment_slip_url ? (
                   <div className="space-y-2">
-                    <a href={selectedOrder.payment_slip_url} target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={selectedOrder.payment_slip_url}
-                        alt="สลิปชำระเงิน"
-                        className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
-                      />
-                    </a>
+                    {slipSignedUrl ? (
+                      <a href={slipSignedUrl} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={slipSignedUrl}
+                          alt="สลิปชำระเงิน"
+                          className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
+                        />
+                      </a>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic text-center">กำลังโหลดสลิป...</p>
+                    )}
                     {selectedOrder.payment_slip_uploaded_at && (
                       <p className="text-xs text-muted-foreground text-center">
                         แนบเมื่อ {format(new Date(selectedOrder.payment_slip_uploaded_at), "d MMM yyyy HH:mm", { locale: th })}
