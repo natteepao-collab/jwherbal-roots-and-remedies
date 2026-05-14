@@ -19,7 +19,7 @@ import {
   HelpCircle,
   Building,
   Flame,
-  Droplets
+  Droplets,
   ScanSearch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
