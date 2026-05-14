@@ -63,7 +63,7 @@ serve(async (req) => {
           .select("id")
           .single();
         conversationId = created!.id;
-        await notifyNewChat(messages, language || "th");
+        await notifyNewChat(supabase, messages, language || "th");
       }
     } else {
       const { data: created } = await supabase
@@ -72,7 +72,7 @@ serve(async (req) => {
         .select("id")
         .single();
       conversationId = created!.id;
-      await notifyNewChat(messages, language || "th");
+      await notifyNewChat(supabase, messages, language || "th");
     }
 
     // Save the latest user message
