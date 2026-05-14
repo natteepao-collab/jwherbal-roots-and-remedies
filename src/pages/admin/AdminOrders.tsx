@@ -116,7 +116,7 @@ const AdminOrders = () => {
   const [slipError, setSlipError] = useState<string | null>(null);
   const [slipRetry, setSlipRetry] = useState(0);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const DELETE_PASSWORD = "696969";
+  const CONFIRM_WORD = "DELETE";
 
   // Verify admin role server-side before allowing any slip access
   useEffect(() => {
