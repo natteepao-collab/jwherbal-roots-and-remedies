@@ -130,6 +130,11 @@ const menuItems = [
     path: "/admin/dashboard/logo" 
   },
   { 
+    title: "i18n Audit", 
+    icon: ScanSearch, 
+    path: "/admin/dashboard/i18n-audit" 
+  },
+  { 
     title: "ตั้งค่า", 
     icon: Settings, 
     path: "/admin/dashboard/settings" 
