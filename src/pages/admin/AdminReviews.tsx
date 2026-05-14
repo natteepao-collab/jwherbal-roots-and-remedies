@@ -229,7 +229,7 @@ const AdminReviews = () => {
                       <div className="flex items-center gap-2">
                         {review.author_avatar ? (
                           <img
-                            src={avatarImages[review.author_avatar] || review.author_avatar}
+                            src={resolveAvatar(review.author_avatar) || review.author_avatar}
                             alt={review.author_name}
                             className="h-8 w-8 rounded-full object-cover"
                           />
