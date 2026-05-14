@@ -120,21 +120,24 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { type, data }: NotificationRequest = await req.json();
-    console.log("Notification request:", { type, data });
+    const body = await req.json();
+    const { type, data, force }: NotificationRequest & { force?: boolean } = body;
+    console.log("Notification request:", { type, data, force });
 
-    // Dedupe: prevent same notification within 60s
+    // Dedupe: prevent same notification within 60s (skipped when force=true)
     const dedupeKey = `${type}:${data.order_id ?? data.review_id ?? ""}:${data.slip_url ?? ""}`;
     const sinceIso = new Date(Date.now() - 60_000).toISOString();
-    const { data: recent } = await supabase
-      .from("notification_logs")
-      .select("id")
-      .eq("dedupe_key", dedupeKey)
-      .eq("status", "success")
-      .gte("created_at", sinceIso)
-      .limit(1);
+    const { data: recent } = !force
+      ? await supabase
+          .from("notification_logs")
+          .select("id")
+          .eq("dedupe_key", dedupeKey)
+          .eq("status", "success")
+          .gte("created_at", sinceIso)
+          .limit(1)
+      : { data: [] as any[] };
 
-    if (recent && recent.length > 0) {
+    if (!force && recent && recent.length > 0) {
       console.log("Duplicate notification suppressed:", dedupeKey);
       await logNotification({
         notification_type: type,
