@@ -11,7 +11,7 @@ const ADMIN_ORDER_URL = "https://jwherbal-roots-and-remedies.lovable.app/admin/d
 const ADMIN_REVIEW_URL = "https://jwherbal-roots-and-remedies.lovable.app/admin/dashboard/reviews";
 
 interface NotificationRequest {
-  type: "new_order" | "new_review" | "slip_uploaded";
+  type: "new_order" | "new_review" | "slip_uploaded" | "order_cancelled";
   data: {
     order_id?: string;
     customer_name?: string;
@@ -21,6 +21,8 @@ interface NotificationRequest {
     rating?: number;
     comment?: string;
     slip_url?: string;
+    cancelled_by?: string;
+    reason?: string;
   };
 }
 
