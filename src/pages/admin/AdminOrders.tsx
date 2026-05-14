@@ -38,6 +38,7 @@ import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send,
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
@@ -111,6 +112,9 @@ const AdminOrders = () => {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [slipSignedUrl, setSlipSignedUrl] = useState<string | null>(null);
+  const [slipLoading, setSlipLoading] = useState(false);
+  const [slipError, setSlipError] = useState<string | null>(null);
+  const [slipRetry, setSlipRetry] = useState(0);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const DELETE_PASSWORD = "696969";
 
@@ -138,30 +142,42 @@ const AdminOrders = () => {
   useEffect(() => {
     let cancelled = false;
     const slipRef = selectedOrder?.payment_slip_url;
+    setSlipError(null);
     if (!slipRef) {
       setSlipSignedUrl(null);
+      setSlipLoading(false);
       return;
     }
     // Hard guard: never request a signed URL unless verified admin
     if (isAdmin !== true) {
       setSlipSignedUrl(null);
+      setSlipLoading(false);
       return;
     }
     // Legacy rows may still hold a full http(s) URL — use as-is
     if (/^https?:\/\//i.test(slipRef)) {
       setSlipSignedUrl(slipRef);
+      setSlipLoading(false);
       return;
     }
+    setSlipLoading(true);
     (async () => {
-      const { data } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from("payment-slips")
         .createSignedUrl(slipRef, 60 * 60);
-      if (!cancelled) setSlipSignedUrl(data?.signedUrl ?? null);
+      if (cancelled) return;
+      if (error || !data?.signedUrl) {
+        setSlipSignedUrl(null);
+        setSlipError(error?.message ?? "ไม่สามารถสร้างลิงก์สลิปได้");
+      } else {
+        setSlipSignedUrl(data.signedUrl);
+      }
+      setSlipLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [selectedOrder?.payment_slip_url, isAdmin]);
+  }, [selectedOrder?.payment_slip_url, isAdmin, slipRetry]);
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -524,7 +540,9 @@ const AdminOrders = () => {
                 <p className="font-semibold mb-2">สลิปการชำระเงิน</p>
                 {selectedOrder.payment_slip_url ? (
                   <div className="space-y-2">
-                    {slipSignedUrl ? (
+                    {isAdmin === false ? (
+                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
+                    ) : slipSignedUrl ? (
                       <a href={slipSignedUrl} target="_blank" rel="noopener noreferrer">
                         <img
                           src={slipSignedUrl}
@@ -532,11 +550,22 @@ const AdminOrders = () => {
                           className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
                         />
                       </a>
-                    ) : isAdmin === false ? (
-                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic text-center">กำลังโหลดสลิป...</p>
-                    )}
+                    ) : slipError ? (
+                      <div className="flex flex-col items-center gap-2 py-4">
+                        <p className="text-sm text-destructive italic text-center">โหลดสลิปไม่สำเร็จ: {slipError}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSlipRetry((n) => n + 1)}
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                          ลองใหม่
+                        </Button>
+                      </div>
+                    ) : slipLoading || isAdmin === null ? (
+                      <Skeleton className="h-64 w-full max-w-sm mx-auto rounded-lg" />
+                    ) : null}
                     {selectedOrder.payment_slip_uploaded_at && (
                       <p className="text-xs text-muted-foreground text-center">
                         แนบเมื่อ {format(new Date(selectedOrder.payment_slip_uploaded_at), "d MMM yyyy HH:mm", { locale: th })}
