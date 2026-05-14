@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { QrCode, ArrowLeft, CheckCircle, Building2, Copy } from "lucide-react";
+import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
 
 interface PaymentSettings {
   promptpay_number: string;
@@ -65,6 +65,41 @@ const Checkout = () => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("promptpay");
   const [user, setUser] = useState<{ id: string } | null>(null);
+  const [slipUploading, setSlipUploading] = useState(false);
+  const [slipUrl, setSlipUrl] = useState<string | null>(null);
+
+  const handleSlipUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !orderId) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("ไฟล์ต้องไม่เกิน 5MB");
+      return;
+    }
+    setSlipUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${orderId}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("payment-slips")
+        .upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("payment-slips").getPublicUrl(path);
+      const { error: dbErr } = await supabase
+        .from("orders")
+        .update({
+          payment_slip_url: urlData.publicUrl,
+          payment_slip_uploaded_at: new Date().toISOString(),
+        } as any)
+        .eq("id", orderId);
+      if (dbErr) throw dbErr;
+      setSlipUrl(urlData.publicUrl);
+      toast.success("อัปโหลดสลิปสำเร็จ! ทีมงานกำลังตรวจสอบ");
+    } catch (err: any) {
+      toast.error("อัปโหลดไม่สำเร็จ: " + err.message);
+    } finally {
+      setSlipUploading(false);
+    }
+  };
 
   // Fetch payment settings
   const { data: paymentSettings } = useQuery({
@@ -288,6 +323,62 @@ const Checkout = () => {
                 <p>หลังจากชำระเงินแล้ว ทีมงานจะตรวจสอบและยืนยันคำสั่งซื้อ</p>
                 <p>คุณจะได้รับอีเมลยืนยันเมื่อคำสั่งซื้อถูกจัดส่ง</p>
               </div>
+
+              {/* Slip upload */}
+              <Card className="bg-secondary/40 mb-6 text-left">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Upload className="h-5 w-5" />
+                    แนบสลิปการชำระเงิน
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    หลังโอนเงินแล้ว กรุณาแนบสลิปเพื่อให้ทางร้านตรวจสอบความถูกต้อง (รองรับ JPG/PNG ไม่เกิน 5MB)
+                  </p>
+                  {slipUrl ? (
+                    <div className="space-y-2">
+                      <img src={slipUrl} alt="สลิปการชำระเงิน" className="max-h-64 rounded-lg border mx-auto" />
+                      <p className="text-sm text-green-600 text-center font-medium">
+                        ✓ อัปโหลดสลิปเรียบร้อยแล้ว
+                      </p>
+                      <Label htmlFor="slip-upload" className="cursor-pointer">
+                        <div className="text-center text-sm text-primary underline">เปลี่ยนสลิป</div>
+                      </Label>
+                      <input
+                        id="slip-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleSlipUpload}
+                        disabled={slipUploading}
+                      />
+                    </div>
+                  ) : (
+                    <Label
+                      htmlFor="slip-upload"
+                      className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-background transition"
+                    >
+                      {slipUploading ? (
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      ) : (
+                        <Upload className="h-8 w-8 text-primary" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {slipUploading ? "กำลังอัปโหลด..." : "คลิกเพื่อแนบสลิป"}
+                      </span>
+                      <input
+                        id="slip-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleSlipUpload}
+                        disabled={slipUploading}
+                      />
+                    </Label>
+                  )}
+                </CardContent>
+              </Card>
 
               <div className="flex gap-4 justify-center">
                 <Button variant="outline" onClick={() => navigate("/")}>

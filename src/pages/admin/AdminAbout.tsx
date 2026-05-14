@@ -159,7 +159,7 @@ const AdminAbout = () => {
     try {
       const { error } = await supabase
         .from("about_settings")
-        .update(settings as unknown as Record<string, unknown>)
+        .update(settings as any)
         .eq("id", settings.id);
       if (error) throw error;
       toast.success("บันทึกสำเร็จ!");

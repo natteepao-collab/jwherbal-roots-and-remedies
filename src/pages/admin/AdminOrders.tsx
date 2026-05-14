@@ -46,6 +46,8 @@ interface Order {
   status: string;
   payment_method: string;
   payment_status: string;
+  payment_slip_url?: string | null;
+  payment_slip_uploaded_at?: string | null;
   created_at: string;
 }
 
@@ -125,7 +127,7 @@ const AdminOrders = () => {
     }) => {
       const { error } = await supabase
         .from("orders")
-        .update({ [field]: value })
+        .update({ [field]: value } as any)
         .eq("id", id);
       if (error) throw error;
     },
@@ -328,6 +330,27 @@ const AdminOrders = () => {
               <div>
                 <p className="text-muted-foreground text-sm">ที่อยู่จัดส่ง</p>
                 <p className="font-medium">{selectedOrder.customer_address}</p>
+              </div>
+              <div className="border-t pt-4">
+                <p className="font-semibold mb-2">สลิปการชำระเงิน</p>
+                {selectedOrder.payment_slip_url ? (
+                  <div className="space-y-2">
+                    <a href={selectedOrder.payment_slip_url} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={selectedOrder.payment_slip_url}
+                        alt="สลิปชำระเงิน"
+                        className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
+                      />
+                    </a>
+                    {selectedOrder.payment_slip_uploaded_at && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        แนบเมื่อ {format(new Date(selectedOrder.payment_slip_uploaded_at), "d MMM yyyy HH:mm", { locale: th })}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">ลูกค้ายังไม่ได้แนบสลิป</p>
+                )}
               </div>
               <div className="border-t pt-4">
                 <p className="font-semibold mb-2">รายการสินค้า</p>
