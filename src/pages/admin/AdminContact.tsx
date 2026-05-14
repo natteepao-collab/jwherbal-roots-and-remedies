@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Phone, Mail, MapPin, Facebook, Instagram, Clock, Save, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Clock, Save, MessageCircle, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface ContactSettings {
   id: string;
@@ -21,6 +22,7 @@ interface ContactSettings {
   instagram_url: string;
   weekday_hours: string;
   weekend_hours: string;
+  chat_line_notify_enabled: boolean;
 }
 
 const AdminContact = () => {
