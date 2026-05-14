@@ -324,6 +324,62 @@ const Checkout = () => {
                 <p>คุณจะได้รับอีเมลยืนยันเมื่อคำสั่งซื้อถูกจัดส่ง</p>
               </div>
 
+              {/* Slip upload */}
+              <Card className="bg-secondary/40 mb-6 text-left">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Upload className="h-5 w-5" />
+                    แนบสลิปการชำระเงิน
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    หลังโอนเงินแล้ว กรุณาแนบสลิปเพื่อให้ทางร้านตรวจสอบความถูกต้อง (รองรับ JPG/PNG ไม่เกิน 5MB)
+                  </p>
+                  {slipUrl ? (
+                    <div className="space-y-2">
+                      <img src={slipUrl} alt="สลิปการชำระเงิน" className="max-h-64 rounded-lg border mx-auto" />
+                      <p className="text-sm text-green-600 text-center font-medium">
+                        ✓ อัปโหลดสลิปเรียบร้อยแล้ว
+                      </p>
+                      <Label htmlFor="slip-upload" className="cursor-pointer">
+                        <div className="text-center text-sm text-primary underline">เปลี่ยนสลิป</div>
+                      </Label>
+                      <input
+                        id="slip-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleSlipUpload}
+                        disabled={slipUploading}
+                      />
+                    </div>
+                  ) : (
+                    <Label
+                      htmlFor="slip-upload"
+                      className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-background transition"
+                    >
+                      {slipUploading ? (
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      ) : (
+                        <Upload className="h-8 w-8 text-primary" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {slipUploading ? "กำลังอัปโหลด..." : "คลิกเพื่อแนบสลิป"}
+                      </span>
+                      <input
+                        id="slip-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleSlipUpload}
+                        disabled={slipUploading}
+                      />
+                    </Label>
+                  )}
+                </CardContent>
+              </Card>
+
               <div className="flex gap-4 justify-center">
                 <Button variant="outline" onClick={() => navigate("/")}>
                   กลับหน้าแรก
