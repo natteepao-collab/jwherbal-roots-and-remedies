@@ -34,7 +34,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send } from "lucide-react";
+import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
