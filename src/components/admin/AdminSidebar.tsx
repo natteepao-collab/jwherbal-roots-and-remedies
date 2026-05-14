@@ -19,7 +19,8 @@ import {
   HelpCircle,
   Building,
   Flame,
-  Droplets
+  Droplets,
+  ScanSearch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -128,6 +129,11 @@ const menuItems = [
     title: "จัดการ Logo", 
     icon: ImageIcon, 
     path: "/admin/dashboard/logo" 
+  },
+  { 
+    title: "i18n Audit", 
+    icon: ScanSearch, 
+    path: "/admin/dashboard/i18n-audit" 
   },
   { 
     title: "ตั้งค่า", 
