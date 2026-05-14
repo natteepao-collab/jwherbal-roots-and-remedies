@@ -553,6 +553,38 @@ const AdminOrders = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={cancelTarget !== null} onOpenChange={(o) => !o && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ยืนยันการยกเลิกคำสั่งซื้อ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              คุณกำลังจะยกเลิกคำสั่งซื้อของ <strong>{cancelTarget?.customer_name}</strong>
+              {" "}ยอดรวม <strong>฿{cancelTarget?.total_amount.toLocaleString()}</strong>
+              <br />การกระทำนี้จะส่งแจ้งเตือนไปยังแอดมินทันที และไม่สามารถย้อนกลับได้โดยอัตโนมัติ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ไม่ใช่</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (cancelTarget) {
+                  updateStatusMutation.mutate({
+                    id: cancelTarget.id,
+                    field: "status",
+                    value: "cancelled",
+                    order: cancelTarget,
+                  });
+                }
+                setCancelTarget(null);
+              }}
+            >
+              ยืนยันยกเลิก
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
