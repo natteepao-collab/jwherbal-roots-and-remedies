@@ -431,6 +431,85 @@ const AdminOrders = () => {
                   </span>
                 </div>
               </div>
+
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-semibold">สถานะการแจ้งเตือน LINE / Email</p>
+                  <Button size="sm" variant="ghost" onClick={() => refetchLogs()} title="รีเฟรช">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => retryMutation.mutate("new_order")}
+                    disabled={retryMutation.isPending}
+                  >
+                    <Send className="h-3.5 w-3.5 mr-1" />
+                    ส่งแจ้งคำสั่งซื้อซ้ำ
+                  </Button>
+                  {selectedOrder.payment_slip_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => retryMutation.mutate("slip_uploaded")}
+                      disabled={retryMutation.isPending}
+                    >
+                      <Send className="h-3.5 w-3.5 mr-1" />
+                      ส่งแจ้งสลิปซ้ำ
+                    </Button>
+                  )}
+                </div>
+
+                {!notifLogs || notifLogs.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">ยังไม่มีบันทึกการส่งแจ้งเตือน</p>
+                ) : (
+                  <div className="space-y-2">
+                    {notifLogs.map((log) => {
+                      const isFailed = log.status === "failed";
+                      return (
+                        <div
+                          key={log.id}
+                          className="flex items-start justify-between gap-2 p-2 rounded border bg-muted/30 text-xs"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium uppercase">{log.channel}</span>
+                              {statusBadge(log.status)}
+                              <span className="text-muted-foreground">{log.notification_type}</span>
+                            </div>
+                            <p className="text-muted-foreground mt-1">
+                              {format(new Date(log.created_at), "d MMM HH:mm:ss", { locale: th })}
+                            </p>
+                            {log.dedupe_key && (
+                              <p className="text-[10px] text-muted-foreground truncate" title={log.dedupe_key}>
+                                dedupe: {log.dedupe_key}
+                              </p>
+                            )}
+                            {log.error_message && (
+                              <p className="text-red-600 mt-1 break-words">{log.error_message}</p>
+                            )}
+                          </div>
+                          {isFailed && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="shrink-0"
+                              onClick={() => retryMutation.mutate(log.notification_type)}
+                              disabled={retryMutation.isPending}
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              ลองใหม่
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
