@@ -30,6 +30,8 @@ const Auth = () => {
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +58,6 @@ const Auth = () => {
       setForgotLoading(false);
     }
   };
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
