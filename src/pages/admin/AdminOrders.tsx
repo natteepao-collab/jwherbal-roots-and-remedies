@@ -111,13 +111,39 @@ const AdminOrders = () => {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [slipSignedUrl, setSlipSignedUrl] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const DELETE_PASSWORD = "696969";
 
-  // Resolve payment_slip_url (storage path) into a signed URL for admin viewing
+  // Verify admin role server-side before allowing any slip access
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        if (!cancelled) setIsAdmin(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!cancelled) setIsAdmin(!!data);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Resolve payment_slip_url (storage path) into a signed URL — admin only
   useEffect(() => {
     let cancelled = false;
     const slipRef = selectedOrder?.payment_slip_url;
     if (!slipRef) {
+      setSlipSignedUrl(null);
+      return;
+    }
+    // Hard guard: never request a signed URL unless verified admin
+    if (isAdmin !== true) {
       setSlipSignedUrl(null);
       return;
     }
@@ -135,7 +161,7 @@ const AdminOrders = () => {
     return () => {
       cancelled = true;
     };
-  }, [selectedOrder?.payment_slip_url]);
+  }, [selectedOrder?.payment_slip_url, isAdmin]);
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -506,6 +532,8 @@ const AdminOrders = () => {
                           className="max-h-80 rounded-lg border mx-auto hover:opacity-90 transition"
                         />
                       </a>
+                    ) : isAdmin === false ? (
+                      <p className="text-sm text-destructive italic text-center">เฉพาะผู้ดูแลระบบเท่านั้นที่ดูสลิปได้</p>
                     ) : (
                       <p className="text-sm text-muted-foreground italic text-center">กำลังโหลดสลิป...</p>
                     )}
