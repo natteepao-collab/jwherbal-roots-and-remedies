@@ -768,6 +768,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_logs: {
+        Row: {
+          channel: string
+          created_at: string
+          dedupe_key: string | null
+          error_message: string | null
+          id: string
+          notification_type: string
+          payload: Json | null
+          reference_id: string | null
+          reference_type: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          dedupe_key?: string | null
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          payload?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          status: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          dedupe_key?: string | null
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          payload?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
