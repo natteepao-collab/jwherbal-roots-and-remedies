@@ -126,9 +126,9 @@ const AdminOverview = () => {
     });
 
     const salesByDate = last7Days.map((date) => {
-      const dayOrders = ordersRes.data?.filter(
+      const dayOrders = activeOrders.filter(
         (order) => format(new Date(order.created_at), "yyyy-MM-dd") === date
-      ) || [];
+      );
       return {
         date: format(new Date(date), "d MMM", { locale: th }),
         sales: dayOrders.reduce((sum, order) => sum + Number(order.total_amount), 0),
