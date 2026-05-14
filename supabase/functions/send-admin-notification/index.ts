@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface NotificationRequest {
-  type: "new_order" | "new_review";
+  type: "new_order" | "new_review" | "slip_uploaded";
   data: {
     order_id?: string;
     customer_name?: string;
@@ -16,6 +16,7 @@ interface NotificationRequest {
     author_name?: string;
     rating?: number;
     comment?: string;
+    slip_url?: string;
   };
 }
 
