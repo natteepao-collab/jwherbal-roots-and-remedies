@@ -34,7 +34,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send } from "lucide-react";
+import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -106,6 +108,28 @@ const AdminOrders = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const DELETE_PASSWORD = "696969";
+
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // ลบ order_items ก่อน แล้วค่อยลบ order
+      const { error: itemsError } = await supabase.from("order_items").delete().eq("order_id", id);
+      if (itemsError) throw itemsError;
+      const { error } = await supabase.from("orders").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast.success("ลบคำสั่งซื้อเรียบร้อย");
+      setDeleteTarget(null);
+      setDeletePassword("");
+    },
+    onError: (error) => {
+      toast.error("เกิดข้อผิดพลาด: " + error.message);
+    },
+  });
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders", filter],
@@ -377,13 +401,29 @@ const AdminOrders = () => {
                       })}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleViewOrder(order)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleViewOrder(order)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {order.status === "cancelled" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setDeleteTarget(order);
+                              setDeletePassword("");
+                            }}
+                            title="ลบคำสั่งซื้อที่ถูกยกเลิก"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -581,6 +621,63 @@ const AdminOrders = () => {
               }}
             >
               ยืนยันยกเลิก
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteTarget(null);
+            setDeletePassword("");
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-600">ยืนยันการลบคำสั่งซื้อถาวร?</AlertDialogTitle>
+            <AlertDialogDescription>
+              คุณกำลังจะลบคำสั่งซื้อของ <strong>{deleteTarget?.customer_name}</strong>
+              {" "}ยอดรวม <strong>฿{deleteTarget?.total_amount.toLocaleString()}</strong>
+              <br />
+              การกระทำนี้ <strong>ไม่สามารถย้อนกลับได้</strong> กรุณากรอกรหัสยืนยันเพื่อดำเนินการต่อ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="delete-password">รหัสยืนยัน</Label>
+            <Input
+              id="delete-password"
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="กรอกรหัสยืนยัน"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && deletePassword === DELETE_PASSWORD && deleteTarget) {
+                  deleteOrderMutation.mutate(deleteTarget.id);
+                }
+              }}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={deletePassword !== DELETE_PASSWORD || deleteOrderMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (deletePassword !== DELETE_PASSWORD) {
+                  toast.error("รหัสยืนยันไม่ถูกต้อง");
+                  return;
+                }
+                if (deleteTarget) {
+                  deleteOrderMutation.mutate(deleteTarget.id);
+                }
+              }}
+            >
+              ลบถาวร
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
