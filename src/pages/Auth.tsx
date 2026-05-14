@@ -247,7 +247,21 @@ const Auth = () => {
               </div>
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error}
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotEmail(email);
+                          setForgotOpen(true);
+                        }}
+                        className="ml-2 underline font-medium"
+                      >
+                        รีเซ็ตรหัสผ่าน
+                      </button>
+                    )}
+                  </AlertDescription>
                 </Alert>
               )}
               <Button type="submit" className="w-full" disabled={loading}>
