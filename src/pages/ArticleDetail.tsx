@@ -300,7 +300,7 @@ const ArticleDetail = () => {
             </div>
             <div className="prose prose-lg max-w-none">
               <div className="text-xl text-muted-foreground mb-8 font-medium">{excerpt}</div>
-              <div className="space-y-4" dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br />") }} />
+              <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(content)} />
             </div>
             <div className="mt-8 pt-8 border-t flex justify-center">
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
