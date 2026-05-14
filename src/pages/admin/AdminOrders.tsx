@@ -24,10 +24,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart, Eye, RefreshCw, CheckCircle2, XCircle, MinusCircle, Send } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+
+interface NotificationLog {
+  id: string;
+  notification_type: string;
+  channel: string;
+  status: string;
+  dedupe_key: string | null;
+  error_message: string | null;
+  created_at: string;
+}
 
 interface OrderItem {
   id: string;
@@ -140,9 +151,57 @@ const AdminOrders = () => {
     },
   });
 
+  const { data: notifLogs, refetch: refetchLogs } = useQuery({
+    queryKey: ["notification-logs", selectedOrder?.id],
+    enabled: !!selectedOrder?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notification_logs" as any)
+        .select("*")
+        .eq("reference_id", selectedOrder!.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as unknown as NotificationLog[];
+    },
+  });
+
+  const retryMutation = useMutation({
+    mutationFn: async (notifType: string) => {
+      if (!selectedOrder) throw new Error("no order");
+      const isSlip = notifType === "slip_uploaded";
+      const { error } = await supabase.functions.invoke("send-admin-notification", {
+        body: {
+          type: notifType,
+          force: true,
+          data: {
+            order_id: selectedOrder.id,
+            customer_name: selectedOrder.customer_name,
+            total_amount: Number(selectedOrder.total_amount),
+            ...(isSlip ? { slip_url: selectedOrder.payment_slip_url ?? "" } : {}),
+          },
+        },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("ส่งแจ้งเตือนซ้ำเรียบร้อย");
+      refetchLogs();
+    },
+    onError: (e: any) => toast.error("ส่งซ้ำไม่สำเร็จ: " + e.message),
+  });
+
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
     fetchOrderItems(order.id);
+  };
+
+  const statusBadge = (s: string) => {
+    if (s === "success") return <Badge className="bg-green-100 text-green-800 hover:bg-green-100"><CheckCircle2 className="h-3 w-3 mr-1" />สำเร็จ</Badge>;
+    if (s === "failed") return <Badge className="bg-red-100 text-red-800 hover:bg-red-100"><XCircle className="h-3 w-3 mr-1" />ล้มเหลว</Badge>;
+    if (s === "skipped") return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100"><MinusCircle className="h-3 w-3 mr-1" />ข้าม</Badge>;
+    if (s === "deduped") return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">ซ้ำ (กันส่งซ้ำ)</Badge>;
+    return <Badge variant="outline">{s}</Badge>;
   };
 
   return (
@@ -299,7 +358,7 @@ const AdminOrders = () => {
         open={selectedOrder !== null}
         onOpenChange={() => setSelectedOrder(null)}
       >
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>รายละเอียดคำสั่งซื้อ</DialogTitle>
           </DialogHeader>
@@ -371,6 +430,85 @@ const AdminOrders = () => {
                     ฿{selectedOrder.total_amount.toLocaleString()}
                   </span>
                 </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-semibold">สถานะการแจ้งเตือน LINE / Email</p>
+                  <Button size="sm" variant="ghost" onClick={() => refetchLogs()} title="รีเฟรช">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => retryMutation.mutate("new_order")}
+                    disabled={retryMutation.isPending}
+                  >
+                    <Send className="h-3.5 w-3.5 mr-1" />
+                    ส่งแจ้งคำสั่งซื้อซ้ำ
+                  </Button>
+                  {selectedOrder.payment_slip_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => retryMutation.mutate("slip_uploaded")}
+                      disabled={retryMutation.isPending}
+                    >
+                      <Send className="h-3.5 w-3.5 mr-1" />
+                      ส่งแจ้งสลิปซ้ำ
+                    </Button>
+                  )}
+                </div>
+
+                {!notifLogs || notifLogs.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">ยังไม่มีบันทึกการส่งแจ้งเตือน</p>
+                ) : (
+                  <div className="space-y-2">
+                    {notifLogs.map((log) => {
+                      const isFailed = log.status === "failed";
+                      return (
+                        <div
+                          key={log.id}
+                          className="flex items-start justify-between gap-2 p-2 rounded border bg-muted/30 text-xs"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium uppercase">{log.channel}</span>
+                              {statusBadge(log.status)}
+                              <span className="text-muted-foreground">{log.notification_type}</span>
+                            </div>
+                            <p className="text-muted-foreground mt-1">
+                              {format(new Date(log.created_at), "d MMM HH:mm:ss", { locale: th })}
+                            </p>
+                            {log.dedupe_key && (
+                              <p className="text-[10px] text-muted-foreground truncate" title={log.dedupe_key}>
+                                dedupe: {log.dedupe_key}
+                              </p>
+                            )}
+                            {log.error_message && (
+                              <p className="text-red-600 mt-1 break-words">{log.error_message}</p>
+                            )}
+                          </div>
+                          {isFailed && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="shrink-0"
+                              onClick={() => retryMutation.mutate(log.notification_type)}
+                              disabled={retryMutation.isPending}
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              ลองใหม่
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}
