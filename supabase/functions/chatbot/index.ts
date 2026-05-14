@@ -16,18 +16,28 @@ async function notifyNewChat(supabase: any, messages: any[], language: string) {
       .single();
     if (cfg && cfg.chat_line_notify_enabled === false) return;
 
-    const token = Deno.env.get("LINE_NOTIFY_TOKEN");
-    if (!token) return;
+    const channelToken = Deno.env.get("LINE_CHANNEL_ACCESS_TOKEN");
+    const userId = Deno.env.get("LINE_USER_ID");
+    if (!channelToken || !userId) {
+      console.warn("LINE_CHANNEL_ACCESS_TOKEN หรือ LINE_USER_ID ไม่ได้ตั้งค่า");
+      return;
+    }
     const firstUserMsg = messages.find((m: any) => m.role === "user")?.content || "(ไม่มีข้อความ)";
-    const text = `\n💬 มีลูกค้าเริ่มแชทใหม่ใน JWHERBAL Help!\n\n🌐 ภาษา: ${language}\n❓ ข้อความแรก: ${firstUserMsg}\n\n📅 ${new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}\n\n⚠️ กรุณาตรวจสอบเพื่อให้ลูกค้าได้รับการตอบกลับ`;
-    await fetch("https://notify-api.line.me/api/notify", {
+    const text = `💬 มีลูกค้าเริ่มแชทใหม่ใน JWHERBAL Help!\n\n🌐 ภาษา: ${language}\n❓ ข้อความแรก: ${firstUserMsg}\n\n📅 ${new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}\n\n⚠️ กรุณาตรวจสอบเพื่อให้ลูกค้าได้รับการตอบกลับ`;
+    const res = await fetch("https://api.line.me/v2/bot/message/push", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${channelToken}`,
       },
-      body: `message=${encodeURIComponent(text)}`,
+      body: JSON.stringify({
+        to: userId,
+        messages: [{ type: "text", text }],
+      }),
     });
+    if (!res.ok) {
+      console.error("LINE push failed:", res.status, await res.text());
+    }
   } catch (e) {
     console.error("notifyNewChat error:", e);
   }
