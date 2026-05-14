@@ -131,16 +131,39 @@ const AdminOrders = () => {
       id,
       field,
       value,
+      order,
     }: {
       id: string;
       field: "status" | "payment_status";
       value: string;
+      order?: Order;
     }) => {
       const { error } = await supabase
         .from("orders")
         .update({ [field]: value } as any)
         .eq("id", id);
       if (error) throw error;
+
+      // Notify admins when order is cancelled
+      if (field === "status" && value === "cancelled" && order && order.status !== "cancelled") {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          await supabase.functions.invoke("send-admin-notification", {
+            body: {
+              type: "order_cancelled",
+              force: true,
+              data: {
+                order_id: order.id,
+                customer_name: order.customer_name,
+                total_amount: Number(order.total_amount),
+                cancelled_by: user?.email ?? "Admin",
+              },
+            },
+          });
+        } catch (e) {
+          console.error("Failed to send cancel notification:", e);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
