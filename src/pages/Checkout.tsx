@@ -105,11 +105,7 @@ const Checkout = () => {
   const { data: paymentSettings } = useQuery({
     queryKey: ["payment-settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_settings")
-        .select("*")
-        .single();
-      
+      const { data, error } = await supabase.functions.invoke("get-payment-settings");
       if (error) throw error;
       return data as PaymentSettings;
     },
