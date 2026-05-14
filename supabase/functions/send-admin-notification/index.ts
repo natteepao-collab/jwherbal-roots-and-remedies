@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface NotificationRequest {
-  type: "new_order" | "new_review";
+  type: "new_order" | "new_review" | "slip_uploaded";
   data: {
     order_id?: string;
     customer_name?: string;
@@ -16,6 +16,7 @@ interface NotificationRequest {
     author_name?: string;
     rating?: number;
     comment?: string;
+    slip_url?: string;
   };
 }
 
@@ -171,6 +172,35 @@ ${stars}
             <a href="https://guauobzuxgvkluxwfvxt.lovableproject.com/admin/dashboard/reviews" 
                style="background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               ตรวจสอบรีวิว
+            </a>
+          </p>
+        </div>
+      `;
+    } else if (type === "slip_uploaded") {
+      lineMessage = `
+💸 มีการอัปโหลดสลิปใหม่!
+📦 หมายเลข: ${data.order_id?.slice(0, 8).toUpperCase()}
+👤 ลูกค้า: ${data.customer_name ?? "-"}
+💰 ยอดรวม: ฿${data.total_amount?.toLocaleString() ?? "-"}
+📅 เวลา: ${new Date().toLocaleString("th-TH")}
+🔗 สลิป: ${data.slip_url ?? "-"}
+      `.trim();
+
+      emailSubject = `💸 ลูกค้าอัปโหลดสลิป - ${data.order_id?.slice(0, 8).toUpperCase()}`;
+      emailHtml = `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #2563eb;">💸 ลูกค้าอัปโหลดสลิปการชำระเงิน</h1>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">
+            <p><strong>หมายเลขคำสั่งซื้อ:</strong> ${data.order_id?.slice(0, 8).toUpperCase()}</p>
+            <p><strong>ลูกค้า:</strong> ${data.customer_name ?? "-"}</p>
+            <p><strong>ยอดรวม:</strong> <span style="color: #16a34a; font-size: 22px;">฿${data.total_amount?.toLocaleString() ?? "-"}</span></p>
+            <p><strong>เวลา:</strong> ${new Date().toLocaleString("th-TH")}</p>
+            ${data.slip_url ? `<p><strong>สลิป:</strong></p><img src="${data.slip_url}" alt="payment slip" style="max-width:100%;border-radius:8px;border:1px solid #e5e7eb;" />` : ""}
+          </div>
+          <p style="margin-top: 20px;">
+            <a href="https://guauobzuxgvkluxwfvxt.lovableproject.com/admin/dashboard/orders"
+               style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              ตรวจสอบสลิป
             </a>
           </p>
         </div>

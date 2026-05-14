@@ -93,6 +93,29 @@ const Checkout = () => {
         .eq("id", orderId);
       if (dbErr) throw dbErr;
       setSlipUrl(urlData.publicUrl);
+
+      // Notify admin via LINE/email (best-effort)
+      try {
+        const { data: orderRow } = await supabase
+          .from("orders")
+          .select("customer_name, total_amount")
+          .eq("id", orderId)
+          .single();
+        await supabase.functions.invoke("send-admin-notification", {
+          body: {
+            type: "slip_uploaded",
+            data: {
+              order_id: orderId,
+              customer_name: orderRow?.customer_name,
+              total_amount: Number(orderRow?.total_amount ?? orderTotal),
+              slip_url: urlData.publicUrl,
+            },
+          },
+        });
+      } catch (notifyErr) {
+        console.error("Slip notification failed:", notifyErr);
+      }
+
       toast.success("อัปโหลดสลิปสำเร็จ! ทีมงานกำลังตรวจสอบ");
     } catch (err: any) {
       toast.error("อัปโหลดไม่สำเร็จ: " + err.message);
