@@ -12,6 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
 import { useEffect } from "react";
+import DOMPurify from "dompurify";
+
+const renderSafeHtml = (raw: string) => ({
+  __html: DOMPurify.sanitize(raw.replace(/\n/g, "<br />"), { USE_PROFILES: { html: true } }),
+});
 
 const ArticleNavButtons = ({
   prevSlug,
@@ -205,7 +210,7 @@ const ArticleDetail = () => {
               </div>
               <div className="prose prose-lg max-w-none">
                 <div className="text-xl text-muted-foreground mb-8 font-medium">{staticArticle.excerpt[currentLang]}</div>
-                <div className="space-y-4" dangerouslySetInnerHTML={{ __html: staticArticle.content[currentLang].replace(/\n/g, "<br />") }} />
+                <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(staticArticle.content[currentLang])} />
               </div>
               <div className="mt-8 pt-8 border-t flex justify-center">
                 <ArticleLikeShare articleId={staticArticle.id} articleTitle={staticArticle.title[currentLang]} articleUrl={`${window.location.origin}/articles/${staticArticle.slug}`} initialLikes={staticArticle.likes} />
@@ -295,7 +300,7 @@ const ArticleDetail = () => {
             </div>
             <div className="prose prose-lg max-w-none">
               <div className="text-xl text-muted-foreground mb-8 font-medium">{excerpt}</div>
-              <div className="space-y-4" dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br />") }} />
+              <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(content)} />
             </div>
             <div className="mt-8 pt-8 border-t flex justify-center">
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />

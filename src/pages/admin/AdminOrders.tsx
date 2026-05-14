@@ -116,7 +116,7 @@ const AdminOrders = () => {
   const [slipError, setSlipError] = useState<string | null>(null);
   const [slipRetry, setSlipRetry] = useState(0);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const DELETE_PASSWORD = "696969";
+  const CONFIRM_WORD = "DELETE";
 
   // Verify admin role server-side before allowing any slip access
   useEffect(() => {
@@ -728,20 +728,21 @@ const AdminOrders = () => {
               คุณกำลังจะลบคำสั่งซื้อของ <strong>{deleteTarget?.customer_name}</strong>
               {" "}ยอดรวม <strong>฿{deleteTarget?.total_amount.toLocaleString()}</strong>
               <br />
-              การกระทำนี้ <strong>ไม่สามารถย้อนกลับได้</strong> กรุณากรอกรหัสยืนยันเพื่อดำเนินการต่อ
+              การกระทำนี้ <strong>ไม่สามารถย้อนกลับได้</strong> พิมพ์คำว่า <code className="px-1 py-0.5 bg-muted rounded font-mono">{CONFIRM_WORD}</code> เพื่อยืนยัน
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="delete-password">รหัสยืนยัน</Label>
+            <Label htmlFor="delete-password">พิมพ์ {CONFIRM_WORD} เพื่อยืนยัน</Label>
             <Input
               id="delete-password"
-              type="password"
+              type="text"
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
-              placeholder="กรอกรหัสยืนยัน"
+              placeholder={CONFIRM_WORD}
               autoFocus
+              autoComplete="off"
               onKeyDown={(e) => {
-                if (e.key === "Enter" && deletePassword === DELETE_PASSWORD && deleteTarget) {
+                if (e.key === "Enter" && deletePassword === CONFIRM_WORD && deleteTarget) {
                   deleteOrderMutation.mutate(deleteTarget.id);
                 }
               }}
@@ -751,11 +752,11 @@ const AdminOrders = () => {
             <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700"
-              disabled={deletePassword !== DELETE_PASSWORD || deleteOrderMutation.isPending}
+              disabled={deletePassword !== CONFIRM_WORD || deleteOrderMutation.isPending}
               onClick={(e) => {
                 e.preventDefault();
-                if (deletePassword !== DELETE_PASSWORD) {
-                  toast.error("รหัสยืนยันไม่ถูกต้อง");
+                if (deletePassword !== CONFIRM_WORD) {
+                  toast.error("กรุณาพิมพ์ข้อความยืนยันให้ถูกต้อง");
                   return;
                 }
                 if (deleteTarget) {
