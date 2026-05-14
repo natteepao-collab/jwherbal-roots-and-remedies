@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -110,7 +110,32 @@ const AdminOrders = () => {
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
+  const [slipSignedUrl, setSlipSignedUrl] = useState<string | null>(null);
   const DELETE_PASSWORD = "696969";
+
+  // Resolve payment_slip_url (storage path) into a signed URL for admin viewing
+  useEffect(() => {
+    let cancelled = false;
+    const slipRef = selectedOrder?.payment_slip_url;
+    if (!slipRef) {
+      setSlipSignedUrl(null);
+      return;
+    }
+    // Legacy rows may still hold a full http(s) URL — use as-is
+    if (/^https?:\/\//i.test(slipRef)) {
+      setSlipSignedUrl(slipRef);
+      return;
+    }
+    (async () => {
+      const { data } = await supabase.storage
+        .from("payment-slips")
+        .createSignedUrl(slipRef, 60 * 60);
+      if (!cancelled) setSlipSignedUrl(data?.signedUrl ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedOrder?.payment_slip_url]);
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
