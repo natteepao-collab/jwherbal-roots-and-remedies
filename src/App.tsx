@@ -20,6 +20,7 @@ import Community from "./pages/Community";
 import CommunityPost from "./pages/CommunityPost";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
 import FAQ from "./pages/FAQ";
