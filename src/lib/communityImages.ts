@@ -103,14 +103,21 @@ export const getCommunityPostImage = (path: string): string => {
   return postImages[path] || path;
 };
 
+import { resolveAvatar } from "@/lib/avatarUtils";
+
 export const getCommunityAuthorImage = (path: string): string => {
   if (!path) return "/placeholder.svg";
-  
+
+  // Cartoon avatar key (e.g. "cartoon:01") → resolve to bundled cartoon image
+  if (path.startsWith("cartoon:")) {
+    return resolveAvatar(path) || "/placeholder.svg";
+  }
+
   // If it's already a full URL, return as-is
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
-  
+
   // Check if we have a local mapping
   return authorImages[path] || path;
 };

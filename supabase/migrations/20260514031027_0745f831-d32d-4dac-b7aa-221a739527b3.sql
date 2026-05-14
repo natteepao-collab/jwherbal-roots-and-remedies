@@ -1,0 +1,36 @@
+UPDATE community_posts SET author_avatar = 'cartoon:01' WHERE id = 'b2303e53-58db-4c34-9732-2d5c98835a39';
+UPDATE community_posts SET author_avatar = 'cartoon:15' WHERE id = 'e6737af5-4a92-4997-9701-d30cda311b6b';
+UPDATE community_posts SET author_avatar = 'cartoon:16' WHERE id = '473209b6-2954-49d3-903c-c5d78c6b16ca';
+UPDATE community_posts SET author_avatar = 'cartoon:08' WHERE id = '325197bb-d9e5-478f-841b-7b267af91bf3';
+UPDATE community_posts SET author_avatar = 'cartoon:09' WHERE id = '034605c8-c7d0-4402-bfe0-981a37506116';
+UPDATE community_posts SET author_avatar = 'cartoon:10' WHERE id = '611d4419-230e-4af8-b56f-ab268e53da1d';
+UPDATE community_posts SET author_avatar = 'cartoon:02' WHERE id = '9dd2ab95-2674-4b49-b8a1-f7daa57f8208';
+UPDATE community_posts SET author_avatar = 'cartoon:03' WHERE id = '96bece8d-fd2f-4cb4-83dd-50207bec8a8c';
+UPDATE community_posts SET author_avatar = 'cartoon:04' WHERE id = '94c71d89-874c-409a-8d29-57253591923f';
+UPDATE community_posts SET author_avatar = 'cartoon:17' WHERE id = 'b9c68b29-e51c-4ad0-a148-4a59daccc9d5';
+UPDATE community_posts SET author_avatar = 'cartoon:05' WHERE id = 'd7c5546e-36e7-4260-95b5-58fa9755073b';
+UPDATE community_posts SET author_avatar = 'cartoon:11' WHERE id = 'ac071c48-578f-49ee-8412-2199f535f01f';
+UPDATE community_posts SET author_avatar = 'cartoon:18' WHERE id = 'b4c2447d-2109-471a-a189-580629a176bb';
+UPDATE community_posts SET author_avatar = 'cartoon:12' WHERE id = '0b154624-f64f-420e-9f20-ab895ebcb6d5';
+UPDATE community_posts SET author_avatar = 'cartoon:06' WHERE id = 'f3659b85-a6f1-44e0-9a7b-f1dccc514cb3';
+UPDATE community_posts SET author_avatar = 'cartoon:13' WHERE id = 'f0b09d39-2e24-491d-ace0-a5a5ee0f8a77';
+UPDATE community_posts SET author_avatar = 'cartoon:19' WHERE id = '56e513f1-6d9a-4e5f-8246-60c78e761075';
+UPDATE community_posts SET author_avatar = 'cartoon:14' WHERE id = 'edf8bc9e-86a5-4915-84ce-c9f4ab851d86';
+UPDATE community_posts SET author_avatar = 'cartoon:20' WHERE id = 'd550e032-04f8-4f9c-9bec-fdfc807e262a';
+UPDATE community_posts SET author_avatar = 'cartoon:07' WHERE id = 'a43de72b-9b1f-4a39-8e1e-59652ed619ab';
+
+UPDATE community_replies SET author_avatar = 'cartoon:01' WHERE author_name IN ('คุณนภา','คุณนิภา','คุณเอื้อย');
+UPDATE community_replies SET author_avatar = 'cartoon:02' WHERE author_name IN ('คุณสุภา','คุณสายฝน','คุณบุญมา');
+UPDATE community_replies SET author_avatar = 'cartoon:03' WHERE author_name IN ('คุณพรทิพย์','คุณวิภา','คุณสมศรี');
+UPDATE community_replies SET author_avatar = 'cartoon:04' WHERE author_name IN ('คุณรัตนา','คุณดวงใจ');
+UPDATE community_replies SET author_avatar = 'cartoon:05' WHERE author_name IN ('คุณวรรณา','คุณบงกช');
+UPDATE community_replies SET author_avatar = 'cartoon:06' WHERE author_name IN ('คุณวันดี','คุณอนงค์');
+UPDATE community_replies SET author_avatar = 'cartoon:07' WHERE author_name IN ('คุณมาลี','คุณอารี');
+
+UPDATE community_replies SET author_avatar = 'cartoon:08' WHERE author_name IN ('คุณสมชาย','คุณกมล');
+UPDATE community_replies SET author_avatar = 'cartoon:09' WHERE author_name IN ('คุณวิชัย','คุณเกษม');
+UPDATE community_replies SET author_avatar = 'cartoon:10' WHERE author_name IN ('คุณปรีชา','คุณจำลอง');
+UPDATE community_replies SET author_avatar = 'cartoon:11' WHERE author_name IN ('คุณสมพร','คุณชาติ');
+UPDATE community_replies SET author_avatar = 'cartoon:12' WHERE author_name IN ('คุณยินดี','คุณประยูร');
+UPDATE community_replies SET author_avatar = 'cartoon:13' WHERE author_name IN ('คุณบัวลอย','คุณเสริม');
+UPDATE community_replies SET author_avatar = 'cartoon:14' WHERE author_name = 'คุณธวัช';
