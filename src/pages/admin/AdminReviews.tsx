@@ -22,7 +22,7 @@ import { Star, Check, X, Trash2, MessageSquare, User, Reply, Eye } from "lucide-
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import { avatarImages } from "@/assets/avatars";
+import { resolveAvatar } from "@/lib/avatarUtils";
 
 interface Review {
   id: string;
@@ -229,7 +229,7 @@ const AdminReviews = () => {
                       <div className="flex items-center gap-2">
                         {review.author_avatar ? (
                           <img
-                            src={avatarImages[review.author_avatar] || review.author_avatar}
+                            src={resolveAvatar(review.author_avatar) || review.author_avatar}
                             alt={review.author_name}
                             className="h-8 w-8 rounded-full object-cover"
                           />
@@ -353,7 +353,7 @@ const AdminReviews = () => {
               <div className="flex items-center gap-3">
                 {selectedReview.author_avatar ? (
                   <img
-                    src={avatarImages[selectedReview.author_avatar] || selectedReview.author_avatar}
+                    src={resolveAvatar(selectedReview.author_avatar) || selectedReview.author_avatar}
                     alt={selectedReview.author_name}
                     className="h-12 w-12 rounded-full object-cover"
                   />
