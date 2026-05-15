@@ -10,6 +10,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import AvatarPicker from "@/components/AvatarPicker";
 
 interface NewPostDialogProps {
   onPostCreated: () => void;
