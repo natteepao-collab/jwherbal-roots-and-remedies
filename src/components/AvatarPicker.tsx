@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Maximize2, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AvatarEditor from "./AvatarEditor";
 
 interface AvatarPickerProps {
   value: string | null;
@@ -26,12 +27,13 @@ const AvatarPicker = ({
 }: AvatarPickerProps) => {
   const [zoomOpen, setZoomOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editorFile, setEditorFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const selectedPreset = avatarOptions.find((a) => a.key === value);
   const previewSrc = resolveAvatar(value);
 
-  const handleUpload = async (file: File) => {
+  const pickFile = (file: File) => {
     if (!userId) {
       toast.error("กรุณาเข้าสู่ระบบเพื่ออัปโหลดรูป");
       return;
@@ -44,20 +46,24 @@ const AvatarPicker = ({
       toast.error("ขนาดไฟล์ต้องไม่เกิน 5MB");
       return;
     }
+    setEditorFile(file);
+  };
 
+  const handleUploadBlob = async (blob: Blob) => {
+    if (!userId) return;
     setUploading(true);
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${userId}/avatar-${Date.now()}.${ext}`;
+    const path = `${userId}/avatar-${Date.now()}.jpg`;
     const { error } = await supabase.storage
       .from("user-avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
 
     if (error) {
       toast.error("อัปโหลดรูปไม่สำเร็จ");
     } else {
       const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
-      onChange(data.publicUrl);
+      onChange(`${data.publicUrl}?t=${Date.now()}`);
       toast.success("อัปโหลดรูปเรียบร้อย");
+      setEditorFile(null);
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -121,7 +127,7 @@ const AvatarPicker = ({
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) handleUpload(f);
+              if (f) pickFile(f);
             }}
           />
           <Button
@@ -187,6 +193,14 @@ const AvatarPicker = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      <AvatarEditor
+        open={!!editorFile}
+        file={editorFile}
+        onCancel={() => setEditorFile(null)}
+        onSave={handleUploadBlob}
+        saving={uploading}
+      />
     </div>
   );
 };
