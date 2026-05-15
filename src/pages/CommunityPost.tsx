@@ -224,7 +224,7 @@ const CommunityPost = () => {
         post_id: id,
         user_id: user.id,
         author_name: authorName,
-        author_avatar: "/community/author01.jpg", // Default avatar
+        author_avatar: selectedAvatar,
         content: comment.trim(),
       });
 
