@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SidebarToggle } from "./SidebarToggle";
 import { ClipboardList, Users, Shield, LogOut, UserCog } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
+import { useUserAvatar } from "@/hooks/useUserAvatar";
 
 export function SecondaryNavbar() {
   const { items } = useCart();
