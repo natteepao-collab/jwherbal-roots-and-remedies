@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Flame, FileText, Star, Droplets } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,52 @@ const navItems = [
 export function DesktopQuickAccess() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  // Track which section is currently in view on the home page
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setActiveSection(null);
+      return;
+    }
+
+    const sectionIds = navItems
+      .filter((i) => i.sectionId)
+      .map((i) => i.sectionId!) as string[];
+
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+
+    if (elements.length === 0) return;
+
+    const visibility = new Map<string, number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          visibility.set(entry.target.id, entry.intersectionRatio);
+        });
+        let bestId: string | null = null;
+        let bestRatio = 0;
+        visibility.forEach((ratio, id) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestId = id;
+          }
+        });
+        setActiveSection(bestRatio > 0.1 ? bestId : null);
+      },
+      {
+        // Account for sticky topbar height (~96px) so highlight matches what user actually sees
+        rootMargin: "-120px 0px -55% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [location.pathname]);
 
   const handleClick = (item: typeof navItems[0], e: React.MouseEvent) => {
     if (item.path === "/products/vflow") {
@@ -47,7 +94,7 @@ export function DesktopQuickAccess() {
           const isActive =
             item.path === "/products/vflow"
               ? location.pathname === "/products/vflow"
-              : location.pathname === "/" && false; // no persistent active for scroll items
+              : location.pathname === "/" && activeSection === item.sectionId;
           const Icon = item.icon;
 
           return (
