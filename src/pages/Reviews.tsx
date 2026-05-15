@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
 import { avatarOptions, resolveAvatar } from "@/lib/avatarUtils";
 import { cn } from "@/lib/utils";
+import AvatarPicker from "@/components/AvatarPicker";
 
 interface Review {
   id: string;
