@@ -98,6 +98,7 @@ const CommunityPost = () => {
     
     if (data) {
       setUserProfile(data);
+      if (data.preferred_avatar) setSelectedAvatar(data.preferred_avatar);
     }
   };
 
