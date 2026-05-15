@@ -86,7 +86,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
         category,
         thumbnail: "/community/post01.jpg", // Default thumbnail
         author_name: authorName,
-        author_avatar: "/community/author01.jpg", // Default avatar
+        author_avatar: selectedAvatar,
         views: 0,
         comments_count: 0,
       });
