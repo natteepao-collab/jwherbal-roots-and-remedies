@@ -18,6 +18,7 @@ interface NewPostDialogProps {
     id: string;
     full_name: string | null;
     email: string | null;
+    preferred_avatar?: string | null;
   } | null;
 }
 
