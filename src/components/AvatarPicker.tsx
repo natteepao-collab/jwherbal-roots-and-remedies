@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Maximize2, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AvatarEditor from "./AvatarEditor";
 
 interface AvatarPickerProps {
   value: string | null;
