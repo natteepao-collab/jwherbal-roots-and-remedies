@@ -150,7 +150,11 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="avatar" className="h-7 w-7 rounded-full object-cover border border-primary/30" />
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
                   <span className="hidden sm:inline-block font-prompt text-sm">
                     {getUserDisplayName()}
                   </span>
