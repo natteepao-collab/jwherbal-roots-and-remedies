@@ -66,6 +66,13 @@ const Reviews = () => {
           .eq("role", "admin");
         
         setIsAdmin(roles && roles.length > 0);
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("preferred_avatar")
+          .eq("id", authUser.id)
+          .single();
+        if (profile?.preferred_avatar) setSelectedAvatar(profile.preferred_avatar);
       }
     };
     checkUserAndRole();
