@@ -30,6 +30,7 @@ const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const avatarUrl = useUserAvatar(user?.id);
 
   useEffect(() => {
     // Fetch custom logo from site_settings
