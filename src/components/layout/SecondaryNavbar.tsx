@@ -165,6 +165,10 @@ export function SecondaryNavbar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")} className="font-prompt cursor-pointer">
+                  <UserCog className="mr-2 h-4 w-4" />
+                  จัดการโปรไฟล์
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/orders")} className="font-prompt cursor-pointer">
                   <ClipboardList className="mr-2 h-4 w-4" />
                   ประวัติคำสั่งซื้อ
