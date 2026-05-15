@@ -65,6 +65,7 @@ const Profile = () => {
     } else {
       toast.success("บันทึกข้อมูลเรียบร้อย");
       setProfile({ ...profile, full_name: fullName.trim(), preferred_avatar: avatar });
+      window.dispatchEvent(new Event("profile-updated"));
     }
     setSaving(false);
   };
