@@ -92,7 +92,7 @@ const CommunityPost = () => {
   const fetchUserProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, email")
+      .select("id, full_name, email, preferred_avatar")
       .eq("id", userId)
       .single();
     
