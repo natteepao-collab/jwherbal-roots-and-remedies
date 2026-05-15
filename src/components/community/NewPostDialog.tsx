@@ -10,6 +10,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import AvatarPicker from "@/components/AvatarPicker";
 
 interface NewPostDialogProps {
   onPostCreated: () => void;
@@ -34,6 +35,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedAvatar, setSelectedAvatar] = useState<string>("cartoon:01");
 
   const handleSubmit = async () => {
     // Validate input
@@ -84,7 +86,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
         category,
         thumbnail: "/community/post01.jpg", // Default thumbnail
         author_name: authorName,
-        author_avatar: "/community/author01.jpg", // Default avatar
+        author_avatar: selectedAvatar,
         views: 0,
         comments_count: 0,
       });
@@ -121,6 +123,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 mt-4">
+          <AvatarPicker value={selectedAvatar} onChange={setSelectedAvatar} />
           <div>
             <Label htmlFor="category" className="text-sm font-medium">หมวดหมู่</Label>
             <Select value={category} onValueChange={setCategory}>

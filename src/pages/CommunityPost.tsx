@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
+import AvatarPicker from "@/components/AvatarPicker";
 
 interface CommunityPost {
   id: string;
@@ -57,6 +58,7 @@ const CommunityPost = () => {
   const [comment, setComment] = useState("");
   const [submittingReply, setSubmittingReply] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>("cartoon:01");
 
   useEffect(() => {
     if (id) {
@@ -222,7 +224,7 @@ const CommunityPost = () => {
         post_id: id,
         user_id: user.id,
         author_name: authorName,
-        author_avatar: "/community/author01.jpg", // Default avatar
+        author_avatar: selectedAvatar,
         content: comment.trim(),
       });
 
@@ -406,6 +408,9 @@ const CommunityPost = () => {
               </h3>
               {userProfile ? (
                 <>
+                  <div className="mb-4">
+                    <AvatarPicker value={selectedAvatar} onChange={setSelectedAvatar} />
+                  </div>
                   <Textarea
                     placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
                     value={comment}
