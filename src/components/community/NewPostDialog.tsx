@@ -123,6 +123,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 mt-4">
+          <AvatarPicker value={selectedAvatar} onChange={setSelectedAvatar} />
           <div>
             <Label htmlFor="category" className="text-sm font-medium">หมวดหมู่</Label>
             <Select value={category} onValueChange={setCategory}>
