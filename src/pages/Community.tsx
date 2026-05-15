@@ -202,10 +202,19 @@ const Community = () => {
                   </p>
                 </div>
                 {userProfile ? (
-                  <NewPostDialog 
-                    onPostCreated={fetchPosts} 
-                    userProfile={userProfile}
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <ProfileAvatarDialog
+                      userId={userProfile.id}
+                      currentAvatar={userProfile.preferred_avatar}
+                      onSaved={(avatar) =>
+                        setUserProfile({ ...userProfile, preferred_avatar: avatar })
+                      }
+                    />
+                    <NewPostDialog
+                      onPostCreated={fetchPosts}
+                      userProfile={userProfile}
+                    />
+                  </div>
                 ) : (
                   <Button 
                     onClick={handleNewPost}
