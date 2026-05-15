@@ -79,6 +79,7 @@ const PublicRoutes = () => {
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/orders" element={<OrderHistory />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
     </AnimatePresence>
