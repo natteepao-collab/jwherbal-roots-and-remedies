@@ -127,7 +127,7 @@ const AvatarPicker = ({
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) handleUpload(f);
+              if (f) pickFile(f);
             }}
           />
           <Button
