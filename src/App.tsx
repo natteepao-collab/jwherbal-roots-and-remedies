@@ -25,6 +25,7 @@ import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
 import FAQ from "./pages/FAQ";
 import OrderHistory from "./pages/OrderHistory";
+import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
