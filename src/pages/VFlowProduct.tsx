@@ -224,7 +224,7 @@ const VFlowProduct = () => {
                         className="w-full font-semibold text-base sm:text-lg text-foreground hover:bg-foreground/10 transition-all duration-300 rounded-xl h-14 sm:h-16" 
                         onClick={handleLineOrder}
                       >
-                        เลือกยบสินค้า
+                        เลือกซื้อสินค้า
                       </Button>
                     </motion.div>
                   </motion.div>
