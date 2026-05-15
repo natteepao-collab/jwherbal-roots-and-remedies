@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { icon: ShoppingBag, label: "สินค้าแนะนำ", sectionId: "featured-products", path: "/" },
   { icon: Flame, label: "โปรโมชั่นประจำเดือน", sectionId: "monthly-promotion", path: "/" },
-  { icon: FileText, label: "บทความล่าสุด", sectionId: "latest-articles", path: "/" },
+  { icon: FileText, label: "บทความล่าสุด", sectionId: "featured-articles", path: "/" },
   { icon: Star, label: "รีวิวจากผู้ใช้จริง", sectionId: "reviews", path: "/" },
   { icon: Droplets, label: "ผลิตภัณฑ์ VFLOW คืออะไร", path: "/products/vflow" },
 ];
