@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useUserAvatar } from "@/hooks/useUserAvatar";
 
 const Navbar = () => {
   const { items } = useCart();
@@ -29,6 +30,7 @@ const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const avatarUrl = useUserAvatar(user?.id);
 
   useEffect(() => {
     // Fetch custom logo from site_settings
@@ -148,7 +150,11 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="avatar" className="h-7 w-7 rounded-full object-cover border border-primary/30" />
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
                   <span className="hidden sm:inline-block font-prompt text-sm">
                     {getUserDisplayName()}
                   </span>
