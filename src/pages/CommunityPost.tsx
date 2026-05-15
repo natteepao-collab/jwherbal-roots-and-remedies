@@ -58,6 +58,7 @@ const CommunityPost = () => {
   const [comment, setComment] = useState("");
   const [submittingReply, setSubmittingReply] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>("cartoon:01");
 
   useEffect(() => {
     if (id) {
