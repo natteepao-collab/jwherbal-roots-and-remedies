@@ -153,8 +153,12 @@ export function SecondaryNavbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-auto lg:px-2 hover:bg-muted shrink-0">
-                  <div className="flex h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-[10px] sm:text-xs shrink-0">
-                    {getUserDisplayName().charAt(0).toUpperCase()}
+                  <div className="flex h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-[10px] sm:text-xs shrink-0 overflow-hidden">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      getUserDisplayName().charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="hidden xl:inline text-sm font-medium max-w-[80px] truncate ml-1.5">{getUserDisplayName()}</span>
                 </Button>
