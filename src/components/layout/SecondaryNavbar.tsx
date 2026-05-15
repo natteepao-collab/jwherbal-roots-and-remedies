@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarToggle } from "./SidebarToggle";
-import { ClipboardList, Users, Shield, LogOut } from "lucide-react";
+import { ClipboardList, Users, Shield, LogOut, UserCog } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
 
 export function SecondaryNavbar() {
