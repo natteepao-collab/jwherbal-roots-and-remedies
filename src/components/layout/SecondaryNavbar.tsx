@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarToggle } from "./SidebarToggle";
-import { ClipboardList, Users, Shield, LogOut } from "lucide-react";
+import { ClipboardList, Users, Shield, LogOut, UserCog } from "lucide-react";
 import jwGroupLogo from "@/assets/jwgroup-logo.png";
 
 export function SecondaryNavbar() {
@@ -165,6 +165,10 @@ export function SecondaryNavbar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")} className="font-prompt cursor-pointer">
+                  <UserCog className="mr-2 h-4 w-4" />
+                  จัดการโปรไฟล์
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/orders")} className="font-prompt cursor-pointer">
                   <ClipboardList className="mr-2 h-4 w-4" />
                   ประวัติคำสั่งซื้อ
