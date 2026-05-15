@@ -25,6 +25,7 @@ import VFlowProduct from "./pages/VFlowProduct";
 import Reviews from "./pages/Reviews";
 import FAQ from "./pages/FAQ";
 import OrderHistory from "./pages/OrderHistory";
+import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -78,6 +79,7 @@ const PublicRoutes = () => {
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/orders" element={<OrderHistory />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
     </AnimatePresence>
@@ -141,7 +143,7 @@ const AppWithNotFound = () => {
   const isKnownRoute = [
     "/", "/about", "/shop", "/cart", "/checkout", "/articles", 
     "/community", "/contact", "/auth", "/reset-password", "/products/vflow", 
-    "/reviews", "/faq", "/orders", "/admin"
+    "/reviews", "/faq", "/orders", "/profile", "/admin"
   ].some(route => location.pathname === route || location.pathname.startsWith(route + "/"));
   
   if (!isAdminDashboard && !isKnownRoute) {

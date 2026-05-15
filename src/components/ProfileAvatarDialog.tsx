@@ -53,7 +53,7 @@ const ProfileAvatarDialog = ({ userId, currentAvatar, onSaved }: ProfileAvatarDi
           </DialogTitle>
         </DialogHeader>
         <div className="mt-4">
-          <AvatarPicker value={selected} onChange={setSelected} />
+          <AvatarPicker value={selected} onChange={setSelected} userId={userId} />
         </div>
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" onClick={() => setOpen(false)} className="rounded-full">

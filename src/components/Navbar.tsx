@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield, ClipboardList, HelpCircle } from "lucide-react";
+import { ShoppingCart, Menu, User, Home, Info, ShoppingBag, BookOpen, Users, Star, Phone, LogOut, Shield, ClipboardList, HelpCircle, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -159,6 +159,10 @@ const Navbar = () => {
                   {getUserDisplayName()}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")} className="font-prompt cursor-pointer">
+                  <UserCog className="mr-2 h-4 w-4" />
+                  จัดการโปรไฟล์
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/orders")} className="font-prompt cursor-pointer">
                   <ClipboardList className="mr-2 h-4 w-4" />
                   ประวัติคำสั่งซื้อ

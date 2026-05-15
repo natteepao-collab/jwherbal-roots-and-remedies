@@ -411,7 +411,7 @@ const CommunityPost = () => {
               {userProfile ? (
                 <>
                   <div className="mb-4">
-                    <AvatarPicker value={selectedAvatar} onChange={setSelectedAvatar} />
+                    <AvatarPicker value={selectedAvatar} onChange={setSelectedAvatar} userId={userProfile?.id} />
                   </div>
                   <Textarea
                     placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
