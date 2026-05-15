@@ -13,6 +13,7 @@ import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
 import NewPostDialog from "@/components/community/NewPostDialog";
+import ProfileAvatarDialog from "@/components/ProfileAvatarDialog";
 
 interface CommunityPost {
   id: string;
