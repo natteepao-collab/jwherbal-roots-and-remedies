@@ -143,7 +143,7 @@ const AppWithNotFound = () => {
   const isKnownRoute = [
     "/", "/about", "/shop", "/cart", "/checkout", "/articles", 
     "/community", "/contact", "/auth", "/reset-password", "/products/vflow", 
-    "/reviews", "/faq", "/orders", "/admin"
+    "/reviews", "/faq", "/orders", "/profile", "/admin"
   ].some(route => location.pathname === route || location.pathname.startsWith(route + "/"));
   
   if (!isAdminDashboard && !isKnownRoute) {
