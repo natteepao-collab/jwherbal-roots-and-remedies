@@ -193,6 +193,14 @@ const AvatarPicker = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      <AvatarEditor
+        open={!!editorFile}
+        file={editorFile}
+        onCancel={() => setEditorFile(null)}
+        onSave={handleUploadBlob}
+        saving={uploading}
+      />
     </div>
   );
 };
