@@ -299,6 +299,7 @@ const Reviews = () => {
                       <AvatarPicker
                         value={selectedAvatar}
                         onChange={setSelectedAvatar}
+                        userId={user?.id}
                         label={currentLanguage === "th" ? "เลือกรูปโปรไฟล์" : currentLanguage === "en" ? "Choose your avatar" : "选择头像"}
                       />
 
