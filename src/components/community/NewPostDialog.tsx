@@ -18,6 +18,7 @@ interface NewPostDialogProps {
     id: string;
     full_name: string | null;
     email: string | null;
+    preferred_avatar?: string | null;
   } | null;
 }
 
@@ -35,7 +36,7 @@ const NewPostDialog = ({ onPostCreated, userProfile }: NewPostDialogProps) => {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("cartoon:01");
+  const [selectedAvatar, setSelectedAvatar] = useState<string>(userProfile?.preferred_avatar || "cartoon:01");
 
   const handleSubmit = async () => {
     // Validate input

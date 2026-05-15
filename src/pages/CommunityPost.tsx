@@ -46,6 +46,7 @@ interface UserProfile {
   id: string;
   full_name: string | null;
   email: string | null;
+  preferred_avatar: string | null;
 }
 
 const CommunityPost = () => {
@@ -91,12 +92,13 @@ const CommunityPost = () => {
   const fetchUserProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, email")
+      .select("id, full_name, email, preferred_avatar")
       .eq("id", userId)
       .single();
     
     if (data) {
       setUserProfile(data);
+      if (data.preferred_avatar) setSelectedAvatar(data.preferred_avatar);
     }
   };
 

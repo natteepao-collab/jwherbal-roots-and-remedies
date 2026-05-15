@@ -13,6 +13,7 @@ import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage, getCommunityAuthorImage } from "@/lib/communityImages";
 import NewPostDialog from "@/components/community/NewPostDialog";
+import ProfileAvatarDialog from "@/components/ProfileAvatarDialog";
 
 interface CommunityPost {
   id: string;
@@ -35,6 +36,7 @@ interface UserProfile {
   id: string;
   full_name: string | null;
   email: string | null;
+  preferred_avatar: string | null;
 }
 
 const Community = () => {
@@ -72,7 +74,7 @@ const Community = () => {
   const fetchUserProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, email")
+      .select("id, full_name, email, preferred_avatar")
       .eq("id", userId)
       .single();
     
@@ -200,10 +202,19 @@ const Community = () => {
                   </p>
                 </div>
                 {userProfile ? (
-                  <NewPostDialog 
-                    onPostCreated={fetchPosts} 
-                    userProfile={userProfile}
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <ProfileAvatarDialog
+                      userId={userProfile.id}
+                      currentAvatar={userProfile.preferred_avatar}
+                      onSaved={(avatar) =>
+                        setUserProfile({ ...userProfile, preferred_avatar: avatar })
+                      }
+                    />
+                    <NewPostDialog
+                      onPostCreated={fetchPosts}
+                      userProfile={userProfile}
+                    />
+                  </div>
                 ) : (
                   <Button 
                     onClick={handleNewPost}

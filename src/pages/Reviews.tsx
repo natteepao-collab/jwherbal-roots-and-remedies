@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
 import { avatarOptions, resolveAvatar } from "@/lib/avatarUtils";
 import { cn } from "@/lib/utils";
+import AvatarPicker from "@/components/AvatarPicker";
 
 interface Review {
   id: string;
@@ -65,6 +66,13 @@ const Reviews = () => {
           .eq("role", "admin");
         
         setIsAdmin(roles && roles.length > 0);
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("preferred_avatar")
+          .eq("id", authUser.id)
+          .single();
+        if (profile?.preferred_avatar) setSelectedAvatar(profile.preferred_avatar);
       }
     };
     checkUserAndRole();
@@ -288,28 +296,11 @@ const Reviews = () => {
                     </DialogHeader>
                     <div className="space-y-6 py-4">
                       {/* Avatar Selection */}
-                      <div>
-                        <Label className="text-muted-foreground">
-                          {currentLanguage === "th" ? "เลือกรูปโปรไฟล์" : currentLanguage === "en" ? "Choose your avatar" : "选择头像"}
-                        </Label>
-                        <div className="mt-3 grid grid-cols-5 gap-2 max-h-[180px] overflow-y-auto pr-1">
-                          {avatarOptions.map((av) => (
-                            <button
-                              key={av.key}
-                              type="button"
-                              onClick={() => setSelectedAvatar(av.key)}
-                              className={cn(
-                                "rounded-full overflow-hidden border-2 transition-all duration-200 hover:scale-105",
-                                selectedAvatar === av.key
-                                  ? "border-primary ring-2 ring-primary/30 scale-105"
-                                  : "border-transparent opacity-70 hover:opacity-100"
-                              )}
-                            >
-                              <img src={av.src} alt={av.key} className="w-full h-full object-cover aspect-square" />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                      <AvatarPicker
+                        value={selectedAvatar}
+                        onChange={setSelectedAvatar}
+                        label={currentLanguage === "th" ? "เลือกรูปโปรไฟล์" : currentLanguage === "en" ? "Choose your avatar" : "选择头像"}
+                      />
 
                       <div className="text-center">
                         <Label className="text-muted-foreground">
