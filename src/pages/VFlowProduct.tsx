@@ -722,6 +722,34 @@ const VFlowProduct = () => {
                 >
                   มาตรฐานที่คุณมั่นใจได้
                 </motion.h2>
+
+                {/* FDA / อย. Highlight Banner */}
+                {(() => {
+                  const fdaCert = certificatesList.find((c) => /อย\.|FDA/i.test(c));
+                  return fdaCert ? (
+                    <motion.div
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      custom={0}
+                      className="mb-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/[0.08] via-primary/[0.04] to-primary/[0.08] p-5 sm:p-6 flex items-center gap-4 shadow-sm"
+                    >
+                      <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/15 flex items-center justify-center">
+                        <BadgeCheck className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                          ขึ้นทะเบียนสำนักงานคณะกรรมการอาหารและยา
+                        </p>
+                        <p className="text-base sm:text-lg md:text-xl font-bold text-foreground break-all">
+                          {fdaCert}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : null;
+                })()}
+
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {certificatesList.map((cert, i) => (
                     <motion.div
