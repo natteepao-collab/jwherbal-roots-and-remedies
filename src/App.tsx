@@ -28,6 +28,7 @@ import OrderHistory from "./pages/OrderHistory";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Certifications from "./pages/Certifications";
 
 // Admin pages
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -78,6 +79,8 @@ const PublicRoutes = () => {
         <Route path="/products/vflow" element={<VFlowProduct />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/certifications" element={<Certifications />} />
+        <Route path="/trust" element={<Certifications />} />
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
