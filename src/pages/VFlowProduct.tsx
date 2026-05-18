@@ -1,4 +1,5 @@
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight, Leaf, AlertTriangle, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
