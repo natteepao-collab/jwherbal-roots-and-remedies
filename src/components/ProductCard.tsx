@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import type { PromotionTier } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
 import { cn } from "@/lib/utils";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 interface ProductCardProps {
   product: Product;
