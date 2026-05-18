@@ -1,5 +1,6 @@
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { JsonLd } from "@/components/JsonLd";
 import { ArrowLeft, ChevronLeft, ChevronRight, Home, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -182,6 +183,34 @@ const ArticleDetail = () => {
           <meta property="og:type" content="article" />
           <meta property="og:image" content={staticArticle.coverImage} />
         </Helmet>
+        <JsonLd
+          data={[
+            {
+              "@context": "https://schema.org",
+              "@type": "Article",
+              headline: staticArticle.title[currentLang],
+              description: staticArticle.metaDescription,
+              image: staticArticle.coverImage,
+              author: { "@type": "Person", name: staticArticle.author },
+              publisher: {
+                "@type": "Organization",
+                name: "JW HERBAL",
+                logo: { "@type": "ImageObject", url: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png" },
+              },
+              datePublished: staticArticle.date,
+              mainEntityOfPage: `https://jwherbal-roots-and-remedies.lovable.app/articles/${staticArticle.slug}`,
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "หน้าแรก", item: "https://jwherbal-roots-and-remedies.lovable.app/" },
+                { "@type": "ListItem", position: 2, name: "บทความ", item: "https://jwherbal-roots-and-remedies.lovable.app/articles" },
+                { "@type": "ListItem", position: 3, name: staticArticle.title[currentLang], item: `https://jwherbal-roots-and-remedies.lovable.app/articles/${staticArticle.slug}` },
+              ],
+            },
+          ]}
+        />
 
         <main className="flex-1 container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
@@ -272,6 +301,34 @@ const ArticleDetail = () => {
         <meta property="og:type" content="article" />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
       </Helmet>
+      <JsonLd
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: title,
+            description: excerpt,
+            ...(article.image_url ? { image: article.image_url } : {}),
+            author: { "@type": "Person", name: article.author || "JW HERBAL" },
+            publisher: {
+              "@type": "Organization",
+              name: "JW HERBAL",
+              logo: { "@type": "ImageObject", url: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png" },
+            },
+            ...(article.published_date ? { datePublished: article.published_date } : {}),
+            mainEntityOfPage: `https://jwherbal-roots-and-remedies.lovable.app/articles/${article.slug}`,
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "หน้าแรก", item: "https://jwherbal-roots-and-remedies.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "บทความ", item: "https://jwherbal-roots-and-remedies.lovable.app/articles" },
+              { "@type": "ListItem", position: 3, name: title, item: `https://jwherbal-roots-and-remedies.lovable.app/articles/${article.slug}` },
+            ],
+          },
+        ]}
+      />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
