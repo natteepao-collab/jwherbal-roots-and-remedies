@@ -25,6 +25,7 @@ import FAQImageCarousel from "@/components/FAQImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
