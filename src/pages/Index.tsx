@@ -328,9 +328,9 @@ const Index = () => {
                 />
               ))
             ) : (
-              <p className="col-span-full text-center text-muted-foreground py-8">
-                {currentLanguage === "th" ? "ยังไม่มีสินค้าแนะนำ" : currentLanguage === "en" ? "No featured products yet" : "暂无推荐产品"}
-              </p>
+              staticProducts.slice(0, 4).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
             )}
           </div>
         </div>
