@@ -533,6 +533,74 @@ const VFlowProduct = () => {
             </section>
           )}
 
+          {/* Main Ingredients */}
+          <section className="py-16 md:py-20 bg-gradient-to-b from-background to-primary/[0.03]">
+            <div className="container px-4">
+              <div className="max-w-5xl mx-auto">
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  custom={0}
+                  className="text-center mb-10"
+                >
+                  <Badge variant="outline" className="mb-3 text-xs tracking-wider">
+                    <Leaf className="h-3 w-3 mr-1" /> NATURAL INGREDIENTS
+                  </Badge>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    ส่วนประกอบหลักจากธรรมชาติ
+                  </h2>
+                  <p className="text-muted-foreground">
+                    3 สมุนไพรชั้นเลิศ คัดสรรเพื่อสุขภาพเลือดและการไหลเวียนที่ดี
+                  </p>
+                </motion.div>
+                <div className="grid md:grid-cols-3 gap-5">
+                  {[
+                    {
+                      emoji: "🌿",
+                      name: "ขิง (Ginger)",
+                      latin: "Zingiber officinale",
+                      desc: "ช่วยกระตุ้นการไหลเวียนโลหิต ลดความหนืดของเลือด ต้านการอักเสบ และให้ความอบอุ่นแก่ร่างกาย",
+                    },
+                    {
+                      emoji: "🔴",
+                      name: "พุทราจีน (Jujube)",
+                      latin: "Ziziphus jujuba",
+                      desc: "บำรุงเลือด เสริมพลังชี่ ช่วยให้นอนหลับสบาย เพิ่มความสดชื่นและภูมิคุ้มกันตามตำรับแพทย์แผนจีน",
+                    },
+                    {
+                      emoji: "⚫",
+                      name: "เห็ดหูหนูดำ (Black Fungus)",
+                      latin: "Auricularia auricula",
+                      desc: "ช่วยลดความข้นเหนียวของเลือด ส่งเสริมการไหลเวียน ลดคอเลสเตอรอล และอุดมด้วยใยอาหาร",
+                    },
+                  ].map((ing, i) => (
+                    <motion.div
+                      key={i}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      custom={i}
+                    >
+                      <Card className="h-full border-border/50 hover:shadow-lg transition-shadow">
+                        <CardContent className="p-6 text-center space-y-3">
+                          <div className="text-5xl">{ing.emoji}</div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">{ing.name}</h3>
+                            <p className="text-xs text-muted-foreground italic">{ing.latin}</p>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{ing.desc}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* How to Use */}
           <section className="py-16 md:py-20">
             <div className="container px-4">
