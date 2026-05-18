@@ -226,8 +226,10 @@ const Index = () => {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 <span>ผ่านมาตรฐาน อย. & GMP</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground animate-fade-in-up animation-delay-200 leading-tight">
-                V FLOW สมุนไพรไทย<br />ดูแลการไหลเวียนโลหิต
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-tight animate-fade-in-up animation-delay-200">
+                สุขภาพดี เริ่มที่
+                <br />
+                <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">V FLOW</span>
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground animate-fade-in-up animation-delay-400 max-w-lg mx-auto">
                 เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
@@ -261,8 +263,10 @@ const Index = () => {
                 <ShieldCheck className="h-4 w-4" />
                 <span>ผ่านมาตรฐาน อย. & GMP — สมุนไพรไทย 100%</span>
               </div>
-              <p role="heading" aria-level={2} className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
-                V FLOW สมุนไพรไทย<br />ดูแลการไหลเวียนโลหิต
+              <p role="heading" aria-level={2} className="text-5xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter leading-tight animate-fade-in-up">
+                สุขภาพดี เริ่มที่
+                <br />
+                <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">V FLOW</span>
               </p>
               <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg">
                 เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
