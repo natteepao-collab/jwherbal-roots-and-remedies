@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import BrandStoryGallery from "@/components/BrandStoryGallery";
 import { productImages } from "@/assets/products";
+import { products as staticProducts } from "@/data/products";
 import { usePromotionTiers, getTiersByProduct, getLowestTierPrice } from "@/hooks/usePromotionTiers";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";

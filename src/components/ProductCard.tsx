@@ -121,7 +121,8 @@ const ProductCard = ({
             <Button
               size="sm"
               onClick={handleSelectPackage}
-              className="gap-1 sm:gap-2 h-8 px-2 sm:px-3 text-xs"
+              aria-label={hasTiers ? "เลือกแพ็กเกจ" : "เพิ่มลงตะกร้า"}
+              className="gap-1 sm:gap-2 min-h-10 h-10 sm:h-9 px-3 text-xs"
             >
               {hasTiers ? (
                 <>
