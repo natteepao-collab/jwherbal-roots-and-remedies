@@ -66,7 +66,12 @@ const Articles = () => {
     }
   };
 
-  const articles = dbArticles || [];
+  const allArticlesRaw = dbArticles || [];
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const articles = selectedCategory === "all"
+    ? allArticlesRaw
+    : allArticlesRaw.filter((a) => a.category === selectedCategory);
 
   // Category sections
   const latestArticles = articles.slice(0, 6);
@@ -76,6 +81,19 @@ const Articles = () => {
 
   // Hero: show first featured article, fallback to latest
   const heroArticle = featuredArticles[0] || latestArticles[0];
+
+  // Categories present in DB (predefined first, then unknown legacy values)
+  const availableCategories = Array.from(new Set(allArticlesRaw.map((a) => a.category)));
+  const categoryChips = [
+    { value: "all", label: "ทั้งหมด" },
+    ...ARTICLE_CATEGORIES.filter((c) => availableCategories.includes(c.value)).map((c) => ({
+      value: c.value,
+      label: getCategoryLabel(c.value, currentLang),
+    })),
+    ...availableCategories
+      .filter((c) => !ARTICLE_CATEGORIES.some((pc) => pc.value === c))
+      .map((c) => ({ value: c, label: c })),
+  ];
 
   const ArticleCard = ({ article, index, size = "normal" }: { article: Article; index: number; size?: "normal" | "small" }) => (
     <motion.div
