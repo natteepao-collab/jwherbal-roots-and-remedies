@@ -114,6 +114,32 @@ const ProductDetail = () => {
   const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
   const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });
 
+  // Combined media list for swipeable carousel: main image first, then gallery
+  const allMedia = useMemo(() => {
+    const list: { url: string; type: string }[] = [{ url: mainImage, type: "image" }];
+    (galleryMedia || []).forEach((m: any) => {
+      list.push({ url: m.image_url, type: m.media_type || "image" });
+    });
+    return list;
+  }, [mainImage, galleryMedia]);
+
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setActiveIdx(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi]);
+
+  useEffect(() => {
+    if (!carouselApi || !selectedMedia) return;
+    const idx = allMedia.findIndex((m) => m.url === selectedMedia.url);
+    if (idx >= 0 && idx !== carouselApi.selectedScrollSnap()) carouselApi.scrollTo(idx);
+  }, [selectedMedia, carouselApi, allMedia]);
+
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
