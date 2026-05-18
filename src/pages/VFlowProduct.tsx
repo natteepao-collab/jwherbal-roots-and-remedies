@@ -147,10 +147,12 @@ const VFlowProduct = () => {
   return (
     <PageTransition>
       <>
-        <Helmet>
-          <title>V FLOW HERBAL - ผลิตภัณฑ์สมุนไพรเพื่อการไหลเวียนโลหิต | JWHERBAL</title>
-          <meta name="description" content="V Flow ผลิตภัณฑ์สมุนไพรไทย 100% จากโครงการวิจัย IRTC ช่วยการไหลเวียนโลหิต ลดภาวะเลือดข้น มีทั้งแบบแคปซูลและเครื่องดื่ม" />
-        </Helmet>
+        <SeoHead
+          title="V FLOW HERBAL - ผลิตภัณฑ์สมุนไพรเพื่อการไหลเวียนโลหิต | JWHERBAL"
+          description="V Flow ผลิตภัณฑ์สมุนไพรไทย 100% จากโครงการวิจัย IRTC ช่วยการไหลเวียนโลหิต ลดภาวะเลือดข้น มีทั้งแบบแคปซูลและเครื่องดื่ม"
+          path="/products/vflow"
+          type="product"
+        />
 
         <div className="min-h-screen bg-background">
 

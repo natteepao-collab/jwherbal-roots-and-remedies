@@ -211,10 +211,11 @@ const Articles = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Helmet>
-          <title>{t("articles.title")} | JWHERBAL</title>
-          <meta name="description" content={t("articles.description")} />
-        </Helmet>
+        <SeoHead
+          title={`${t("articles.title")} | JWHERBAL`}
+          description={t("articles.description")}
+          path="/articles"
+        />
 
         <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
           <div className="max-w-6xl mx-auto space-y-12">

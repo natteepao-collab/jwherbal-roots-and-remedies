@@ -182,10 +182,11 @@ const FAQ = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-secondary/20 to-background">
-      <Helmet>
-        <title>{currentLanguage === "th" ? "ถามตอบ" : currentLanguage === "en" ? "Q&A" : "问答"} - JWHERBAL</title>
-        <meta name="description" content={currentLanguage === "th" ? "คำถามที่พบบ่อยเกี่ยวกับผลิตภัณฑ์ V Flow" : "Frequently asked questions about V Flow products"} />
-      </Helmet>
+      <SeoHead
+        title={`${currentLanguage === "th" ? "คำถามที่พบบ่อย (FAQ)" : currentLanguage === "en" ? "Frequently Asked Questions" : "常见问题"} - JWHERBAL`}
+        description={currentLanguage === "th" ? "คำถามที่พบบ่อยเกี่ยวกับผลิตภัณฑ์ V Flow และบริการของ JWHERBAL" : "Frequently asked questions about V Flow products and JWHERBAL services"}
+        path="/faq"
+      />
 
       <main className="flex-1">
         {/* FAQ Images Carousel */}
