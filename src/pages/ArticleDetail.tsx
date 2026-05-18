@@ -133,7 +133,7 @@ const ArticleFooterMeta = ({
         <h3 className="text-sm font-semibold mb-3">{t.related}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
-            to="/product/vflow"
+            to="/products/vflow"
             className="group flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
           >
             <ShoppingBag className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
