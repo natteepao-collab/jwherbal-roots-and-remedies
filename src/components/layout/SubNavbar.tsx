@@ -75,14 +75,65 @@ export function SubNavbar() {
     );
   };
 
+  // Pointer drag handlers — let users swipe/scroll manually while marquee runs
+  const draggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
+  const movedRef = useRef(false);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    movedRef.current = false;
+    dragStartXRef.current = e.clientX;
+    dragStartOffsetRef.current = offsetRef.current;
+    setPaused(true);
+    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    const dx = e.clientX - dragStartXRef.current;
+    if (Math.abs(dx) > 4) movedRef.current = true;
+    const first = firstSetRef.current;
+    const track = trackRef.current;
+    if (!first || !track) return;
+    const width = first.offsetWidth;
+    if (width <= 0) return;
+    // Drag right => content moves right => decrease offset
+    let next = (dragStartOffsetRef.current - dx) % width;
+    if (next < 0) next += width;
+    offsetRef.current = next;
+    track.style.transform = `translate3d(${-next}px, 0, 0)`;
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId); } catch {}
+    // Resume marquee shortly after release
+    setTimeout(() => setPaused(false), 600);
+  };
+
+  // Suppress click after a drag so swipe doesn't trigger navigation
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (movedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      movedRef.current = false;
+    }
+  };
+
   return (
     <div className="sticky top-12 sm:top-14 z-40 w-full border-b border-border/30 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50 lg:hidden">
       <div
-        className="relative overflow-hidden py-2"
+        className="relative overflow-hidden py-2 touch-pan-y select-none cursor-grab active:cursor-grabbing"
         onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onTouchStart={() => setPaused(true)}
-        onTouchEnd={() => setPaused(false)}
+        onMouseLeave={() => { if (!draggingRef.current) setPaused(false); }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onClickCapture={onClickCapture}
         onFocusCapture={() => setPaused(true)}
         onBlurCapture={() => setPaused(false)}
       >
@@ -106,3 +157,4 @@ export function SubNavbar() {
     </div>
   );
 }
+
