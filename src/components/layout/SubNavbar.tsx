@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, ShoppingBag, FileText, Users, MessageCircle, Star, HelpCircle, Info, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const navItems = [
   { icon: Home, label: "หน้าแรก", path: "/" },
@@ -15,44 +15,166 @@ const navItems = [
   { icon: MessageCircle, label: "ติดต่อ", path: "/contact" },
 ];
 
+const AUTO_SPEED = 30; // px/sec
+const RESUME_DELAY = 800; // ms after release
+
 export function SubNavbar() {
   const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const firstSetRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-  const offsetRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
-  const lastTsRef = useRef<number | null>(null);
 
-  // Auto-scroll loop (~30 px/sec). Pauses on hover/touch/focus.
+  // Refs (no state) so we never re-render during scroll/drag
+  const offsetRef = useRef(0);
+  const pausedRef = useRef(false);
+  const velocityRef = useRef(0); // px/sec — for inertia after release
+
+  // Drag state
+  const draggingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
+  const lastXRef = useRef(0);
+  const lastMoveTsRef = useRef(0);
+  const movedRef = useRef(false);
+  const resumeTimerRef = useRef<number | null>(null);
+
   useEffect(() => {
     const track = trackRef.current;
     const first = firstSetRef.current;
-    if (!track || !first) return;
+    const container = containerRef.current;
+    if (!track || !first || !container) return;
 
-    const SPEED = 30; // px per second
+    let rafId = 0;
+    let lastTs: number | null = null;
+
+    const apply = () => {
+      const width = first.offsetWidth;
+      if (width <= 0) return;
+      let n = offsetRef.current % width;
+      if (n < 0) n += width;
+      offsetRef.current = n;
+      track.style.transform = `translate3d(${-n}px, 0, 0)`;
+    };
 
     const step = (ts: number) => {
-      if (lastTsRef.current == null) lastTsRef.current = ts;
-      const dt = (ts - lastTsRef.current) / 1000;
-      lastTsRef.current = ts;
+      if (lastTs == null) lastTs = ts;
+      const dt = Math.min((ts - lastTs) / 1000, 0.05); // clamp big gaps
+      lastTs = ts;
 
-      if (!paused) {
-        const width = first.offsetWidth;
-        if (width > 0) {
-          offsetRef.current = (offsetRef.current + SPEED * dt) % width;
-          track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
-        }
+      if (draggingRef.current) {
+        // Position handled by pointermove; nothing to do
+      } else if (Math.abs(velocityRef.current) > 1) {
+        // Inertia after release
+        offsetRef.current += velocityRef.current * dt;
+        velocityRef.current *= Math.pow(0.0015, dt); // strong friction
+        apply();
+      } else if (!pausedRef.current) {
+        offsetRef.current += AUTO_SPEED * dt;
+        apply();
       }
-      rafRef.current = requestAnimationFrame(step);
+
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+
+    // Pointer / touch handlers (native so we can preventDefault on touchmove)
+    const scheduleResume = () => {
+      if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = window.setTimeout(() => {
+        pausedRef.current = false;
+      }, RESUME_DELAY);
     };
 
-    rafRef.current = requestAnimationFrame(step);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lastTsRef.current = null;
+    const onPointerDown = (e: PointerEvent) => {
+      // Only primary button / touch / pen
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      draggingRef.current = true;
+      pointerIdRef.current = e.pointerId;
+      lastXRef.current = e.clientX;
+      lastMoveTsRef.current = performance.now();
+      movedRef.current = false;
+      velocityRef.current = 0;
+      pausedRef.current = true;
+      if (resumeTimerRef.current) {
+        window.clearTimeout(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
+      try { container.setPointerCapture(e.pointerId); } catch {}
     };
-  }, [paused]);
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!draggingRef.current || e.pointerId !== pointerIdRef.current) return;
+      const now = performance.now();
+      const dx = e.clientX - lastXRef.current;
+      const dt = Math.max(now - lastMoveTsRef.current, 1) / 1000;
+      if (Math.abs(dx) > 3) movedRef.current = true;
+      // Drag right => content moves right => offset decreases
+      offsetRef.current -= dx;
+      // Velocity for inertia (px/sec, sign matches offset delta direction)
+      velocityRef.current = -dx / dt;
+      lastXRef.current = e.clientX;
+      lastMoveTsRef.current = now;
+      apply();
+    };
+
+    const endDrag = (e: PointerEvent) => {
+      if (!draggingRef.current || e.pointerId !== pointerIdRef.current) return;
+      draggingRef.current = false;
+      pointerIdRef.current = null;
+      try { container.releasePointerCapture(e.pointerId); } catch {}
+      // Clamp velocity so inertia stays pleasant
+      const v = velocityRef.current;
+      velocityRef.current = Math.max(-2500, Math.min(2500, v));
+      scheduleResume();
+    };
+
+    // Prevent default on horizontal touch drags so the page doesn't scroll sideways
+    const onTouchMove = (e: TouchEvent) => {
+      if (draggingRef.current && movedRef.current) {
+        // We're horizontally dragging — block default
+        e.preventDefault();
+      }
+    };
+
+    const onMouseEnter = () => {
+      pausedRef.current = true;
+      if (resumeTimerRef.current) {
+        window.clearTimeout(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
+    };
+    const onMouseLeave = () => {
+      if (!draggingRef.current) scheduleResume();
+    };
+
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", endDrag);
+    container.addEventListener("pointercancel", endDrag);
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
+    container.addEventListener("mouseenter", onMouseEnter);
+    container.addEventListener("mouseleave", onMouseLeave);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
+      container.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerup", endDrag);
+      container.removeEventListener("pointercancel", endDrag);
+      container.removeEventListener("touchmove", onTouchMove);
+      container.removeEventListener("mouseenter", onMouseEnter);
+      container.removeEventListener("mouseleave", onMouseLeave);
+    };
+  }, []);
+
+  // Suppress click-through after a real drag
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (movedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      movedRef.current = false;
+    }
+  };
 
   const renderItem = (item: typeof navItems[number], key: string) => {
     const isActive = location.pathname === item.path ||
@@ -62,8 +184,9 @@ export function SubNavbar() {
       <Link
         key={key}
         to={item.path}
+        draggable={false}
         className={cn(
-          "flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0",
+          "flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 select-none",
           isActive
             ? "bg-primary text-primary-foreground shadow-sm"
             : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -75,86 +198,29 @@ export function SubNavbar() {
     );
   };
 
-  // Pointer drag handlers — let users swipe/scroll manually while marquee runs
-  const draggingRef = useRef(false);
-  const dragStartXRef = useRef(0);
-  const dragStartOffsetRef = useRef(0);
-  const movedRef = useRef(false);
-
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    draggingRef.current = true;
-    movedRef.current = false;
-    dragStartXRef.current = e.clientX;
-    dragStartOffsetRef.current = offsetRef.current;
-    setPaused(true);
-    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-  };
-
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    const dx = e.clientX - dragStartXRef.current;
-    if (Math.abs(dx) > 4) movedRef.current = true;
-    const first = firstSetRef.current;
-    const track = trackRef.current;
-    if (!first || !track) return;
-    const width = first.offsetWidth;
-    if (width <= 0) return;
-    // Drag right => content moves right => decrease offset
-    let next = (dragStartOffsetRef.current - dx) % width;
-    if (next < 0) next += width;
-    offsetRef.current = next;
-    track.style.transform = `translate3d(${-next}px, 0, 0)`;
-  };
-
-  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId); } catch {}
-    // Resume marquee shortly after release
-    setTimeout(() => setPaused(false), 600);
-  };
-
-  // Suppress click after a drag so swipe doesn't trigger navigation
-  const onClickCapture = (e: React.MouseEvent) => {
-    if (movedRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      movedRef.current = false;
-    }
-  };
-
   return (
     <div className="sticky top-12 sm:top-14 z-40 w-full border-b border-border/30 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50 lg:hidden">
       <div
-        className="relative overflow-hidden py-2 touch-pan-y select-none cursor-grab active:cursor-grabbing"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => { if (!draggingRef.current) setPaused(false); }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
+        ref={containerRef}
+        className="relative overflow-hidden py-2 select-none cursor-grab active:cursor-grabbing"
+        style={{ touchAction: "pan-y" }}
         onClickCapture={onClickCapture}
-        onFocusCapture={() => setPaused(true)}
-        onBlurCapture={() => setPaused(false)}
       >
         <div
           ref={trackRef}
           className="flex items-center w-max will-change-transform"
+          style={{ transform: "translate3d(0,0,0)" }}
         >
-          {/* First set (measured for loop width) */}
           <div ref={firstSetRef} className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4">
             {navItems.map((item) => renderItem(item, `a-${item.path}`))}
           </div>
-          {/* Duplicate set for seamless loop */}
           <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4" aria-hidden="true">
             {navItems.map((item) => renderItem(item, `b-${item.path}`))}
           </div>
         </div>
-        {/* Edge fade masks */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-background to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-background to-transparent" />
       </div>
     </div>
   );
 }
-
