@@ -238,9 +238,9 @@ const Index = () => {
           {/* Desktop Layout: 2 columns */}
           <div className="hidden lg:grid grid-cols-2 gap-8 items-center">
             <div className="max-w-2xl space-y-6 text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
+              <p role="heading" aria-level={2} className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
                 {t("hero.title")}
-              </h1>
+              </p>
               <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg">
                 {t("hero.subtitle")}
               </p>
