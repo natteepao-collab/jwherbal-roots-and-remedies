@@ -34,6 +34,11 @@ const Contact = () => {
 
   return (
     <PageTransition>
+    <SeoHead
+      title="ติดต่อเรา - JWHERBAL"
+      description="ติดต่อสอบถามผลิตภัณฑ์สมุนไพร JWHERBAL และ V Flow ผ่านโทรศัพท์ LINE Facebook หรือส่งข้อความถึงทีมงาน"
+      path="/contact"
+    />
     <div className="min-h-screen flex flex-col">
 
       <main className="flex-1 container mx-auto px-4 py-8">

@@ -186,6 +186,11 @@ const Index = () => {
 
   return (
     <PageTransition>
+    <SeoHead
+      title="JWHERBAL - สุขภาพดีเริ่มจากสมุนไพรใกล้ตัว"
+      description="ร้านค้าออนไลน์สมุนไพรและผลิตภัณฑ์เพื่อสุขภาพคุณภาพ V Flow พร้อมบทความความรู้และชุมชนแลกเปลี่ยนประสบการณ์"
+      path="/"
+    />
     <div className="min-h-screen flex flex-col">
 
       {/* Hero Section - Mobile Optimized */}
