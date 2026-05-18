@@ -1,6 +1,6 @@
 import { SeoHead } from "@/components/SeoHead";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight } from "lucide-react";
+import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight, Leaf, AlertTriangle, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import Footer from "@/components/Footer";
@@ -204,29 +204,47 @@ const VFlowProduct = () => {
                       </div>
                     )}
 
-                    {/* Primary CTA Button - Very Prominent */}
-                    <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="pt-2">
-                      <Button 
-                        size="lg"
-                        className="w-full gap-3 font-bold text-lg sm:text-xl shadow-2xl hover:shadow-2xl transition-all duration-300 rounded-2xl h-16 sm:h-20 md:h-20" 
+                    {/* Primary CTAs */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                        <Button
+                          size="lg"
+                          className="w-full gap-2 font-bold text-base sm:text-lg shadow-xl rounded-2xl h-14 sm:h-16"
+                          onClick={() => {
+                            const el = document.getElementById("vflow-products");
+                            el?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                        >
+                          <ShoppingCart className="h-5 w-5" />
+                          <span>สั่งซื้อ</span>
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="w-full gap-2 font-bold text-base sm:text-lg rounded-2xl h-14 sm:h-16 border-2 border-[#06C755] text-[#06C755] hover:bg-[#06C755] hover:text-white"
+                          onClick={handleLineOrder}
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          <span>แชท LINE</span>
+                        </Button>
+                      </motion.div>
+                    </div>
+
+                    {/* Secondary CTA: เลือกแพ็กเกจ */}
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
+                        variant="ghost"
+                        className="w-full gap-2 font-semibold text-sm sm:text-base text-muted-foreground hover:text-foreground rounded-xl h-12"
                         onClick={() => {
                           const el = document.getElementById("vflow-products");
                           el?.scrollIntoView({ behavior: "smooth" });
                         }}
                       >
-                        <span>V Flow - สินค้าแนะนำ</span>
-                        <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7" />
-                      </Button>
-                    </motion.div>
-
-                    {/* Secondary CTA - Simpler design */}
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button 
-                        variant="ghost"
-                        className="w-full font-semibold text-base sm:text-lg text-foreground hover:bg-foreground/10 transition-all duration-300 rounded-xl h-14 sm:h-16" 
-                        onClick={handleLineOrder}
-                      >
-                        เลือกซื้อสินค้า
+                        <Package className="h-4 w-4" />
+                        เลือกแพ็กเกจที่เหมาะกับคุณ
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </motion.div>
                   </motion.div>
