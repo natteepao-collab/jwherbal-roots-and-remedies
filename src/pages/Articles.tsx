@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SeoHead } from "@/components/SeoHead";
-import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight } from "lucide-react";
+import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
+import { useState } from "react";
+import { ARTICLE_CATEGORIES, getCategoryLabel } from "@/data/articleCategories";
 
 interface Article {
   id: string;
