@@ -110,6 +110,7 @@ const Navbar = () => {
     { to: "/articles", label: t("nav.articles"), icon: BookOpen },
     { to: "/community", label: t("nav.community"), icon: Users },
     { to: "/reviews", label: t("nav.reviews"), icon: Star },
+    { to: "/certifications", label: t("nav.certifications"), icon: Award },
     { to: "/faq", label: t("nav.faq"), icon: HelpCircle },
     { to: "/contact", label: t("nav.contact"), icon: Phone },
   ];
