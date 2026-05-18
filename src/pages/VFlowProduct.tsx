@@ -766,6 +766,15 @@ const VFlowProduct = () => {
                     </motion.div>
                   ))}
                 </div>
+
+                <div className="mt-6 text-center">
+                  <Button asChild variant="outline" className="gap-2">
+                    <Link to="/certifications">
+                      ดูใบรับรองและมาตรฐานทั้งหมด
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </section>

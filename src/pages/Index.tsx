@@ -405,6 +405,11 @@ const Index = () => {
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
+                <Button asChild size="lg" variant="outline" className="gap-2">
+                  <Link to="/certifications">
+                    {currentLanguage === "th" ? "ดูใบรับรองทั้งหมด" : currentLanguage === "en" ? "View All Certifications" : "查看所有认证"}
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

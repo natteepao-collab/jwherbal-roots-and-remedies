@@ -57,6 +57,11 @@ const Footer = () => {
                   {t("footer.community")}
                 </Link>
               </li>
+              <li>
+                <Link to="/certifications" className="text-muted-foreground hover:text-primary transition-colors">
+                  ใบรับรอง / มาตรฐาน
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -70,13 +75,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/certifications" className="text-muted-foreground hover:text-primary transition-colors">
                   {t("footer.privacyPolicy")}
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t("footer.terms")}
+                <Link to="/certifications" className="text-muted-foreground hover:text-primary transition-colors">
+                  นโยบายจัดส่ง
                 </Link>
               </li>
             </ul>
