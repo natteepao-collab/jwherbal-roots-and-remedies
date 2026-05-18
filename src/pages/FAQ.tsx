@@ -25,6 +25,7 @@ import FAQImageCarousel from "@/components/FAQImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -187,6 +188,19 @@ const FAQ = () => {
         description={currentLanguage === "th" ? "คำถามที่พบบ่อยเกี่ยวกับผลิตภัณฑ์ V Flow และบริการของ JWHERBAL" : "Frequently asked questions about V Flow products and JWHERBAL services"}
         path="/faq"
       />
+      {faqItems.length > 0 && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.slice(0, 50).map((item) => ({
+              "@type": "Question",
+              name: getQuestion(item),
+              acceptedAnswer: { "@type": "Answer", text: getAnswer(item) },
+            })),
+          }}
+        />
+      )}
 
       <main className="flex-1">
         {/* FAQ Images Carousel */}

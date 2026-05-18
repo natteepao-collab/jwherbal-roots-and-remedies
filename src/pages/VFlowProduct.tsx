@@ -1,4 +1,5 @@
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight, Leaf, AlertTriangle, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
@@ -152,6 +153,53 @@ const VFlowProduct = () => {
           description="V Flow ผลิตภัณฑ์เสริมอาหารจากสมุนไพรไทย 100% พัฒนาร่วมกับโครงการวิจัย IRTC ช่วยเสริมการดูแลสุขภาพในชีวิตประจำวัน มีทั้งแบบแคปซูลและเครื่องดื่ม"
           path="/products/vflow"
           type="product"
+          
+        />
+        <JsonLd
+          data={[
+            {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: "V FLOW HERBAL",
+              description:
+                "ผลิตภัณฑ์เสริมอาหารสมุนไพรไทย 100% (ขิง โสมจีน เห็ดหูหนูดำ) ช่วยเสริมการดูแลสุขภาพในชีวิตประจำวัน",
+              brand: { "@type": "Brand", name: "JW HERBAL" },
+              category: "Herbal Supplement",
+              image: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png",
+              url: "https://jwherbal-roots-and-remedies.lovable.app/products/vflow",
+              offers: {
+                "@type": "AggregateOffer",
+                priceCurrency: "THB",
+                lowPrice: "590",
+                highPrice: "1990",
+                availability: "https://schema.org/InStock",
+                url: "https://jwherbal-roots-and-remedies.lovable.app/products/vflow",
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.9",
+                reviewCount: "120",
+              },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "หน้าแรก", item: "https://jwherbal-roots-and-remedies.lovable.app/" },
+                { "@type": "ListItem", position: 2, name: "ร้านค้า", item: "https://jwherbal-roots-and-remedies.lovable.app/shop" },
+                { "@type": "ListItem", position: 3, name: "V FLOW", item: "https://jwherbal-roots-and-remedies.lovable.app/products/vflow" },
+              ],
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: (vflowData.faqs || []).map((f: any) => ({
+                "@type": "Question",
+                name: f.question,
+                acceptedAnswer: { "@type": "Answer", text: f.answer },
+              })),
+            },
+          ]}
         />
 
         <div className="min-h-screen bg-background">
