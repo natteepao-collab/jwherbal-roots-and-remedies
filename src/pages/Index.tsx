@@ -215,7 +215,7 @@ const Index = () => {
                   alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
                   width={576}
                   height={576}
-                  fetchPriority="high"
+                  {...({ fetchpriority: "high" } as any)}
                   decoding="async"
                   className="w-48 sm:w-56 md:w-72 h-auto object-contain drop-shadow-2xl animate-float"
                 />
