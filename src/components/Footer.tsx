@@ -130,8 +130,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border mt-6 md:mt-8 pt-6 md:pt-8 text-center text-xs sm:text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} JWHERBAL.com {t("footer.rights")}</p>
+        {/* Supplement Disclaimer */}
+        <div className="border-t border-border mt-6 md:mt-8 pt-6 md:pt-8">
+          <div className="rounded-lg border border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 p-3 sm:p-4 text-[11px] sm:text-xs leading-relaxed text-muted-foreground">
+            <strong className="text-amber-700 dark:text-amber-300">คำเตือน:</strong>{" "}
+            ผลิตภัณฑ์เสริมอาหาร ไม่มีผลในการป้องกันหรือรักษาโรค ควรกินอาหารหลากหลายครบ 5 หมู่ ในสัดส่วนที่เหมาะสมเป็นประจำ
+          </div>
+          <p className="mt-4 text-center text-xs sm:text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} JWHERBAL.com {t("footer.rights")}
+          </p>
         </div>
       </div>
     </footer>
