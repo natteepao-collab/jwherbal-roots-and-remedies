@@ -11,7 +11,8 @@ import {
   ShoppingCart, 
   LogOut, 
   Shield, 
-  ClipboardList 
+  ClipboardList,
+  Award
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
