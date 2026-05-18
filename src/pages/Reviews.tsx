@@ -18,7 +18,7 @@ import PageTransition from "@/components/PageTransition";
 import ReviewImageCarousel from "@/components/ReviewImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
 import { avatarOptions, resolveAvatar } from "@/lib/avatarUtils";
@@ -246,10 +246,11 @@ const Reviews = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-secondary/30 via-background to-secondary/20">
-      <Helmet>
-        <title>{t("sections.customerReviews")} - JWHERBAL</title>
-        <meta name="description" content={t("sections.customerReviews")} />
-      </Helmet>
+      <SeoHead
+        title={`${t("sections.customerReviews")} - JWHERBAL`}
+        description="รีวิวจากลูกค้าที่ใช้ผลิตภัณฑ์สมุนไพร JWHERBAL และ V Flow พร้อมประสบการณ์จริงจากผู้ใช้"
+        path="/reviews"
+      />
 
       <main className="flex-1">
         {/* Hero Section */}

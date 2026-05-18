@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SeoHead } from "@/components/SeoHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PageTransition from "@/components/PageTransition";
@@ -115,6 +116,11 @@ const Shop = () => {
 
   return (
     <PageTransition>
+    <SeoHead
+      title={`${t("shop.title")} | JWHERBAL`}
+      description="เลือกซื้อผลิตภัณฑ์สมุนไพรไทยคุณภาพจาก JWHERBAL ทั้ง V Flow แคปซูล และเครื่องดื่มสมุนไพรเพื่อสุขภาพ"
+      path="/shop"
+    />
     <div className="min-h-screen flex flex-col">
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SeoHead } from "@/components/SeoHead";
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -34,6 +35,11 @@ const Contact = () => {
 
   return (
     <PageTransition>
+    <SeoHead
+      title="ติดต่อเรา - JWHERBAL"
+      description="ติดต่อสอบถามผลิตภัณฑ์สมุนไพร JWHERBAL และ V Flow ผ่านโทรศัพท์ LINE Facebook หรือส่งข้อความถึงทีมงาน"
+      path="/contact"
+    />
     <div className="min-h-screen flex flex-col">
 
       <main className="flex-1 container mx-auto px-4 py-8">

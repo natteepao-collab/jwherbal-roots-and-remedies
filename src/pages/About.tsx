@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { supabase } from "@/integrations/supabase/client";
 
 // Import images
@@ -165,10 +165,11 @@ const About = () => {
   return (
     <PageTransition>
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>{t("about.pageTitle")} - JWHERBAL BY JWGROUP</title>
-        <meta name="description" content={t("about.metaDescription")} />
-      </Helmet>
+      <SeoHead
+        title={`${t("about.pageTitle")} - JWHERBAL BY JWGROUP`}
+        description={t("about.metaDescription")}
+        path="/about"
+      />
 
       {/* Hero Section - Minimal */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-secondary/50 to-background">

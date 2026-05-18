@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
@@ -211,10 +211,11 @@ const Articles = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Helmet>
-          <title>{t("articles.title")} | JWHERBAL</title>
-          <meta name="description" content={t("articles.description")} />
-        </Helmet>
+        <SeoHead
+          title={`${t("articles.title")} | JWHERBAL`}
+          description={t("articles.description")}
+          path="/articles"
+        />
 
         <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
           <div className="max-w-6xl mx-auto space-y-12">
