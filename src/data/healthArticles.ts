@@ -236,13 +236,13 @@ You can mix Chinese dates with dried longan, dried lotus seeds, and chrysanthemu
     id: 3,
     slug: "black-fungus-blood-viscosity",
     title: {
-      th: "เห็ดหูหนูดำกับการลดภาวะเลือดข้น — ข้อมูลจากงานวิจัย",
-      en: "Black Fungus and Reducing Blood Viscosity — Research Evidence",
-      zh: "黑木耳与降低血液粘稠度 — 研究证据"
+      th: "เห็ดหูหนูดำกับการดูแลสุขภาพระบบไหลเวียนโลหิต — ข้อมูลจากงานวิจัย",
+      en: "Black Fungus and Circulatory Health — Research Insights",
+      zh: "黑木耳与血液循环健康 — 研究见解"
     },
     excerpt: {
-      th: "เห็ดหูหนูดำมีสารที่ช่วยลดความข้นของเลือด ป้องกันการอุดตันของหลอดเลือด และลดความเสี่ยงของโรคหัวใจและหลอดเลือดสมอง",
-      en: "Black fungus contains substances that help reduce blood viscosity, prevent vascular blockage, and reduce the risk of cardiovascular and cerebrovascular diseases.",
+      th: "เห็ดหูหนูดำเป็นสมุนไพรที่มีงานวิจัยรองรับ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพระบบไหลเวียนโลหิตและหัวใจในชีวิตประจำวัน",
+      en: "Black fungus is a traditionally researched herb suitable for those who want to support circulatory and heart health as part of daily wellness.",
       zh: "黑木耳含有有助于降低血液粘稠度、防止血管堵塞并降低心脑血管疾病风险的物质。"
     },
     content: {
@@ -523,9 +523,9 @@ You can add a little honey to adjust the taste, but avoid sugar for maximum heal
 
 ## ผลิตภัณฑ์ V Flow
 
-V Flow Herbal Drink เป็นสูตรสมุนไพรที่ผสมผสานขิง พุทราจีน และเห็ดหูหนูดำ ซึ่งช่วยลดภาวะเลือดข้นได้อย่างมีประสิทธิภาพ พัฒนาร่วมกับนักวิจัยด้านสมุนไพร มีใบรับรอง อย. และผ่านการทดสอบทางคลินิก
+V Flow Herbal Drink เป็นสูตรสมุนไพรที่ผสมผสานขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพระบบไหลเวียนโลหิตในชีวิตประจำวัน พัฒนาร่วมกับนักวิจัยด้านสมุนไพร มีใบรับรอง อย. และผ่านการทดสอบความปลอดภัย
 
-การดื่ม V Flow ควบคู่ไปกับการปรับเปลี่ยนพฤติกรรมการกินและการใช้ชีวิต จะช่วยลดความเสี่ยงของโรคหลอดเลือดและโรคหัวใจได้อย่างมีนัยสำคัญ`,
+การดื่ม V Flow ควบคู่ไปกับการปรับเปลี่ยนพฤติกรรมการกินและการใช้ชีวิต เป็นส่วนหนึ่งของการดูแลสุขภาพควบคู่กับอาหารที่ดีและการพักผ่อนที่เพียงพอ`,
       en: `Blood viscosity or Hyperviscosity is a condition where blood has higher than normal viscosity, causing blood circulation to various organs to slow down. It is a major cause of cerebrovascular and heart diseases in the elderly.
 
 ## Symptoms of Blood Viscosity
