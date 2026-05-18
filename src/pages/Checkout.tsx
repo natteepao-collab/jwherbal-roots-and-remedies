@@ -571,6 +571,8 @@ const Checkout = () => {
                   </CardContent>
                 </Card>
 
+                <ShippingPolicy title="นโยบายการจัดส่ง (กรุณาอ่านก่อนยืนยัน)" />
+
                 <Button
                   type="submit"
                   className="w-full"
