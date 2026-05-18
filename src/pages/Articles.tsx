@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SeoHead } from "@/components/SeoHead";
-import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight } from "lucide-react";
+import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
+import { useState } from "react";
+import { ARTICLE_CATEGORIES, getCategoryLabel } from "@/data/articleCategories";
 
 interface Article {
   id: string;
@@ -64,7 +66,12 @@ const Articles = () => {
     }
   };
 
-  const articles = dbArticles || [];
+  const allArticlesRaw = dbArticles || [];
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const articles = selectedCategory === "all"
+    ? allArticlesRaw
+    : allArticlesRaw.filter((a) => a.category === selectedCategory);
 
   // Category sections
   const latestArticles = articles.slice(0, 6);
@@ -74,6 +81,19 @@ const Articles = () => {
 
   // Hero: show first featured article, fallback to latest
   const heroArticle = featuredArticles[0] || latestArticles[0];
+
+  // Categories present in DB (predefined first, then unknown legacy values)
+  const availableCategories = Array.from(new Set(allArticlesRaw.map((a) => a.category)));
+  const categoryChips = [
+    { value: "all", label: "ทั้งหมด" },
+    ...ARTICLE_CATEGORIES.filter((c) => availableCategories.includes(c.value)).map((c) => ({
+      value: c.value,
+      label: getCategoryLabel(c.value, currentLang),
+    })),
+    ...availableCategories
+      .filter((c) => !ARTICLE_CATEGORIES.some((pc) => pc.value === c))
+      .map((c) => ({ value: c, label: c })),
+  ];
 
   const ArticleCard = ({ article, index, size = "normal" }: { article: Article; index: number; size?: "normal" | "small" }) => (
     <motion.div
@@ -230,6 +250,28 @@ const Articles = () => {
                 {t("articles.description")}
               </p>
             </motion.div>
+
+            {/* Category Filter Chips */}
+            {categoryChips.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex gap-2 flex-nowrap">
+                  {categoryChips.map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => setSelectedCategory(c.value)}
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        selectedCategory === c.value
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-foreground border-border hover:border-primary/40"
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {isLoading ? (
               <div className="flex items-center justify-center py-20">

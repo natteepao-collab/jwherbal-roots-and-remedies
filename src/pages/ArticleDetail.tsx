@@ -1,7 +1,7 @@
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { JsonLd } from "@/components/JsonLd";
-import { ArrowLeft, ChevronLeft, ChevronRight, Home, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, ExternalLink, Home, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,162 @@ import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { getArticleImage } from "@/assets/articles/index";
 import { useEffect } from "react";
 import DOMPurify from "dompurify";
+import { getCategoryLabel } from "@/data/articleCategories";
 
 const renderSafeHtml = (raw: string) => ({
   __html: DOMPurify.sanitize(raw.replace(/\n/g, "<br />"), { USE_PROFILES: { html: true } }),
 });
+
+// Reusable: medical disclaimer + internal CTA links
+const ArticleFooterMeta = ({
+  reviewer,
+  references,
+  lang,
+}: {
+  reviewer?: string | null;
+  references?: string | null;
+  lang: "th" | "en" | "zh";
+}) => {
+  const refLines = (references || "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  const urlRegex = /(https?:\/\/[^\s]+)/;
+
+  const disclaimer = {
+    th: "เนื้อหานี้เป็นข้อมูลทั่วไปเพื่อการศึกษา ไม่ใช่คำแนะนำทางการแพทย์ หากมีโรคประจำตัวหรือกำลังใช้ยา ควรปรึกษาแพทย์หรือเภสัชกรก่อนใช้ผลิตภัณฑ์เสริมอาหาร",
+    en: "This content is general information for educational purposes only and is not medical advice. If you have a medical condition or take medication, consult a healthcare professional before using any supplement.",
+    zh: "本内容仅供一般教育参考,并非医疗建议。如有疾病或正在服药,请在使用任何保健品前咨询医生或药师。",
+  } as const;
+
+  const titles = {
+    th: {
+      reviewer: "ตรวจทานโดย",
+      references: "แหล่งอ้างอิง",
+      related: "อ่านต่อบนเว็บไซต์",
+      product: "ดูข้อมูลผลิตภัณฑ์ V FLOW",
+      productSub: "ส่วนประกอบ • วิธีใช้ • คำถามที่พบบ่อย",
+      faq: "คำถามที่พบบ่อย",
+      faqSub: "รวมคำถามและคำตอบจากผู้ใช้จริง",
+      line: "ปรึกษาทีมงานผ่าน LINE",
+      lineSub: "ตอบกลับภายในเวลาทำการ",
+    },
+    en: {
+      reviewer: "Reviewed by",
+      references: "References",
+      related: "Continue on our site",
+      product: "View V FLOW product page",
+      productSub: "Ingredients • Usage • FAQ",
+      faq: "Frequently asked questions",
+      faqSub: "Questions and answers from real users",
+      line: "Chat with our team on LINE",
+      lineSub: "We reply during business hours",
+    },
+    zh: {
+      reviewer: "审核",
+      references: "参考资料",
+      related: "继续浏览",
+      product: "查看 V FLOW 产品页",
+      productSub: "成分 · 用法 · 常见问题",
+      faq: "常见问题",
+      faqSub: "来自真实用户的问题与回答",
+      line: "通过 LINE 联系我们",
+      lineSub: "营业时间内回复",
+    },
+  } as const;
+
+  const t = titles[lang];
+
+  return (
+    <div className="mt-10 space-y-6">
+      {reviewer && (
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
+          <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+          <div>
+            <div className="text-xs text-muted-foreground">{t.reviewer}</div>
+            <div className="text-sm font-medium">{reviewer}</div>
+          </div>
+        </div>
+      )}
+
+      {refLines.length > 0 && (
+        <div className="p-4 rounded-lg border border-border bg-muted/30">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">{t.references}</h3>
+          </div>
+          <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-5">
+            {refLines.map((line, i) => {
+              const m = line.match(urlRegex);
+              if (m) {
+                const url = m[1];
+                const label = line.replace(url, "").trim() || url;
+                return (
+                  <li key={i}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      {label} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </li>
+                );
+              }
+              return <li key={i}>{line}</li>;
+            })}
+          </ul>
+        </div>
+      )}
+
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40">
+        <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">{disclaimer[lang]}</p>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold mb-3">{t.related}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <Link
+            to="/products/vflow"
+            className="group flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
+          >
+            <ShoppingBag className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <div className="text-sm font-medium group-hover:text-primary">{t.product}</div>
+              <div className="text-[11px] text-muted-foreground">{t.productSub}</div>
+            </div>
+          </Link>
+          <Link
+            to="/faq"
+            className="group flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
+          >
+            <MessageCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <div className="text-sm font-medium group-hover:text-primary">{t.faq}</div>
+              <div className="text-[11px] text-muted-foreground">{t.faqSub}</div>
+            </div>
+          </Link>
+          <a
+            href="https://line.me/R/ti/p/@jwherbal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
+          >
+            <ExternalLink className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <div className="text-sm font-medium group-hover:text-primary">{t.line}</div>
+              <div className="text-[11px] text-muted-foreground">{t.lineSub}</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const ArticleNavButtons = ({
   prevSlug,
@@ -241,6 +393,8 @@ const ArticleDetail = () => {
                 <div className="text-xl text-muted-foreground mb-8 font-medium">{staticArticle.excerpt[currentLang]}</div>
                 <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(staticArticle.content[currentLang])} />
               </div>
+
+              <ArticleFooterMeta reviewer={null} references={null} lang={currentLang} />
               <div className="mt-8 pt-8 border-t flex justify-center">
                 <ArticleLikeShare articleId={staticArticle.id} articleTitle={staticArticle.title[currentLang]} articleUrl={`${window.location.origin}/articles/${staticArticle.slug}`} initialLikes={staticArticle.likes} />
               </div>
@@ -283,11 +437,19 @@ const ArticleDetail = () => {
   }
 
   // Render DB article
-  const article = dbArticle!;
+  const article = dbArticle! as any;
   const title = getText(article.title_th, article.title_en, article.title_zh);
   const excerpt = getText(article.excerpt_th, article.excerpt_en, article.excerpt_zh);
   const content = getText(article.content_th, article.content_en, article.content_zh);
   const nav = getDbNavigation(article.slug);
+  const reviewer: string | null = article.reviewer ?? null;
+  const references: string | null = article.references_text ?? null;
+  const categoryLabel = getCategoryLabel(article.category, currentLang);
+
+  const publishedDate = article.published_date as string | null;
+  const updatedDate = article.updated_at as string | null;
+  const isUpdated = !!(publishedDate && updatedDate && new Date(updatedDate).getTime() - new Date(publishedDate).getTime() > 24 * 60 * 60 * 1000);
+  const locale = currentLang === "th" ? "th-TH" : currentLang === "zh" ? "zh-CN" : "en-US";
 
   return (
     <PageTransition>
@@ -310,12 +472,15 @@ const ArticleDetail = () => {
             description: excerpt,
             ...(article.image_url ? { image: article.image_url } : {}),
             author: { "@type": "Person", name: article.author || "JW HERBAL" },
+            ...(reviewer ? { reviewedBy: { "@type": "Person", name: reviewer } } : {}),
             publisher: {
               "@type": "Organization",
               name: "JW HERBAL",
               logo: { "@type": "ImageObject", url: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png" },
             },
-            ...(article.published_date ? { datePublished: article.published_date } : {}),
+            ...(publishedDate ? { datePublished: publishedDate } : {}),
+            ...(updatedDate ? { dateModified: updatedDate } : {}),
+            ...(article.category ? { articleSection: article.category } : {}),
             mainEntityOfPage: `https://jwherbal-roots-and-remedies.lovable.app/articles/${article.slug}`,
           },
           {
@@ -344,14 +509,39 @@ const ArticleDetail = () => {
               <img src={getArticleImage(article.image_url)} alt={title} className="w-full max-h-[500px] object-contain rounded-lg mb-8 bg-muted" />
             )}
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-4">
-              {article.category}
+              {categoryLabel}
             </div>
             <h1 className="text-4xl font-bold mb-6">{title}</h1>
-            <div className="flex items-center justify-between mb-8 pb-8 border-b">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8 pb-8 border-b">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                 <span>{article.author}</span>
-                <span>•</span>
-                <span>{article.published_date ? new Date(article.published_date).toLocaleDateString(currentLang === "th" ? "th-TH" : currentLang === "zh" ? "zh-CN" : "en-US") : ""}</span>
+                {reviewer && (
+                  <>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                      {currentLang === "en" ? "Reviewed by" : currentLang === "zh" ? "审核" : "ตรวจทานโดย"} {reviewer}
+                    </span>
+                  </>
+                )}
+                {publishedDate && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {currentLang === "en" ? "Published" : currentLang === "zh" ? "发布" : "เผยแพร่"}{" "}
+                      {new Date(publishedDate).toLocaleDateString(locale)}
+                    </span>
+                  </>
+                )}
+                {isUpdated && updatedDate && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {currentLang === "en" ? "Updated" : currentLang === "zh" ? "更新" : "อัปเดต"}{" "}
+                      {new Date(updatedDate).toLocaleDateString(locale)}
+                    </span>
+                  </>
+                )}
               </div>
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
@@ -359,6 +549,9 @@ const ArticleDetail = () => {
               <div className="text-xl text-muted-foreground mb-8 font-medium">{excerpt}</div>
               <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(content)} />
             </div>
+
+            <ArticleFooterMeta reviewer={reviewer} references={references} lang={currentLang} />
+
             <div className="mt-8 pt-8 border-t flex justify-center">
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
