@@ -1,6 +1,6 @@
 import { SeoHead } from "@/components/SeoHead";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight } from "lucide-react";
+import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight, Leaf, AlertTriangle, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import Footer from "@/components/Footer";
@@ -204,29 +204,47 @@ const VFlowProduct = () => {
                       </div>
                     )}
 
-                    {/* Primary CTA Button - Very Prominent */}
-                    <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="pt-2">
-                      <Button 
-                        size="lg"
-                        className="w-full gap-3 font-bold text-lg sm:text-xl shadow-2xl hover:shadow-2xl transition-all duration-300 rounded-2xl h-16 sm:h-20 md:h-20" 
+                    {/* Primary CTAs */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                        <Button
+                          size="lg"
+                          className="w-full gap-2 font-bold text-base sm:text-lg shadow-xl rounded-2xl h-14 sm:h-16"
+                          onClick={() => {
+                            const el = document.getElementById("vflow-products");
+                            el?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                        >
+                          <ShoppingCart className="h-5 w-5" />
+                          <span>สั่งซื้อ</span>
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="w-full gap-2 font-bold text-base sm:text-lg rounded-2xl h-14 sm:h-16 border-2 border-[#06C755] text-[#06C755] hover:bg-[#06C755] hover:text-white"
+                          onClick={handleLineOrder}
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          <span>แชท LINE</span>
+                        </Button>
+                      </motion.div>
+                    </div>
+
+                    {/* Secondary CTA: เลือกแพ็กเกจ */}
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
+                        variant="ghost"
+                        className="w-full gap-2 font-semibold text-sm sm:text-base text-muted-foreground hover:text-foreground rounded-xl h-12"
                         onClick={() => {
                           const el = document.getElementById("vflow-products");
                           el?.scrollIntoView({ behavior: "smooth" });
                         }}
                       >
-                        <span>V Flow - สินค้าแนะนำ</span>
-                        <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7" />
-                      </Button>
-                    </motion.div>
-
-                    {/* Secondary CTA - Simpler design */}
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button 
-                        variant="ghost"
-                        className="w-full font-semibold text-base sm:text-lg text-foreground hover:bg-foreground/10 transition-all duration-300 rounded-xl h-14 sm:h-16" 
-                        onClick={handleLineOrder}
-                      >
-                        เลือกซื้อสินค้า
+                        <Package className="h-4 w-4" />
+                        เลือกแพ็กเกจที่เหมาะกับคุณ
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </motion.div>
                   </motion.div>
@@ -515,6 +533,74 @@ const VFlowProduct = () => {
             </section>
           )}
 
+          {/* Main Ingredients */}
+          <section className="py-16 md:py-20 bg-gradient-to-b from-background to-primary/[0.03]">
+            <div className="container px-4">
+              <div className="max-w-5xl mx-auto">
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  custom={0}
+                  className="text-center mb-10"
+                >
+                  <Badge variant="outline" className="mb-3 text-xs tracking-wider">
+                    <Leaf className="h-3 w-3 mr-1" /> NATURAL INGREDIENTS
+                  </Badge>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    ส่วนประกอบหลักจากธรรมชาติ
+                  </h2>
+                  <p className="text-muted-foreground">
+                    3 สมุนไพรชั้นเลิศ คัดสรรเพื่อสุขภาพเลือดและการไหลเวียนที่ดี
+                  </p>
+                </motion.div>
+                <div className="grid md:grid-cols-3 gap-5">
+                  {[
+                    {
+                      emoji: "🌿",
+                      name: "ขิง (Ginger)",
+                      latin: "Zingiber officinale",
+                      desc: "ช่วยกระตุ้นการไหลเวียนโลหิต ลดความหนืดของเลือด ต้านการอักเสบ และให้ความอบอุ่นแก่ร่างกาย",
+                    },
+                    {
+                      emoji: "🔴",
+                      name: "พุทราจีน (Jujube)",
+                      latin: "Ziziphus jujuba",
+                      desc: "บำรุงเลือด เสริมพลังชี่ ช่วยให้นอนหลับสบาย เพิ่มความสดชื่นและภูมิคุ้มกันตามตำรับแพทย์แผนจีน",
+                    },
+                    {
+                      emoji: "⚫",
+                      name: "เห็ดหูหนูดำ (Black Fungus)",
+                      latin: "Auricularia auricula",
+                      desc: "ช่วยลดความข้นเหนียวของเลือด ส่งเสริมการไหลเวียน ลดคอเลสเตอรอล และอุดมด้วยใยอาหาร",
+                    },
+                  ].map((ing, i) => (
+                    <motion.div
+                      key={i}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      custom={i}
+                    >
+                      <Card className="h-full border-border/50 hover:shadow-lg transition-shadow">
+                        <CardContent className="p-6 text-center space-y-3">
+                          <div className="text-5xl">{ing.emoji}</div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">{ing.name}</h3>
+                            <p className="text-xs text-muted-foreground italic">{ing.latin}</p>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{ing.desc}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* How to Use */}
           <section className="py-16 md:py-20">
             <div className="container px-4">
@@ -636,6 +722,34 @@ const VFlowProduct = () => {
                 >
                   มาตรฐานที่คุณมั่นใจได้
                 </motion.h2>
+
+                {/* FDA / อย. Highlight Banner */}
+                {(() => {
+                  const fdaCert = certificatesList.find((c) => /อย\.|FDA/i.test(c));
+                  return fdaCert ? (
+                    <motion.div
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      custom={0}
+                      className="mb-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/[0.08] via-primary/[0.04] to-primary/[0.08] p-5 sm:p-6 flex items-center gap-4 shadow-sm"
+                    >
+                      <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/15 flex items-center justify-center">
+                        <BadgeCheck className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                          ขึ้นทะเบียนสำนักงานคณะกรรมการอาหารและยา
+                        </p>
+                        <p className="text-base sm:text-lg md:text-xl font-bold text-foreground break-all">
+                          {fdaCert}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : null;
+                })()}
+
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {certificatesList.map((cert, i) => (
                     <motion.div
@@ -751,6 +865,30 @@ const VFlowProduct = () => {
                     <MessageCircle className="h-4 w-4" />
                     สั่งผ่านไลน์
                   </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Supplement Warning */}
+          <section className="py-10 md:py-12 bg-muted/40 border-t border-border/40">
+            <div className="container px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-start gap-4 p-5 sm:p-6 rounded-xl border border-amber-500/30 bg-amber-50/60 dark:bg-amber-950/20">
+                  <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-sm leading-relaxed text-foreground/90">
+                    <p className="font-bold text-amber-700 dark:text-amber-300">
+                      คำเตือนผลิตภัณฑ์เสริมอาหาร
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>ไม่มีผลในการป้องกันหรือรักษาโรค</li>
+                      <li>ควรกินอาหารหลากหลาย ครบ 5 หมู่ ในสัดส่วนที่เหมาะสมเป็นประจำ</li>
+                      <li>สตรีมีครรภ์ สตรีให้นมบุตร และเด็ก ไม่ควรรับประทาน</li>
+                      <li>ผู้ที่มีโรคประจำตัวหรือรับประทานยาเป็นประจำ ควรปรึกษาแพทย์ก่อนใช้</li>
+                      <li>หากมีอาการผิดปกติให้หยุดใช้และปรึกษาแพทย์ทันที</li>
+                      <li>อ่านคำเตือนในฉลากก่อนบริโภค</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
