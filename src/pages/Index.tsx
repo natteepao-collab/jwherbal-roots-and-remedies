@@ -299,9 +299,160 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Brand Story Gallery Section */}
-      <BrandStoryGallery />
+      {/* Featured Products */}
+      <section id="featured-products" className="py-10 md:py-16 scroll-mt-28">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.featuredProducts")}</h2>
+            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+              <Link to="/shop">{t("sections.viewAll")}</Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            {featuredProducts && featuredProducts.length > 0 ? (
+              featuredProducts.map((product: any) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
+                    name: getText(product.name_th, product.name_en, product.name_zh),
+                    price: product.price,
+                    image: productImages[product.id] || product.image_url,
+                    category: product.category,
+                    description: getText(product.description_th, product.description_en, product.description_zh),
+                    rating: product.rating || 0,
+                  }}
+                  productUuid={product.id}
+                  tiers={allTiers ? getTiersByProduct(allTiers, product.id) : undefined}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-muted-foreground py-8">
+                {currentLanguage === "th" ? "ยังไม่มีสินค้าแนะนำ" : currentLanguage === "en" ? "No featured products yet" : "暂无推荐产品"}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+      {/* Monthly Promotion */}
+      {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (
+        <section id="monthly-promotion" className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-destructive/5 via-background to-primary/5 scroll-mt-28">
+          <div className="container mx-auto px-4 sm:px-6">
+            {/* Header Card with countdown */}
+            <div className="relative mb-6 sm:mb-8 md:mb-10 p-4 sm:p-6 md:p-8 rounded-2xl bg-white/50 dark:bg-foreground/5 border border-destructive/20 backdrop-blur-sm overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-destructive/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative">
+                {/* Top section: Title with icon */}
+                <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-5">
+                  <motion.div 
+                    animate={{ rotate: [0, -15, 15, -10, 10, 0], scale: [1, 1.2, 1] }} 
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="flex-shrink-0 mt-0.5"
+                  >
+                    <Flame className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-destructive drop-shadow-lg" />
+                  </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight">
+                      {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
+                    </h2>
+                    <p className="text-2xs sm:text-xs md:text-sm text-muted-foreground mt-1 leading-snug">
+                      {currentLanguage === "th" ? "ลดราคาส่วนลดสูงสุดสำหรับสิค้าเลือกสรร" : currentLanguage === "en" ? "Maximum discounts on selected items" : "精选产品最大优惠"}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Countdown Timer */}
+                <CountdownTimer />
+              </div>
+            </div>
 
+            {/* Promoted Products Grid - Deal-focused layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+              {promotedProducts.map((product: any, idx: number) => {
+                const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
+                const lowestPrice = getLowestTierPrice(allTiers || [], product.id);
+                const bestTier = productTiers.find((t: any) => t.is_best_seller);
+                const savings = bestTier ? Math.round(((bestTier.normal_price - bestTier.price) / bestTier.normal_price) * 100) : 0;
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  >
+                    <Link to={`/shop/${product.id}`} className="block h-full">
+                      <Card className="group overflow-hidden border-2 border-primary/30 hover:border-destructive/50 transition-all duration-300 hover:shadow-2xl relative h-full flex flex-col bg-gradient-to-br from-white/80 to-background dark:from-foreground/10 dark:to-background">
+                        {/* Hot Deal Badge */}
+                        <motion.div
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute top-3 right-3 z-20"
+                        >
+                          <div className="bg-gradient-to-br from-destructive to-destructive/80 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-black shadow-lg drop-shadow">
+                            <div className="flex items-center gap-1">
+                              <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span>{savings > 0 ? `${savings}%` : "สุดคุ้ม"}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
+                          <img
+                            src={productImages[product.id] || product.image_url}
+                            alt={getText(product.name_th, product.name_en, product.name_zh)}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          {/* Price Tag Overlay */}
+                          <div className="absolute bottom-0 right-0 bg-gradient-to-l from-black/80 to-transparent px-3 sm:px-4 py-2 sm:py-3 text-right">
+                            {lowestPrice && bestTier ? (
+                              <div className="space-y-0.5">
+                                <div className="text-2xs sm:text-xs text-white/70 line-through">
+                                  ฿{bestTier.normal_price?.toLocaleString("th-TH")}
+                                </div>
+                                <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
+                                  ฿{lowestPrice.toLocaleString("th-TH")}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
+                                ฿{product.price?.toLocaleString("th-TH")}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Content Section */}
+                        <CardContent className="p-3 sm:p-4 flex-1 flex flex-col">
+                          <div className="text-2xs sm:text-xs text-primary font-bold uppercase tracking-wider mb-1">{product.category}</div>
+                          <h3 className="text-sm sm:text-base font-bold text-foreground mb-2 line-clamp-2 flex-grow group-hover:text-primary transition-colors">
+                            {getText(product.name_th, product.name_en, product.name_zh)}
+                          </h3>
+                          <p className="text-2xs sm:text-xs text-muted-foreground mb-3 line-clamp-2">
+                            {getText(product.description_th, product.description_en, product.description_zh)}
+                          </p>
+
+                          {/* CTA Button */}
+                          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="mt-auto">
+                            <Button size="sm" className="w-full gap-1.5 font-bold text-xs sm:text-sm bg-destructive hover:bg-destructive/90 shadow-lg hover:shadow-xl transition-all">
+                              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+                              ดูดีล
+                            </Button>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
       {/* Trust Elements Section */}
       <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
@@ -439,234 +590,31 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Monthly Promotion */}
-      {(promoSettings?.is_active !== false) && promotedProducts && promotedProducts.length > 0 && (
-        <section id="monthly-promotion" className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-destructive/5 via-background to-primary/5 scroll-mt-28">
-          <div className="container mx-auto px-4 sm:px-6">
-            {/* Header Card with countdown */}
-            <div className="relative mb-6 sm:mb-8 md:mb-10 p-4 sm:p-6 md:p-8 rounded-2xl bg-white/50 dark:bg-foreground/5 border border-destructive/20 backdrop-blur-sm overflow-hidden">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-destructive/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-              
-              <div className="relative">
-                {/* Top section: Title with icon */}
-                <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-5">
-                  <motion.div 
-                    animate={{ rotate: [0, -15, 15, -10, 10, 0], scale: [1, 1.2, 1] }} 
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="flex-shrink-0 mt-0.5"
-                  >
-                    <Flame className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-destructive drop-shadow-lg" />
-                  </motion.div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight">
-                      {promoSettings?.title || (currentLanguage === "th" ? "โปรโมชั่นประจำเดือน" : currentLanguage === "en" ? "Monthly Promotion" : "本月促销")}
-                    </h2>
-                    <p className="text-2xs sm:text-xs md:text-sm text-muted-foreground mt-1 leading-snug">
-                      {currentLanguage === "th" ? "ลดราคาส่วนลดสูงสุดสำหรับสิค้าเลือกสรร" : currentLanguage === "en" ? "Maximum discounts on selected items" : "精选产品最大优惠"}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Countdown Timer */}
-                <CountdownTimer />
-              </div>
-            </div>
-
-            {/* Promoted Products Grid - Deal-focused layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-              {promotedProducts.map((product: any, idx: number) => {
-                const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
-                const lowestPrice = getLowestTierPrice(allTiers || [], product.id);
-                const bestTier = productTiers.find((t: any) => t.is_best_seller);
-                const savings = bestTier ? Math.round(((bestTier.normal_price - bestTier.price) / bestTier.normal_price) * 100) : 0;
-                return (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  >
-                    <Link to={`/shop/${product.id}`} className="block h-full">
-                      <Card className="group overflow-hidden border-2 border-primary/30 hover:border-destructive/50 transition-all duration-300 hover:shadow-2xl relative h-full flex flex-col bg-gradient-to-br from-white/80 to-background dark:from-foreground/10 dark:to-background">
-                        {/* Hot Deal Badge */}
-                        <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="absolute top-3 right-3 z-20"
-                        >
-                          <div className="bg-gradient-to-br from-destructive to-destructive/80 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-black shadow-lg drop-shadow">
-                            <div className="flex items-center gap-1">
-                              <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span>{savings > 0 ? `${savings}%` : "สุดคุ้ม"}</span>
-                            </div>
-                          </div>
-                        </motion.div>
-
-                        {/* Image Section */}
-                        <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
-                          <img
-                            src={productImages[product.id] || product.image_url}
-                            alt={getText(product.name_th, product.name_en, product.name_zh)}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          {/* Price Tag Overlay */}
-                          <div className="absolute bottom-0 right-0 bg-gradient-to-l from-black/80 to-transparent px-3 sm:px-4 py-2 sm:py-3 text-right">
-                            {lowestPrice && bestTier ? (
-                              <div className="space-y-0.5">
-                                <div className="text-2xs sm:text-xs text-white/70 line-through">
-                                  ฿{bestTier.normal_price?.toLocaleString("th-TH")}
-                                </div>
-                                <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
-                                  ฿{lowestPrice.toLocaleString("th-TH")}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
-                                ฿{product.price?.toLocaleString("th-TH")}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Content Section */}
-                        <CardContent className="p-3 sm:p-4 flex-1 flex flex-col">
-                          <div className="text-2xs sm:text-xs text-primary font-bold uppercase tracking-wider mb-1">{product.category}</div>
-                          <h3 className="text-sm sm:text-base font-bold text-foreground mb-2 line-clamp-2 flex-grow group-hover:text-primary transition-colors">
-                            {getText(product.name_th, product.name_en, product.name_zh)}
-                          </h3>
-                          <p className="text-2xs sm:text-xs text-muted-foreground mb-3 line-clamp-2">
-                            {getText(product.description_th, product.description_en, product.description_zh)}
-                          </p>
-
-                          {/* CTA Button */}
-                          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="mt-auto">
-                            <Button size="sm" className="w-full gap-1.5 font-bold text-xs sm:text-sm bg-destructive hover:bg-destructive/90 shadow-lg hover:shadow-xl transition-all">
-                              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
-                              ดูดีล
-                            </Button>
-                          </motion.div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Featured Products */}
-      <section id="featured-products" className="py-10 md:py-16 scroll-mt-28">
+      {/* Main Ingredients V FLOW */}
+      <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.featuredProducts")}</h2>
-            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-              <Link to="/shop">{t("sections.viewAll")}</Link>
-            </Button>
+          <div className="text-center mb-10 md:mb-12">
+            <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-3">
+              <span className="text-primary font-medium text-xs sm:text-sm">ส่วนประกอบหลัก V FLOW</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">สมุนไพร 3 ชนิด คัดสรรเพื่อการดูแลสุขภาพ</h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+              วัตถุดิบธรรมชาติ 100% ผ่านการคัดเลือกอย่างพิถีพิถัน
+            </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {featuredProducts && featuredProducts.length > 0 ? (
-              featuredProducts.map((product: any) => (
-                <ProductCard
-                  key={product.id}
-                  product={{
-                    id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
-                    name: getText(product.name_th, product.name_en, product.name_zh),
-                    price: product.price,
-                    image: productImages[product.id] || product.image_url,
-                    category: product.category,
-                    description: getText(product.description_th, product.description_en, product.description_zh),
-                    rating: product.rating || 0,
-                  }}
-                  productUuid={product.id}
-                  tiers={allTiers ? getTiersByProduct(allTiers, product.id) : undefined}
-                />
-              ))
-            ) : (
-              <p className="col-span-full text-center text-muted-foreground py-8">
-                {currentLanguage === "th" ? "ยังไม่มีสินค้าแนะนำ" : currentLanguage === "en" ? "No featured products yet" : "暂无推荐产品"}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Articles - from DB with 1:1 aspect ratio */}
-      <section id="featured-articles" className="py-10 md:py-16 bg-secondary scroll-mt-28">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.latestArticles")}</h2>
-            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-              <Link to="/articles">{t("sections.viewAll")}</Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
-            {(latestDbArticles && latestDbArticles.length > 0 ? latestDbArticles : articles.slice(0, 6)).map((article: any) => (
-              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
-                {(article.image_url) && (
-                  <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
-                    <img src={article.image_url} alt={article.title_th || article.title} className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" />
-                  </Link>
-                )}
-                <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
-                  <div className="text-2xs text-primary font-medium mb-1 md:mb-2">{article.category}</div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 line-clamp-2 flex-grow">
-                    {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
-                    <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
-                    <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
-                      <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
-                    </Button>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {[
+              { emoji: "🫚", name: "ขิง", sci: "Zingiber officinale", desc: "สมุนไพรไทยที่ใช้สืบทอดมายาวนาน มีรสเผ็ดร้อน ช่วยให้ร่างกายอบอุ่นในชีวิตประจำวัน" },
+              { emoji: "🍒", name: "พุทราจีน", sci: "Ziziphus jujuba", desc: "ผลไม้บำรุงในตำรับแพทย์แผนจีน นิยมใช้เพื่อเสริมการดูแลสุขภาพและการพักผ่อน" },
+              { emoji: "🍄", name: "เห็ดหูหนูดำ", sci: "Auricularia auricula", desc: "เห็ดที่ใช้ในอาหารและตำรับสมุนไพรจีน นิยมเพื่อสนับสนุนการดูแลสุขภาพหลอดเลือด" },
+            ].map((it) => (
+              <Card key={it.name} className="text-center hover:shadow-lg transition-all hover:-translate-y-1 border-primary/10">
+                <CardContent className="p-6">
+                  <div className="text-5xl mb-3">{it.emoji}</div>
+                  <h3 className="text-lg md:text-xl font-bold text-foreground">{it.name}</h3>
+                  <p className="text-xs text-muted-foreground italic mb-3">{it.sci}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{it.desc}</p>
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Community Highlights - from DB */}
-      <section className="py-10 md:py-16">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.communityHighlights")}</h2>
-            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-              <Link to="/community">{t("sections.viewAll")}</Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            {(latestCommunityPosts && latestCommunityPosts.length > 0 ? latestCommunityPosts : communityPosts.slice(0, 2)).map((post: any) => (
-              <Card key={post.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
-                <div className="flex gap-4 p-4 md:p-6">
-                  {(post.thumbnail) && (
-                    <img
-                      src={getCommunityPostImage(post.thumbnail)}
-                      alt={post.title_th || post.title}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-shrink-0"
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-primary font-medium mb-1">{post.category}</div>
-                    <h3 className="text-sm sm:text-base font-semibold mb-1 line-clamp-2">
-                      {post.title_th ? getText(post.title_th, post.title_en, post.title_zh) : post.title}
-                    </h3>
-                    <div className="flex items-center text-xs text-muted-foreground mb-2">
-                      <span>{post.author_name || post.author}</span>
-                      <span className="mx-2">•</span>
-                      <span>{post.comments_count || post.comments || 0} {currentLanguage === "th" ? "ความคิดเห็น" : "comments"}</span>
-                    </div>
-                    <Button variant="link" asChild className="p-0 h-auto text-xs sm:text-sm">
-                      <Link to={`/community/${post.id}`}>{currentLanguage === "th" ? "อ่านกระทู้" : "Read post"}</Link>
-                    </Button>
-                  </div>
-                </div>
               </Card>
             ))}
           </div>
@@ -728,6 +676,147 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* FAQ ก่อนซื้อ */}
+      <section className="py-12 md:py-20 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
+          <div className="text-center mb-8 md:mb-10">
+            <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-3">
+              <span className="text-primary font-medium text-xs sm:text-sm">คำถามที่พบบ่อย</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">FAQ ก่อนตัดสินใจ</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">รวมข้อสงสัยที่ลูกค้าถามบ่อยที่สุด</p>
+          </div>
+          <Accordion type="single" collapsible className="w-full">
+            {[
+              { q: "V FLOW เหมาะกับใคร?", a: "เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน ผู้สูงอายุ และผู้ที่ต้องการเสริมสมุนไพรในชีวิตประจำวัน" },
+              { q: "ดื่มอย่างไรและบ่อยแค่ไหน?", a: "ฉีกซองผสมในน้ำร้อน 150–200 มล. คนให้เข้ากัน ดื่มก่อนอาหารเช้า วันละ 1 ซอง แนะนำดื่มต่อเนื่อง 14–28 วัน" },
+              { q: "มี อย. หรือมาตรฐานอะไรบ้าง?", a: "ได้รับเลข อย. 50-1-16657-2-0226 ผลิตในโรงงานมาตรฐาน GMP, HACCP, ISO 9001/22000 ดูใบรับรองทั้งหมดที่หน้า /certifications" },
+              { q: "สั่งซื้อและจัดส่งอย่างไร?", a: "สั่งซื้อผ่านเว็บไซต์ หรือแชท LINE @jwherbal จัดส่งทั่วประเทศ ผ่านขนส่งมาตรฐาน 2–4 วันทำการ" },
+              { q: "ผลิตภัณฑ์นี้รักษาโรคได้ไหม?", a: "เป็นผลิตภัณฑ์เสริมอาหาร ไม่มีผลในการป้องกันหรือรักษาโรค ใช้เสริมการดูแลสุขภาพควบคู่กับอาหารหลากหลายครบ 5 หมู่และการพักผ่อน" },
+            ].map((it, i) => (
+              <AccordionItem key={i} value={`faq-${i}`}>
+                <AccordionTrigger className="text-left font-semibold">{it.q}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">{it.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+          <div className="text-center mt-6">
+            <Button variant="outline" asChild>
+              <Link to="/faq">ดู FAQ ทั้งหมด</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Articles - from DB with 1:1 aspect ratio */}
+      <section id="featured-articles" className="py-10 md:py-16 bg-secondary scroll-mt-28">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.latestArticles")}</h2>
+            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+              <Link to="/articles">{t("sections.viewAll")}</Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
+            {(latestDbArticles && latestDbArticles.length > 0 ? latestDbArticles : articles.slice(0, 6)).map((article: any) => (
+              <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
+                {(article.image_url) && (
+                  <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
+                    <img src={article.image_url} alt={article.title_th || article.title} className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" />
+                  </Link>
+                )}
+                <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
+                  <div className="text-2xs text-primary font-medium mb-1 md:mb-2">{article.category}</div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 line-clamp-2 flex-grow">
+                    {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
+                  </h3>
+                  <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
+                    <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
+                    <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
+                      <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* Community Highlights - from DB */}
+      <section className="py-10 md:py-16">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t("sections.communityHighlights")}</h2>
+            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+              <Link to="/community">{t("sections.viewAll")}</Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {(latestCommunityPosts && latestCommunityPosts.length > 0 ? latestCommunityPosts : communityPosts.slice(0, 2)).map((post: any) => (
+              <Card key={post.id} className="hover:shadow-card-hover transition-shadow overflow-hidden">
+                <div className="flex gap-4 p-4 md:p-6">
+                  {(post.thumbnail) && (
+                    <img
+                      src={getCommunityPostImage(post.thumbnail)}
+                      alt={post.title_th || post.title}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-shrink-0"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-primary font-medium mb-1">{post.category}</div>
+                    <h3 className="text-sm sm:text-base font-semibold mb-1 line-clamp-2">
+                      {post.title_th ? getText(post.title_th, post.title_en, post.title_zh) : post.title}
+                    </h3>
+                    <div className="flex items-center text-xs text-muted-foreground mb-2">
+                      <span>{post.author_name || post.author}</span>
+                      <span className="mx-2">•</span>
+                      <span>{post.comments_count || post.comments || 0} {currentLanguage === "th" ? "ความคิดเห็น" : "comments"}</span>
+                    </div>
+                    <Button variant="link" asChild className="p-0 h-auto text-xs sm:text-sm">
+                      <Link to={`/community/${post.id}`}>{currentLanguage === "th" ? "อ่านกระทู้" : "Read post"}</Link>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* Contact / LINE CTA */}
+      <section className="py-14 md:py-20 bg-gradient-to-br from-primary/10 via-background to-[#06C755]/10">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+          <div className="rounded-3xl bg-card border border-primary/20 shadow-xl p-6 md:p-12 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full mb-4">
+              <MessageCircle className="h-4 w-4 text-primary" />
+              <span className="text-primary font-medium text-xs sm:text-sm">ปรึกษา / สั่งซื้อ</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
+              พร้อมให้คำปรึกษาทุกวัน
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+              ทีมงานยินดีให้คำแนะนำเรื่องการเลือกผลิตภัณฑ์และการดูแลสุขภาพ ติดต่อเราได้ผ่านช่องทางที่สะดวก
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                size="lg"
+                onClick={() => window.open("https://line.me/R/ti/p/@jwherbal", "_blank")}
+                className="gap-2 bg-[#06C755] hover:bg-[#06C755]/90 text-white hover:scale-105 transition-transform"
+              >
+                <MessageCircle className="h-5 w-5" />
+                แชท LINE @jwherbal
+              </Button>
+              <Button size="lg" variant="outline" asChild className="gap-2 hover:scale-105 transition-transform">
+                <Link to="/contact">
+                  <Phone className="h-5 w-5" />
+                  ดูช่องทางติดต่อทั้งหมด
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       <Footer />
     </div>
