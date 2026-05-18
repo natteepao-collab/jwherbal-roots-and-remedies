@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, ShoppingBag, FileText, Users, MessageCircle, Star, HelpCircle, Info } from "lucide-react";
+import { Home, ShoppingBag, FileText, Users, MessageCircle, Star, HelpCircle, Info, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -10,6 +10,7 @@ const navItems = [
   { icon: FileText, label: "บทความ", path: "/articles" },
   { icon: Users, label: "คอมมูนิตี้", path: "/community" },
   { icon: Star, label: "รีวิว", path: "/reviews" },
+  { icon: Award, label: "ใบรับรอง", path: "/certifications" },
   { icon: HelpCircle, label: "FAQ", path: "/faq" },
   { icon: MessageCircle, label: "ติดต่อ", path: "/contact" },
 ];
