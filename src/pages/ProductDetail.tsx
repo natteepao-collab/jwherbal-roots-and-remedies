@@ -12,7 +12,9 @@ import { ArrowLeft, Star, Users, Pill, Coffee } from "lucide-react";
 import { productImages } from "@/assets/products";
 import { usePromotionTiers, getTiersByProduct } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
