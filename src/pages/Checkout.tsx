@@ -24,6 +24,7 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
+import ShippingPolicy from "@/components/ShippingPolicy";
 
 interface PaymentSettings {
   promptpay_number: string;
