@@ -2,9 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useHideOnScroll } from "@/hooks/useScrollDirection";
+import { cn } from "@/lib/utils";
 
 export function MobileStickyCTA() {
   const { pathname } = useLocation();
+  const hidden = useHideOnScroll();
 
   const { data: settings } = useQuery({
     queryKey: ["contact-settings-cta"],
@@ -35,7 +38,10 @@ export function MobileStickyCTA() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 lg:hidden border-t border-border/30 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75 shadow-[0_-4px_12px_-2px_hsl(var(--foreground)/0.08)] bottom-14 sm:bottom-16"
+      className={cn(
+        "fixed left-0 right-0 z-40 lg:hidden border-t border-border/30 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75 shadow-[0_-4px_12px_-2px_hsl(var(--foreground)/0.08)] bottom-14 sm:bottom-16 transition-transform duration-300 ease-out",
+        hidden ? "translate-y-[150%]" : "translate-y-0"
+      )}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex items-stretch gap-2 px-3 py-2">

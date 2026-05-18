@@ -3,6 +3,7 @@ import { Home, ShoppingBag, FileText, Users, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
+import { useHideOnScroll } from "@/hooks/useScrollDirection";
 
 const navItems = [
   { icon: Home, label: "หน้าแรก", path: "/" },
@@ -16,9 +17,13 @@ export function MobileBottomNav() {
   const location = useLocation();
   const { items } = useCart();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const hidden = useHideOnScroll();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/30 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/30 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 transition-transform duration-300 ease-out",
+      hidden ? "translate-y-full" : "translate-y-0"
+    )}>
       <div className="flex items-center justify-around h-14 sm:h-16 px-2 safe-area-bottom">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || 

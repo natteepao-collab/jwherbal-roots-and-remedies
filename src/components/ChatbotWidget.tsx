@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import jwherbalLogo from "@/assets/jwherbal-logo-new.png";
 import { toast } from "sonner";
+import { useHideOnScroll } from "@/hooks/useScrollDirection";
 
 type MessageType = {
   id: number;
@@ -25,6 +26,7 @@ const ChatbotWidget = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -177,7 +179,10 @@ const ChatbotWidget = () => {
       {!isOpen && isTabVisible && (
         <button
           onClick={handleOpen}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group"
+          className={cn(
+            "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
+            hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
+          )}
           aria-label="Open Help"
         >
           <div className="flex items-center justify-center bg-primary text-primary-foreground p-2.5 rounded-l-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-primary/90">
@@ -190,7 +195,10 @@ const ChatbotWidget = () => {
       {!isOpen && !isTabVisible && (
         <button
           onClick={() => setIsTabVisible(true)}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-primary/80 text-primary-foreground p-1.5 rounded-l-md shadow-md hover:bg-primary transition-colors"
+          className={cn(
+            "fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-primary/80 text-primary-foreground p-1.5 rounded-l-md shadow-md hover:bg-primary transition-all duration-300 ease-out",
+            hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
+          )}
           aria-label="Show Help Tab"
         >
           <ChevronLeft className="h-4 w-4" />
