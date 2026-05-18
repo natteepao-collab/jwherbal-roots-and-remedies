@@ -44,7 +44,7 @@ export const products: Product[] = [
     price: 350,
     image: painReliefCream,
     category: "ครีมสมุนไพร",
-    description: "ครีมสมุนไพรธรรมชาติ บรรเทาอาการปวดกล้ามเนื้อ ปวดข้อ ผ่อนคลายร่างกาย",
+    description: "ครีมสมุนไพรธรรมชาติ เหมาะสำหรับผู้ที่ต้องการดูแลกล้ามเนื้อและข้อ ผ่อนคลายร่างกาย",
     rating: 4.7,
   },
   {
