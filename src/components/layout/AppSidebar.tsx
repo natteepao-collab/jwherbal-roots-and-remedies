@@ -46,6 +46,7 @@ const mainNavItems = [
   { to: "/articles", labelKey: "nav.articles", icon: BookOpen },
   { to: "/community", labelKey: "nav.community", icon: Users },
   { to: "/reviews", labelKey: "nav.reviews", icon: Star },
+  { to: "/certifications", labelKey: "nav.certifications", icon: Award },
   { to: "/faq", labelKey: "nav.faq", icon: HelpCircle },
   { to: "/contact", labelKey: "nav.contact", icon: Phone },
 ];
