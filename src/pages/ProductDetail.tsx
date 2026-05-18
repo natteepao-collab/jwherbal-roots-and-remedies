@@ -60,6 +60,38 @@ const ProductDetail = () => {
 
   const { data: allTiers } = usePromotionTiers();
 
+  // ---- All hooks must be called before any early return ----
+  const mainImage = product ? (productImages[product.id] || product.image_url) : "";
+
+  const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
+  const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });
+
+  const allMedia = useMemo(() => {
+    const list: { url: string; type: string }[] = [];
+    if (mainImage) list.push({ url: mainImage, type: "image" });
+    (galleryMedia || []).forEach((m: any) => {
+      list.push({ url: m.image_url, type: m.media_type || "image" });
+    });
+    return list;
+  }, [mainImage, galleryMedia]);
+
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setActiveIdx(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi]);
+
+  useEffect(() => {
+    if (!carouselApi || !selectedMedia) return;
+    const idx = allMedia.findIndex((m) => m.url === selectedMedia.url);
+    if (idx >= 0 && idx !== carouselApi.selectedScrollSnap()) carouselApi.scrollTo(idx);
+  }, [selectedMedia, carouselApi, allMedia]);
+
   if (isLoading) {
     return (
       <PageTransition>
@@ -105,40 +137,10 @@ const ProductDetail = () => {
   const detailContent = getText(product.detail_content_th || "", product.detail_content_en || "", product.detail_content_zh || "");
   const suitableFor = getText(product.suitable_for_th || "", product.suitable_for_en || "", product.suitable_for_zh || "");
   const usage = getText(product.usage_instructions_th || "", product.usage_instructions_en || "", product.usage_instructions_zh || "");
-  const mainImage = productImages[product.id] || product.image_url;
   const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
   const hasTiers = productTiers.length > 0;
   const lowestPrice = hasTiers ? Math.min(...productTiers.map((t) => t.price)) : null;
 
-  // Determine what to show as the main media
-  const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
-  const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });
-
-  // Combined media list for swipeable carousel: main image first, then gallery
-  const allMedia = useMemo(() => {
-    const list: { url: string; type: string }[] = [{ url: mainImage, type: "image" }];
-    (galleryMedia || []).forEach((m: any) => {
-      list.push({ url: m.image_url, type: m.media_type || "image" });
-    });
-    return list;
-  }, [mainImage, galleryMedia]);
-
-  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
-  const [activeIdx, setActiveIdx] = useState(0);
-
-  useEffect(() => {
-    if (!carouselApi) return;
-    const onSelect = () => setActiveIdx(carouselApi.selectedScrollSnap());
-    carouselApi.on("select", onSelect);
-    onSelect();
-    return () => { carouselApi.off("select", onSelect); };
-  }, [carouselApi]);
-
-  useEffect(() => {
-    if (!carouselApi || !selectedMedia) return;
-    const idx = allMedia.findIndex((m) => m.url === selectedMedia.url);
-    if (idx >= 0 && idx !== carouselApi.selectedScrollSnap()) carouselApi.scrollTo(idx);
-  }, [selectedMedia, carouselApi, allMedia]);
 
   return (
     <PageTransition>
