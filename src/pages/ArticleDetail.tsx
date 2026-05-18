@@ -435,11 +435,19 @@ const ArticleDetail = () => {
   }
 
   // Render DB article
-  const article = dbArticle!;
+  const article = dbArticle! as any;
   const title = getText(article.title_th, article.title_en, article.title_zh);
   const excerpt = getText(article.excerpt_th, article.excerpt_en, article.excerpt_zh);
   const content = getText(article.content_th, article.content_en, article.content_zh);
   const nav = getDbNavigation(article.slug);
+  const reviewer: string | null = article.reviewer ?? null;
+  const references: string | null = article.references_text ?? null;
+  const categoryLabel = getCategoryLabel(article.category, currentLang);
+
+  const publishedDate = article.published_date as string | null;
+  const updatedDate = article.updated_at as string | null;
+  const isUpdated = !!(publishedDate && updatedDate && new Date(updatedDate).getTime() - new Date(publishedDate).getTime() > 24 * 60 * 60 * 1000);
+  const locale = currentLang === "th" ? "th-TH" : currentLang === "zh" ? "zh-CN" : "en-US";
 
   return (
     <PageTransition>
@@ -462,12 +470,15 @@ const ArticleDetail = () => {
             description: excerpt,
             ...(article.image_url ? { image: article.image_url } : {}),
             author: { "@type": "Person", name: article.author || "JW HERBAL" },
+            ...(reviewer ? { reviewedBy: { "@type": "Person", name: reviewer } } : {}),
             publisher: {
               "@type": "Organization",
               name: "JW HERBAL",
               logo: { "@type": "ImageObject", url: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png" },
             },
-            ...(article.published_date ? { datePublished: article.published_date } : {}),
+            ...(publishedDate ? { datePublished: publishedDate } : {}),
+            ...(updatedDate ? { dateModified: updatedDate } : {}),
+            ...(article.category ? { articleSection: article.category } : {}),
             mainEntityOfPage: `https://jwherbal-roots-and-remedies.lovable.app/articles/${article.slug}`,
           },
           {
@@ -496,14 +507,39 @@ const ArticleDetail = () => {
               <img src={getArticleImage(article.image_url)} alt={title} className="w-full max-h-[500px] object-contain rounded-lg mb-8 bg-muted" />
             )}
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-4">
-              {article.category}
+              {categoryLabel}
             </div>
             <h1 className="text-4xl font-bold mb-6">{title}</h1>
-            <div className="flex items-center justify-between mb-8 pb-8 border-b">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8 pb-8 border-b">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                 <span>{article.author}</span>
-                <span>•</span>
-                <span>{article.published_date ? new Date(article.published_date).toLocaleDateString(currentLang === "th" ? "th-TH" : currentLang === "zh" ? "zh-CN" : "en-US") : ""}</span>
+                {reviewer && (
+                  <>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                      {currentLang === "en" ? "Reviewed by" : currentLang === "zh" ? "审核" : "ตรวจทานโดย"} {reviewer}
+                    </span>
+                  </>
+                )}
+                {publishedDate && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {currentLang === "en" ? "Published" : currentLang === "zh" ? "发布" : "เผยแพร่"}{" "}
+                      {new Date(publishedDate).toLocaleDateString(locale)}
+                    </span>
+                  </>
+                )}
+                {isUpdated && updatedDate && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {currentLang === "en" ? "Updated" : currentLang === "zh" ? "更新" : "อัปเดต"}{" "}
+                      {new Date(updatedDate).toLocaleDateString(locale)}
+                    </span>
+                  </>
+                )}
               </div>
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
@@ -511,6 +547,9 @@ const ArticleDetail = () => {
               <div className="text-xl text-muted-foreground mb-8 font-medium">{excerpt}</div>
               <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(content)} />
             </div>
+
+            <ArticleFooterMeta reviewer={reviewer} references={references} lang={currentLang} />
+
             <div className="mt-8 pt-8 border-t flex justify-center">
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
