@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import BrandStoryGallery from "@/components/BrandStoryGallery";
 import { productImages } from "@/assets/products";
+import { products as staticProducts } from "@/data/products";
 import { usePromotionTiers, getTiersByProduct, getLowestTierPrice } from "@/hooks/usePromotionTiers";
 import { articles } from "@/data/articles";
 import { communityPosts } from "@/data/community";
@@ -211,6 +212,10 @@ const Index = () => {
                 <img
                   src={vflowProduct}
                   alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
+                  width={576}
+                  height={576}
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-48 sm:w-56 md:w-72 h-auto object-contain drop-shadow-2xl animate-float"
                 />
               </div>
@@ -286,6 +291,10 @@ const Index = () => {
                 <img
                   src={vflowProduct}
                   alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
+                  width={576}
+                  height={576}
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-80 lg:w-full lg:max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
                 />
                 <div className="steam-container">
@@ -327,9 +336,9 @@ const Index = () => {
                 />
               ))
             ) : (
-              <p className="col-span-full text-center text-muted-foreground py-8">
-                {currentLanguage === "th" ? "ยังไม่มีสินค้าแนะนำ" : currentLanguage === "en" ? "No featured products yet" : "暂无推荐产品"}
-              </p>
+              staticProducts.slice(0, 4).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
             )}
           </div>
         </div>
@@ -722,7 +731,7 @@ const Index = () => {
               <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
                 {(article.image_url) && (
                   <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
-                    <img src={article.image_url} alt={article.title_th || article.title} className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" />
+                    <img src={article.image_url} alt={article.title_th || article.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" />
                   </Link>
                 )}
                 <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
