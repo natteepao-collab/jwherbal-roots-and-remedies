@@ -348,6 +348,8 @@ export type Database = {
           is_featured: boolean
           likes: number | null
           published_date: string | null
+          references_text: string | null
+          reviewer: string | null
           slug: string
           title_en: string
           title_th: string
@@ -369,6 +371,8 @@ export type Database = {
           is_featured?: boolean
           likes?: number | null
           published_date?: string | null
+          references_text?: string | null
+          reviewer?: string | null
           slug: string
           title_en: string
           title_th: string
@@ -390,6 +394,8 @@ export type Database = {
           is_featured?: boolean
           likes?: number | null
           published_date?: string | null
+          references_text?: string | null
+          reviewer?: string | null
           slug?: string
           title_en?: string
           title_th?: string
