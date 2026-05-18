@@ -153,7 +153,7 @@ const VFlowProduct = () => {
           description="V Flow ผลิตภัณฑ์เสริมอาหารจากสมุนไพรไทย 100% พัฒนาร่วมกับโครงการวิจัย IRTC ช่วยเสริมการดูแลสุขภาพในชีวิตประจำวัน มีทั้งแบบแคปซูลและเครื่องดื่ม"
           path="/products/vflow"
           type="product"
-          image="https://jwherbal-roots-and-remedies.lovable.app/og/vflow.jpg"
+          
         />
         <JsonLd
           data={[
@@ -165,7 +165,7 @@ const VFlowProduct = () => {
                 "ผลิตภัณฑ์เสริมอาหารสมุนไพรไทย 100% (ขิง โสมจีน เห็ดหูหนูดำ) ช่วยเสริมการดูแลสุขภาพในชีวิตประจำวัน",
               brand: { "@type": "Brand", name: "JW HERBAL" },
               category: "Herbal Supplement",
-              image: "https://jwherbal-roots-and-remedies.lovable.app/og/vflow.jpg",
+              image: "https://jwherbal-roots-and-remedies.lovable.app/favicon.png",
               url: "https://jwherbal-roots-and-remedies.lovable.app/products/vflow",
               offers: {
                 "@type": "AggregateOffer",
