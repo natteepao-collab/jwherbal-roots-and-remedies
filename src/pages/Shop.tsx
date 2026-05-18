@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SeoHead } from "@/components/SeoHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PageTransition from "@/components/PageTransition";

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SeoHead } from "@/components/SeoHead";
 
 const Contact = () => {
   const { t } = useTranslation();

@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage } from "@/lib/communityImages";
 import { resolveAvatar } from "@/lib/avatarUtils";
+import { SeoHead } from "@/components/SeoHead";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
