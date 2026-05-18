@@ -870,6 +870,30 @@ const VFlowProduct = () => {
             </div>
           </section>
 
+          {/* Supplement Warning */}
+          <section className="py-10 md:py-12 bg-muted/40 border-t border-border/40">
+            <div className="container px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-start gap-4 p-5 sm:p-6 rounded-xl border border-amber-500/30 bg-amber-50/60 dark:bg-amber-950/20">
+                  <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-sm leading-relaxed text-foreground/90">
+                    <p className="font-bold text-amber-700 dark:text-amber-300">
+                      คำเตือนผลิตภัณฑ์เสริมอาหาร
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>ไม่มีผลในการป้องกันหรือรักษาโรค</li>
+                      <li>ควรกินอาหารหลากหลาย ครบ 5 หมู่ ในสัดส่วนที่เหมาะสมเป็นประจำ</li>
+                      <li>สตรีมีครรภ์ สตรีให้นมบุตร และเด็ก ไม่ควรรับประทาน</li>
+                      <li>ผู้ที่มีโรคประจำตัวหรือรับประทานยาเป็นประจำ ควรปรึกษาแพทย์ก่อนใช้</li>
+                      <li>หากมีอาการผิดปกติให้หยุดใช้และปรึกษาแพทย์ทันที</li>
+                      <li>อ่านคำเตือนในฉลากก่อนบริโภค</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <Footer />
         </div>
       </>
