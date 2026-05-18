@@ -40,6 +40,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
 interface Article {
   id: string;
@@ -54,6 +56,8 @@ interface Article {
   content_en: string;
   content_zh: string;
   author: string;
+  reviewer?: string | null;
+  references_text?: string | null;
   category: string;
   image_url: string;
   published_date: string;
