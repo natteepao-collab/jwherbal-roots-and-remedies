@@ -251,6 +251,28 @@ const Articles = () => {
               </p>
             </motion.div>
 
+            {/* Category Filter Chips */}
+            {categoryChips.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex gap-2 flex-nowrap">
+                  {categoryChips.map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => setSelectedCategory(c.value)}
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        selectedCategory === c.value
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-foreground border-border hover:border-primary/40"
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {isLoading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
