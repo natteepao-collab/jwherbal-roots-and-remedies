@@ -24,6 +24,7 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
+import ShippingPolicy from "@/components/ShippingPolicy";
 
 interface PaymentSettings {
   promptpay_number: string;
@@ -346,6 +347,10 @@ const Checkout = () => {
                 <p>คุณจะได้รับอีเมลยืนยันเมื่อคำสั่งซื้อถูกจัดส่ง</p>
               </div>
 
+              <div className="mb-6 text-left">
+                <ShippingPolicy title="นโยบายการจัดส่ง (โปรดอ่านก่อนโอนเงิน)" />
+              </div>
+
               {/* Slip upload */}
               <Card className="bg-secondary/40 mb-6 text-left">
                 <CardHeader>
@@ -569,6 +574,8 @@ const Checkout = () => {
                     />
                   </CardContent>
                 </Card>
+
+                <ShippingPolicy title="นโยบายการจัดส่ง (กรุณาอ่านก่อนยืนยัน)" />
 
                 <Button
                   type="submit"
