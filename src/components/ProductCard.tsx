@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import type { PromotionTier } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
 import { cn } from "@/lib/utils";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 interface ProductCardProps {
   product: Product;
@@ -68,14 +69,13 @@ const ProductCard = ({
         onClick={handleCardClick}
       >
         <div className="aspect-square overflow-hidden bg-secondary relative">
-          <div className="absolute inset-0 bg-muted animate-pulse" aria-hidden="true" />
-          <img
+          <FadeImage
             src={product.image}
             alt={product.name}
             loading="lazy"
             decoding="async"
-            onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
-            className="relative h-full w-full object-cover transition-opacity duration-300 opacity-0 group-hover:scale-105"
+            wrapperClassName="absolute inset-0"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
           {isAdmin && (
             <button

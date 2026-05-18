@@ -12,7 +12,9 @@ import { ArrowLeft, Star, Users, Pill, Coffee } from "lucide-react";
 import { productImages } from "@/assets/products";
 import { usePromotionTiers, getTiersByProduct } from "@/hooks/usePromotionTiers";
 import PromotionModal from "@/components/PromotionModal";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -112,6 +114,32 @@ const ProductDetail = () => {
   const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
   const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });
 
+  // Combined media list for swipeable carousel: main image first, then gallery
+  const allMedia = useMemo(() => {
+    const list: { url: string; type: string }[] = [{ url: mainImage, type: "image" }];
+    (galleryMedia || []).forEach((m: any) => {
+      list.push({ url: m.image_url, type: m.media_type || "image" });
+    });
+    return list;
+  }, [mainImage, galleryMedia]);
+
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setActiveIdx(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi]);
+
+  useEffect(() => {
+    if (!carouselApi || !selectedMedia) return;
+    const idx = allMedia.findIndex((m) => m.url === selectedMedia.url);
+    if (idx >= 0 && idx !== carouselApi.selectedScrollSnap()) carouselApi.scrollTo(idx);
+  }, [selectedMedia, carouselApi, allMedia]);
+
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
@@ -130,23 +158,54 @@ const ProductDetail = () => {
           <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-10">
             {/* Media Section */}
             <div className="space-y-3">
-              <div className="aspect-square rounded-2xl overflow-hidden bg-secondary border">
-                {currentMedia.type === "video" ? (
-                  <video
-                    src={currentMedia.url}
-                    controls
-                    autoPlay
-                    muted
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <img
-                    src={currentMedia.url}
-                    alt={name}
-                    className="h-full w-full object-cover"
-                  />
+              <Carousel
+                setApi={setCarouselApi}
+                opts={{ loop: false, align: "start" }}
+                className="rounded-2xl overflow-hidden bg-secondary border"
+              >
+                <CarouselContent className="-ml-0">
+                  {allMedia.map((m, i) => (
+                    <CarouselItem key={`${m.url}-${i}`} className="pl-0 basis-full">
+                      <div className="aspect-square w-full">
+                        {m.type === "video" ? (
+                          <video
+                            src={m.url}
+                            controls
+                            muted
+                            playsInline
+                            preload="metadata"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <FadeImage
+                            src={m.url}
+                            alt={name}
+                            loading={i === 0 ? "eager" : "lazy"}
+                            decoding={i === 0 ? "sync" : "async"}
+                            fetchPriority={(i === 0 ? "high" : "auto") as any}
+                            wrapperClassName="h-full w-full"
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {allMedia.length > 1 && (
+                  <>
+                    <CarouselPrevious className="hidden md:flex left-3" />
+                    <CarouselNext className="hidden md:flex right-3" />
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                      {allMedia.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all ${i === activeIdx ? "w-5 bg-primary" : "w-1.5 bg-background/70"}`}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
-              </div>
+              </Carousel>
               {/* Gallery thumbnails */}
               {galleryMedia && galleryMedia.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">

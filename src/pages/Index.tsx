@@ -14,6 +14,7 @@ import { productImages } from "@/assets/products";
 import { products as staticProducts } from "@/data/products";
 import { usePromotionTiers, getTiersByProduct, getLowestTierPrice } from "@/hooks/usePromotionTiers";
 import { articles } from "@/data/articles";
+import { FadeImage } from "@/components/ui/FadeImage";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
@@ -734,14 +735,13 @@ const Index = () => {
               <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
                 {(article.image_url) && (
                   <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
-                    <div className="absolute inset-0 bg-muted animate-pulse" aria-hidden="true" />
-                    <img
+                    <FadeImage
                       src={article.image_url}
                       alt={article.title_th || article.title}
                       loading="lazy"
                       decoding="async"
-                      onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 hover:scale-105 cursor-pointer"
+                      wrapperClassName="absolute inset-0"
+                      className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
                     />
                   </Link>
                 )}
