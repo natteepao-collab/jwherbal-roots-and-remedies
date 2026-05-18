@@ -182,7 +182,7 @@ const ProductDetail = () => {
                             alt={name}
                             loading={i === 0 ? "eager" : "lazy"}
                             decoding={i === 0 ? "sync" : "async"}
-                            fetchPriority={i === 0 ? "high" : "auto" as any}
+                            fetchPriority={(i === 0 ? "high" : "auto") as any}
                             wrapperClassName="h-full w-full"
                             className="object-cover"
                           />
