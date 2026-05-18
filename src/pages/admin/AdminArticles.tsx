@@ -343,11 +343,25 @@ const AdminArticles = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>หมวดหมู่</Label>
-                <Input
+                <Select
                   value={selectedArticle?.category || ""}
-                  onChange={(e) => setSelectedArticle({ ...selectedArticle, category: e.target.value })}
-                  placeholder="สุขภาพ, สมุนไพร..."
-                />
+                  onValueChange={(v) => setSelectedArticle({ ...selectedArticle, category: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกหมวดหมู่" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ARTICLE_CATEGORIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>{c.label_th}</SelectItem>
+                    ))}
+                    {selectedArticle?.category &&
+                      !ARTICLE_CATEGORIES.some((c) => c.value === selectedArticle.category) && (
+                        <SelectItem value={selectedArticle.category}>
+                          {selectedArticle.category} (เดิม)
+                        </SelectItem>
+                      )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>ผู้เขียน</Label>
@@ -355,6 +369,23 @@ const AdminArticles = () => {
                   value={selectedArticle?.author || ""}
                   onChange={(e) => setSelectedArticle({ ...selectedArticle, author: e.target.value })}
                   placeholder="ชื่อผู้เขียน"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>ผู้ตรวจทาน (ถ้ามี)</Label>
+                <Input
+                  value={selectedArticle?.reviewer || ""}
+                  onChange={(e) => setSelectedArticle({ ...selectedArticle, reviewer: e.target.value })}
+                  placeholder="เช่น ภญ.สมหญิง ใจดี"
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label>แหล่งอ้างอิง (หนึ่งบรรทัดต่อหนึ่งแหล่ง รองรับ URL)</Label>
+                <Textarea
+                  value={selectedArticle?.references_text || ""}
+                  onChange={(e) => setSelectedArticle({ ...selectedArticle, references_text: e.target.value })}
+                  rows={3}
+                  placeholder={"เช่น\nกรมการแพทย์แผนไทยและการแพทย์ทางเลือก https://www.dtam.moph.go.th\nWHO Traditional Medicine Strategy 2014–2023"}
                 />
               </div>
             </div>
