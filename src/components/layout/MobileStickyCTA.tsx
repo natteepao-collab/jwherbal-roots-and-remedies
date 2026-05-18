@@ -34,7 +34,10 @@ export function MobileStickyCTA() {
     : { to: "/shop", label: "ดูสินค้า", Icon: ShoppingBag };
 
   return (
-    <div className="fixed bottom-14 sm:bottom-16 left-0 right-0 z-40 lg:hidden border-t border-border/30 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75 shadow-[0_-4px_12px_-2px_hsl(var(--foreground)/0.08)]">
+    <div
+      className="fixed left-0 right-0 z-40 lg:hidden border-t border-border/30 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75 shadow-[0_-4px_12px_-2px_hsl(var(--foreground)/0.08)] bottom-14 sm:bottom-16"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       <div className="flex items-stretch gap-2 px-3 py-2">
         <Link
           to={primary.to}
