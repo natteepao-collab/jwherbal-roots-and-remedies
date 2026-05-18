@@ -37,8 +37,17 @@ const ChatbotWidget = () => {
     setIsOpen(true);
     setIsTabVisible(false);
     if (messages.length === 0) {
-      // Send initial greeting via AI
-      streamChat([{ role: "user", content: "สวัสดี" }], true);
+      // Show local greeting only — do NOT call API to avoid triggering admin notifications
+      setMessages([
+        {
+          id: Date.now(),
+          role: "assistant",
+          content: t(
+            "chatbot.greeting",
+            "สวัสดีค่ะ ยินดีต้อนรับสู่ JWHERBAL 🌿 มีอะไรให้ช่วยสอบถามไหมคะ? เลือกหัวข้อด้านล่าง หรือพิมพ์คำถามได้เลยค่ะ"
+          ),
+        },
+      ]);
     }
   };
 
