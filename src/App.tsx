@@ -81,6 +81,7 @@ const PublicRoutes = () => {
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
@@ -136,27 +137,6 @@ const AppContent = () => {
   );
 };
 
-// Wrapper to handle 404 for unmatched routes
-const AppWithNotFound = () => {
-  const location = useLocation();
-  const isAdminDashboard = location.pathname.startsWith("/admin/dashboard");
-  const isKnownRoute = [
-    "/", "/about", "/shop", "/cart", "/checkout", "/articles", 
-    "/community", "/contact", "/auth", "/reset-password", "/products/vflow", 
-    "/reviews", "/faq", "/orders", "/profile", "/admin"
-  ].some(route => location.pathname === route || location.pathname.startsWith(route + "/"));
-  
-  if (!isAdminDashboard && !isKnownRoute) {
-    return (
-      <MainLayout>
-        <NotFound />
-      </MainLayout>
-    );
-  }
-  
-  return <AppContent />;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <CartProvider>
@@ -165,7 +145,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AppWithNotFound />
+          <AppContent />
           <ChatbotWidget />
         </BrowserRouter>
       </TooltipProvider>
