@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.translate-batch]
 verify_jwt = false
+
+[functions.articles-api]
+verify_jwt = false
