@@ -3,6 +3,7 @@ import { Home, ShoppingBag, FileText, Users, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
+import { useHideOnScroll } from "@/hooks/useScrollDirection";
 
 const navItems = [
   { icon: Home, label: "หน้าแรก", path: "/" },
