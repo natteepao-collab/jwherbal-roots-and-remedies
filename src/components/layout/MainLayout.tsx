@@ -4,6 +4,7 @@ import { SecondaryNavbar } from "./SecondaryNavbar";
 import { SubNavbar } from "./SubNavbar";
 import { DesktopQuickAccess } from "./DesktopQuickAccess";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { MobileStickyCTA } from "./MobileStickyCTA";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
@@ -38,9 +39,10 @@ export function MainLayout({ children }: MainLayoutProps) {
           <SecondaryNavbar />
           <DesktopQuickAccess />
           <SubNavbar />
-          <main className="flex-1 pb-14 sm:pb-16 lg:pb-0">
+          <main className="flex-1 pb-32 sm:pb-36 lg:pb-0">
             {children}
           </main>
+          <MobileStickyCTA />
           <MobileBottomNav />
         </SidebarInset>
       </div>
