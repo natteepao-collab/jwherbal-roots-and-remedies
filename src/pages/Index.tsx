@@ -195,7 +195,7 @@ const Index = () => {
     />
     <div className="min-h-screen flex flex-col">
 
-      {/* Hero Section - Mobile Optimized */}
+      {/* Hero Section - 5-second pitch */}
       <section className="relative min-h-[85vh] md:min-h-[600px] flex items-center justify-center overflow-hidden py-8 md:py-0">
         <div
           className="absolute inset-0 bg-cover bg-center animate-ken-burns"
@@ -204,67 +204,90 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b lg:bg-gradient-to-r from-background/95 via-background/85 to-background/70" />
         </div>
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          {/* Mobile Layout: Image on top */}
+          {/* Mobile Layout */}
           <div className="flex flex-col lg:hidden items-center text-center">
             <div className="flex justify-center items-center mb-6">
               <div className="relative animate-fade-in-up">
-                <img 
-                  src={vflowProduct} 
-                  alt="V Flow Herbal Drink Product" 
+                <img
+                  src={vflowProduct}
+                  alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
                   className="w-48 sm:w-56 md:w-72 h-auto object-contain drop-shadow-2xl animate-float"
                 />
               </div>
             </div>
-            <div className="max-w-2xl space-y-4 md:space-y-6">
+            <div className="max-w-2xl space-y-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                <span>ผ่านมาตรฐาน อย. & GMP</span>
+              </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground animate-fade-in-up animation-delay-200 leading-tight">
-                {t("hero.title")}
+                V FLOW สมุนไพรไทย<br />ดูแลการไหลเวียนโลหิต
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-400 max-w-lg mx-auto">
-                {t("hero.subtitle")}
+              <p className="text-base sm:text-lg text-muted-foreground animate-fade-in-up animation-delay-400 max-w-lg mx-auto">
+                เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up animation-delay-600 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 animate-fade-in-up animation-delay-600 justify-center">
                 <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform w-full sm:w-auto">
                   <Link to="/products/vflow">
-                    {t("hero.vflowButton")}
+                    ดูสินค้า V FLOW
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="hover:scale-105 transition-transform w-full sm:w-auto">
-                  <Link to="/shop">{t("hero.shopButton")}</Link>
+                  <Link to="/shop">สั่งซื้อ</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => window.open("https://line.me/R/ti/p/@jwherbal", "_blank")}
+                  className="hover:scale-105 transition-transform w-full sm:w-auto gap-2 bg-[#06C755] hover:bg-[#06C755]/90 text-white"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  ปรึกษาผ่าน LINE
                 </Button>
               </div>
             </div>
           </div>
-          
-          {/* Desktop Layout: 2 columns */}
+
+          {/* Desktop Layout */}
           <div className="hidden lg:grid grid-cols-2 gap-8 items-center">
             <div className="max-w-2xl space-y-6 text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                <ShieldCheck className="h-4 w-4" />
+                <span>ผ่านมาตรฐาน อย. & GMP — สมุนไพรไทย 100%</span>
+              </div>
               <p role="heading" aria-level={2} className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground animate-fade-in-up leading-tight">
-                {t("hero.title")}
+                V FLOW สมุนไพรไทย<br />ดูแลการไหลเวียนโลหิต
               </p>
               <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg">
-                {t("hero.subtitle")}
+                เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
               </p>
-              <div className="flex flex-row gap-4 animate-fade-in-up animation-delay-400 justify-start">
+              <div className="flex flex-row flex-wrap gap-3 animate-fade-in-up animation-delay-400 justify-start">
                 <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform">
                   <Link to="/products/vflow">
-                    {t("hero.vflowButton")}
+                    ดูสินค้า V FLOW
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="hover:scale-105 transition-transform">
-                  <Link to="/shop">{t("hero.shopButton")}</Link>
+                  <Link to="/shop">สั่งซื้อ</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => window.open("https://line.me/R/ti/p/@jwherbal", "_blank")}
+                  className="hover:scale-105 transition-transform gap-2 bg-[#06C755] hover:bg-[#06C755]/90 text-white"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  ปรึกษาผ่าน LINE
                 </Button>
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div className="relative animate-fade-in-right">
-                <img 
-                  src={vflowProduct} 
-                  alt="V Flow Herbal Drink Product" 
+                <img
+                  src={vflowProduct}
+                  alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
                   className="w-80 lg:w-full lg:max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
                 />
-                {/* Steam Effect */}
                 <div className="steam-container">
                   <span className="steam steam-1"></span>
                   <span className="steam steam-2"></span>
