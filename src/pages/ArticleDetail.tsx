@@ -393,6 +393,8 @@ const ArticleDetail = () => {
                 <div className="text-xl text-muted-foreground mb-8 font-medium">{staticArticle.excerpt[currentLang]}</div>
                 <div className="space-y-4" dangerouslySetInnerHTML={renderSafeHtml(staticArticle.content[currentLang])} />
               </div>
+
+              <ArticleFooterMeta reviewer={null} references={null} lang={currentLang} />
               <div className="mt-8 pt-8 border-t flex justify-center">
                 <ArticleLikeShare articleId={staticArticle.id} articleTitle={staticArticle.title[currentLang]} articleUrl={`${window.location.origin}/articles/${staticArticle.slug}`} initialLikes={staticArticle.likes} />
               </div>
