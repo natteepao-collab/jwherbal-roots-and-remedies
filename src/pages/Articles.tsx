@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";

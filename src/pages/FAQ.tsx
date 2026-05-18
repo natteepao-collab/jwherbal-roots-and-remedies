@@ -24,7 +24,7 @@ import PageTransition from "@/components/PageTransition";
 import FAQImageCarousel from "@/components/FAQImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 

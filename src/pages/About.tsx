@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { supabase } from "@/integrations/supabase/client";
 
 // Import images

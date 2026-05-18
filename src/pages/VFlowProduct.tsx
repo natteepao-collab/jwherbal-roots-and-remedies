@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check, MessageCircle, ChevronRight, Droplets, Shield, Award, Beaker, Package, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";

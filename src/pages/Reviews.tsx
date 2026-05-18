@@ -18,7 +18,7 @@ import PageTransition from "@/components/PageTransition";
 import ReviewImageCarousel from "@/components/ReviewImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/SeoHead";
 import { toast } from "sonner";
 import { reviews as staticReviews } from "@/data/reviews";
 import { avatarOptions, resolveAvatar } from "@/lib/avatarUtils";
