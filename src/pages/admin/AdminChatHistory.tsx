@@ -814,6 +814,27 @@ ${bubbles}
         </Card>
       </div>
 
+      <div className="flex items-center gap-2 border-b">
+        <button
+          onClick={() => setViewMode("conversations")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+            viewMode === "conversations" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <MessageSquare className="inline h-4 w-4 mr-1" /> รายการสนทนา ({conversations.length})
+        </button>
+        <button
+          onClick={() => setViewMode("users")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+            viewMode === "users" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Users className="inline h-4 w-4 mr-1" /> ผู้ใช้ที่ลงทะเบียน ({registeredCount})
+        </button>
+      </div>
+
       <Card>
         <CardContent className="p-4 flex flex-wrap gap-2">
           <div className="relative flex-1 min-w-[200px]">
