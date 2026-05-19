@@ -256,7 +256,7 @@ const AdminLiveChatDock = () => {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="เปิด Admin Live Chat"
-          className="fixed bottom-24 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-6"
+          className="fixed bottom-40 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-24"
         >
           <Headset className="h-5 w-5" />
           {unseenCount > 0 && (
