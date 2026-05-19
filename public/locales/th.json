@@ -34,6 +34,7 @@
   "sections": {
     "featuredProducts": "สินค้าแนะนำ",
     "latestArticles": "บทความล่าสุด",
+    "featuredArticles": "บทความแนะนำ",
     "communityHighlights": "ไฮไลท์จากคอมมูนิตี้",
     "viewAll": "ดูทั้งหมด",
     "customerReviews": "รีวิวจากผู้ใช้จริง"
