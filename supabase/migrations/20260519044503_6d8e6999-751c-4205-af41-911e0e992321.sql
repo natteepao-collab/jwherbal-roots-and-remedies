@@ -1,0 +1,1 @@
+UPDATE public.brand_story SET title_th = 'พัฒนาจากภูมิปัญญาชาวบ้านสู่งานวิจัย', title_en = 'From Folk Wisdom to Scientific Research', title_zh = '从民间智慧到科学研究', updated_at = now();
