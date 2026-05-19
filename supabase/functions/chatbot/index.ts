@@ -176,7 +176,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
             "X-Conversation-Id": conversationId,
             "X-Admin-Takeover": "1",
-            "X-Ai-Staff-Name": aiStaffName,
+            "X-Ai-Staff-Name": encodeURIComponent(aiStaffName),
           },
         },
       );
@@ -358,7 +358,7 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
         ...corsHeaders,
         "Content-Type": "application/json",
         "X-Conversation-Id": conversationId,
-        "X-Ai-Staff-Name": aiStaffName,
+        "X-Ai-Staff-Name": encodeURIComponent(aiStaffName),
       };
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง" }), {
@@ -422,7 +422,7 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
     });
 
     return new Response(stream, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId, "X-Ai-Staff-Name": aiStaffName },
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId, "X-Ai-Staff-Name": encodeURIComponent(aiStaffName) },
     });
   } catch (e) {
     console.error("chatbot error:", e);
