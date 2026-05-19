@@ -58,6 +58,105 @@ const AdminLiveChatDock = () => {
   const [seenAt, setSeenAt] = useState<number>(() => Date.now());
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Draggable position (persisted). null = default placement.
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("admin-live-dock-pos");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    moved: boolean;
+    pointerId: number;
+    curX: number;
+    curY: number;
+  } | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  const clampPos = (x: number, y: number, w: number, h: number) => {
+    const maxX = window.innerWidth - w - 4;
+    const maxY = window.innerHeight - h - 4;
+    return {
+      x: Math.max(4, Math.min(x, maxX)),
+      y: Math.max(4, Math.min(y, maxY)),
+    };
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    const el = e.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    const currentX = pos?.x ?? rect.left;
+    const currentY = pos?.y ?? rect.top;
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: currentX,
+      origY: currentY,
+      curX: currentX,
+      curY: currentY,
+      moved: false,
+      pointerId: e.pointerId,
+    };
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    const d = dragRef.current;
+    if (!d || e.pointerId !== d.pointerId) return;
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    if (!d.moved && Math.hypot(dx, dy) > 5) {
+      d.moved = true;
+      setDragging(true);
+    }
+    if (d.moved) {
+      const el = e.currentTarget as HTMLElement;
+      const next = clampPos(
+        d.origX + dx,
+        d.origY + dy,
+        el.offsetWidth,
+        el.offsetHeight
+      );
+      d.curX = next.x;
+      d.curY = next.y;
+      setPos(next);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLElement>) => {
+    const d = dragRef.current;
+    if (!d) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(d.pointerId);
+    } catch {}
+    if (d.moved) {
+      try {
+        localStorage.setItem(
+          "admin-live-dock-pos",
+          JSON.stringify({ x: d.curX, y: d.curY })
+        );
+      } catch {}
+    }
+    const wasDragged = d.moved;
+    dragRef.current = null;
+    setTimeout(() => setDragging(false), 0);
+    if (wasDragged) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+
   // 1. Detect admin role
   useEffect(() => {
     let mounted = true;
@@ -250,15 +349,33 @@ const AdminLiveChatDock = () => {
 
   return (
     <>
-      {/* Floating launcher button (left side to avoid the customer chatbot on right) */}
+      {/* Floating launcher button (draggable; default bottom-left) */}
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
-          aria-label="เปิด Admin Live Chat"
-          className="fixed bottom-40 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-24"
+          onClick={() => {
+            if (dragging) return;
+            setOpen(true);
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          aria-label="เปิด Admin Live Chat (ลากเพื่อย้าย)"
+          title="ลากเพื่อย้ายตำแหน่ง · คลิกเพื่อเปิด"
+          style={
+            pos
+              ? { left: pos.x, top: pos.y, touchAction: "none" }
+              : { touchAction: "none" }
+          }
+          className={cn(
+            "fixed z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-transform select-none",
+            dragging ? "cursor-grabbing scale-110" : "cursor-grab hover:scale-105 active:scale-95",
+            !pos && "bottom-40 left-4 lg:bottom-24"
+          )}
         >
-          <Headset className="h-5 w-5" />
+          <Headset className="h-5 w-5 pointer-events-none" />
+
           {unseenCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
               {unseenCount}
@@ -273,12 +390,30 @@ const AdminLiveChatDock = () => {
       )}
 
       {open && (
-        <Card className="fixed bottom-40 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-24">
-          {/* Header */}
-          <div className="px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2">
+        <Card
+          style={pos ? { left: pos.x, top: pos.y } : undefined}
+          className={cn(
+            "fixed z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden",
+            !pos && "bottom-40 left-4 lg:bottom-24"
+          )}
+        >
+          {/* Header (drag handle) */}
+          <div
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            style={{ touchAction: "none" }}
+            className={cn(
+              "px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2 select-none",
+              dragging ? "cursor-grabbing" : "cursor-grab"
+            )}
+            title="ลากเพื่อย้ายหน้าต่าง"
+          >
             {selectedId && (
               <button
                 onClick={() => setSelectedId(null)}
+                onPointerDown={(e) => e.stopPropagation()}
                 aria-label="กลับ"
                 className="p-1 -ml-1 hover:bg-white/15 rounded"
               >
@@ -286,6 +421,7 @@ const AdminLiveChatDock = () => {
               </button>
             )}
             <Headset className="h-4 w-4" />
+
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold leading-tight">
                 {selectedId ? "ห้องแชท" : "Admin Live Chat"}
@@ -301,6 +437,7 @@ const AdminLiveChatDock = () => {
                 setOpen(false);
                 setSelectedId(null);
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               aria-label="ปิด"
               className="p-1 hover:bg-white/15 rounded"
             >
