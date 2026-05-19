@@ -291,8 +291,17 @@ const ChatbotWidget = () => {
     }, delay);
   };
 
+  const requireAuth = () => {
+    if (!authUser) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนพูดคุยกับเจ้าหน้าที่ค่ะ");
+      return false;
+    }
+    return true;
+  };
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || isLoading) return;
+    if (!requireAuth()) return;
 
     const userMessage = inputValue.trim();
     setInputValue("");
@@ -310,6 +319,7 @@ const ChatbotWidget = () => {
 
   const handleQuickQuestion = (question: string) => {
     if (isLoading) return;
+    if (!requireAuth()) return;
     const userMsg: MessageType = { id: Date.now(), role: "user", content: question };
     setMessages((prev) => [...prev, userMsg]);
 
