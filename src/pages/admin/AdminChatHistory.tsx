@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   MessageSquare, Clock, Globe, ChevronRight, ArrowLeft, User, Bot,
   Sparkles, Download, Search, Phone, Mail, Smartphone, TrendingUp,
+  Headset, Send, Undo2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
@@ -41,6 +42,9 @@ type Conversation = {
   tags: string[] | null;
   analyzed_at: string | null;
   admin_notes: string | null;
+  admin_takeover: boolean | null;
+  admin_takeover_by: string | null;
+  admin_takeover_at: string | null;
 };
 
 type ChatMessage = {
@@ -83,6 +87,9 @@ const AdminChatHistory = () => {
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
   const [analyzingAll, setAnalyzingAll] = useState(false);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+  const [adminReply, setAdminReply] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const [togglingTakeover, setTogglingTakeover] = useState(false);
   const qc = useQueryClient();
 
   const { data: conversations = [], isLoading } = useQuery({
@@ -111,6 +118,85 @@ const AdminChatHistory = () => {
     },
     enabled: !!selectedConversation,
   });
+
+  // Realtime: refresh messages + conversation when changes occur in the selected chat
+  useEffect(() => {
+    if (!selectedConversation) return;
+    const channel = supabase
+      .channel(`admin-chat-${selectedConversation}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat_messages",
+          filter: `conversation_id=eq.${selectedConversation}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["admin-chat-messages", selectedConversation] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_conversations",
+          filter: `id=eq.${selectedConversation}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConversation, qc]);
+
+  const toggleTakeover = async (conv: Conversation) => {
+    setTogglingTakeover(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const next = !conv.admin_takeover;
+      const { error } = await supabase
+        .from("chat_conversations")
+        .update({
+          admin_takeover: next,
+          admin_takeover_by: next ? user?.id ?? null : null,
+          admin_takeover_at: next ? new Date().toISOString() : null,
+        })
+        .eq("id", conv.id);
+      if (error) throw error;
+      toast.success(next ? "เข้าควบคุมแชทเรียบร้อย" : "ส่งคืนให้ AI ดูแลแล้ว");
+      qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+    } catch (e: any) {
+      toast.error(e.message || "ดำเนินการไม่สำเร็จ");
+    } finally {
+      setTogglingTakeover(false);
+    }
+  };
+
+  const sendAdminReply = async () => {
+    const text = adminReply.trim();
+    if (!text || !selectedConversation) return;
+    setSendingReply(true);
+    try {
+      const { error } = await supabase.from("chat_messages").insert({
+        conversation_id: selectedConversation,
+        role: "assistant",
+        content: text,
+      });
+      if (error) throw error;
+      setAdminReply("");
+      qc.invalidateQueries({ queryKey: ["admin-chat-messages", selectedConversation] });
+    } catch (e: any) {
+      toast.error(e.message || "ส่งข้อความไม่สำเร็จ");
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
 
   const langLabel = (lang: string) => {
     switch (lang) {
@@ -235,14 +321,28 @@ const AdminChatHistory = () => {
             )}
           </div>
           {conv && (
-            <Button
-              size="sm"
-              onClick={() => handleAnalyzeOne(conv.id)}
-              disabled={analyzingId === conv.id}
-            >
-              <Sparkles className="h-4 w-4 mr-1" />
-              {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant={conv.admin_takeover ? "destructive" : "secondary"}
+                onClick={() => toggleTakeover(conv)}
+                disabled={togglingTakeover}
+              >
+                {conv.admin_takeover ? (
+                  <><Undo2 className="h-4 w-4 mr-1" /> คืนให้ AI ดูแล</>
+                ) : (
+                  <><Headset className="h-4 w-4 mr-1" /> เข้าควบคุมแชท</>
+                )}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleAnalyzeOne(conv.id)}
+                disabled={analyzingId === conv.id}
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -355,6 +455,28 @@ const AdminChatHistory = () => {
             )}
           </CardContent>
         </Card>
+
+        {conv?.admin_takeover && (
+          <Card>
+            <CardContent className="p-3">
+              <div className="flex gap-2">
+                <Input
+                  value={adminReply}
+                  onChange={(e) => setAdminReply(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendAdminReply())}
+                  placeholder="พิมพ์ข้อความตอบลูกค้า (ส่งในนามแอดมิน)..."
+                  disabled={sendingReply}
+                />
+                <Button onClick={sendAdminReply} disabled={sendingReply || !adminReply.trim()}>
+                  <Send className="h-4 w-4 mr-1" /> ส่ง
+                </Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                ลูกค้าจะเห็นข้อความนี้ทันทีในแชทผ่าน Realtime — AI ถูกพักไว้จนกว่าจะกด "คืนให้ AI ดูแล"
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }

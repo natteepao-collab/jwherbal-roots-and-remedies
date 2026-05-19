@@ -120,7 +120,6 @@ serve(async (req) => {
       await notifyNewChat(supabase, messages, language || "th");
     }
 
-
     // Save the latest user message
     const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
     if (lastUserMsg) {
@@ -130,6 +129,29 @@ serve(async (req) => {
         content: lastUserMsg.content,
       });
     }
+
+    // Check if a human admin has taken over this conversation. If so, skip AI.
+    const { data: convState } = await supabase
+      .from("chat_conversations")
+      .select("admin_takeover")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+    if (convState?.admin_takeover) {
+      return new Response(
+        JSON.stringify({ takeover: true, conversationId }),
+        {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "X-Conversation-Id": conversationId,
+            "X-Admin-Takeover": "1",
+          },
+        },
+      );
+    }
+
 
     // Fetch comprehensive data from database
     const [

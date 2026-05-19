@@ -488,6 +488,9 @@ export type Database = {
       chat_conversations: {
         Row: {
           admin_notes: string | null
+          admin_takeover: boolean
+          admin_takeover_at: string | null
+          admin_takeover_by: string | null
           analyzed_at: string | null
           customer_email: string | null
           customer_line: string | null
@@ -515,6 +518,9 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          admin_takeover?: boolean
+          admin_takeover_at?: string | null
+          admin_takeover_by?: string | null
           analyzed_at?: string | null
           customer_email?: string | null
           customer_line?: string | null
@@ -542,6 +548,9 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          admin_takeover?: boolean
+          admin_takeover_at?: string | null
+          admin_takeover_by?: string | null
           analyzed_at?: string | null
           customer_email?: string | null
           customer_line?: string | null

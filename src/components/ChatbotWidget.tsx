@@ -78,8 +78,11 @@ const ChatbotWidget = () => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [customerName, setCustomerName] = useState<string>("ลูกค้า");
+  const [customerAvatar, setCustomerAvatar] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [adminTakeover, setAdminTakeover] = useState(false);
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -88,6 +91,7 @@ const ChatbotWidget = () => {
     const loadName = async (user: User | null) => {
       if (!user) {
         setCustomerName("ลูกค้า");
+        setCustomerAvatar(null);
         return;
       }
       const fallback =
@@ -97,29 +101,32 @@ const ChatbotWidget = () => {
       try {
         const { data } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, preferred_avatar")
           .eq("id", user.id)
           .maybeSingle();
         const name = data?.full_name?.trim() || fallback;
         setCustomerName(name.split(" ")[0] || fallback);
+        setCustomerAvatar(data?.preferred_avatar || null);
       } catch {
         setCustomerName(fallback);
+        setCustomerAvatar(null);
       }
     };
 
     const restoreHistory = async (user: User | null) => {
       if (!user) {
-        // Reset to a fresh anonymous session
         setMessages([]);
         setHasGreeted(false);
         setHistoryLoaded(false);
+        setConversationId(null);
+        setAdminTakeover(false);
         setSessionId(crypto.randomUUID());
         return;
       }
       try {
         const { data: conv } = await supabase
           .from("chat_conversations")
-          .select("id, session_id")
+          .select("id, session_id, admin_takeover")
           .eq("user_id", user.id)
           .order("last_message_at", { ascending: false })
           .limit(1)
@@ -127,6 +134,8 @@ const ChatbotWidget = () => {
 
         if (conv?.session_id) {
           setSessionId(conv.session_id);
+          setConversationId(conv.id);
+          setAdminTakeover(!!conv.admin_takeover);
           const { data: msgs } = await supabase
             .from("chat_messages")
             .select("id, role, content, created_at")
@@ -141,13 +150,13 @@ const ChatbotWidget = () => {
                 content: m.content,
               }))
             );
-            // Don't re-greet — they're continuing an existing conversation
             setHasGreeted(true);
           }
         } else {
-          // First-time logged-in user: keep the fresh sessionId, no history yet
           setMessages([]);
           setHasGreeted(false);
+          setConversationId(null);
+          setAdminTakeover(false);
         }
       } catch (e) {
         console.error("restoreHistory error:", e);
@@ -155,6 +164,7 @@ const ChatbotWidget = () => {
         setHistoryLoaded(true);
       }
     };
+
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthUser(session?.user ?? null);
@@ -174,6 +184,57 @@ const ChatbotWidget = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Realtime: listen for admin replies + takeover state on the current conversation
+  useEffect(() => {
+    if (!conversationId) return;
+    const channel = supabase
+      .channel(`chat-${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "chat_messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const row = payload.new as { role: string; content: string; created_at: string };
+          if (row.role !== "assistant") return;
+          setMessages((prev) => {
+            // Avoid duplicating a streamed message we just appended ourselves
+            if (prev.some((m) => m.role === "assistant" && m.content === row.content)) return prev;
+            return [
+              ...prev,
+              {
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                role: "assistant",
+                content: row.content,
+              },
+            ];
+          });
+          setIsTyping(false);
+          setPendingNotice(false);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_conversations",
+          filter: `id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const row = payload.new as { admin_takeover: boolean };
+          setAdminTakeover(!!row.admin_takeover);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
 
 
   useEffect(() => {
@@ -266,6 +327,12 @@ const ChatbotWidget = () => {
         }),
       });
 
+      // Capture conversation id for realtime subscription
+      const respConvId = resp.headers.get("x-conversation-id");
+      if (respConvId && respConvId !== conversationId) {
+        setConversationId(respConvId);
+      }
+
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
         toast.error(errData.error || "เกิดข้อผิดพลาด กรุณาลองใหม่");
@@ -274,6 +341,17 @@ const ChatbotWidget = () => {
         setIsTyping(false);
         return;
       }
+
+      // Admin has taken over — no AI reply will come. Wait for human via realtime.
+      if (resp.headers.get("x-admin-takeover") === "1") {
+        setAdminTakeover(true);
+        setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+        setIsLoading(false);
+        setIsTyping(false);
+        toast.info("พนักงานกำลังดูแลแชทนี้ค่ะ กรุณารอการตอบกลับสักครู่");
+        return;
+      }
+
 
       const reader = resp.body!.getReader();
       const decoder = new TextDecoder();
@@ -485,20 +563,29 @@ const ChatbotWidget = () => {
           {/* Messages Area */}
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             <div className="space-y-4">
+              {adminTakeover && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-3 py-2 text-[12px] text-green-700 animate-fade-in">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
+                  <span>พนักงาน (มนุษย์) กำลังดูแลแชทนี้แทน AI แล้วค่ะ 🌿</span>
+                </div>
+              )}
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={cn(
-                    "flex animate-fade-in",
+                    "flex animate-fade-in gap-2",
                     message.role === "assistant" ? "justify-start" : "justify-end"
                   )}
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
+                      "max-w-[78%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
                       message.role === "assistant"
-                        ? "bg-secondary text-foreground rounded-bl-sm"
-                        : "bg-primary text-primary-foreground rounded-br-sm"
+                        ? "bg-secondary text-foreground rounded-bl-sm order-2"
+                        : "bg-primary text-primary-foreground rounded-br-sm order-1"
                     )}
                   >
                     {message.content ? (
@@ -511,8 +598,24 @@ const ChatbotWidget = () => {
                       </div>
                     )}
                   </div>
+                  {message.role === "user" && (
+                    <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-border bg-muted flex items-center justify-center order-2 self-end">
+                      {customerAvatar ? (
+                        <img
+                          src={customerAvatar}
+                          alt={customerName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[11px] font-semibold text-foreground/70">
+                          {customerName.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
+
 
               {pendingNotice && (
                 <div className="flex flex-col gap-1 animate-fade-in">
