@@ -183,10 +183,20 @@ const ChatbotWidget = () => {
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
             hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
           )}
-          aria-label="Open Help"
+          aria-label="สอบถามเพิ่มเติมแบบ Online"
         >
-          <div className="flex items-center justify-center bg-primary text-primary-foreground p-2.5 rounded-l-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-primary/90">
-            <HelpCircle className="h-5 w-5" />
+          <div className="relative flex items-center gap-2 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground pl-3 pr-3.5 py-3 rounded-l-2xl shadow-xl ring-1 ring-white/20 transition-all duration-300 hover:shadow-2xl hover:pl-4">
+            <span className="absolute -left-1 top-1/2 -translate-y-1/2 flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white" />
+            </span>
+            <MessageCircle className="h-5 w-5" />
+            <span
+              className="text-xs font-medium leading-tight tracking-wide"
+              style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+            >
+              สอบถามเพิ่มเติมแบบ Online
+            </span>
           </div>
         </button>
       )}
