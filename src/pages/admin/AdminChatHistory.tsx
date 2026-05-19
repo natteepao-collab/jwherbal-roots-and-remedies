@@ -548,6 +548,18 @@ const AdminChatHistory = () => {
           <Button variant="outline" onClick={exportCsv}>
             <Download className="h-4 w-4 mr-1" /> Export CSV
           </Button>
+          <Button
+            variant="destructive"
+            onClick={() =>
+              setDeleteTarget({
+                ids: filtered.map((c) => c.id),
+                label: `${filtered.length} บทสนทนาที่กรองอยู่`,
+              })
+            }
+            disabled={filtered.length === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-1" /> ลบที่กรองอยู่
+          </Button>
         </div>
       </div>
 
