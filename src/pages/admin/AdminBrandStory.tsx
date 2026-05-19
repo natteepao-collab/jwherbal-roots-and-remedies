@@ -67,13 +67,15 @@ const AdminBrandStory = () => {
   }, [brandStory]);
 
   const uploadImage = async (file: File) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
     const fileExt = file.name.split(".").pop();
-    const fileName = `brand-story-${Date.now()}.${fileExt}`;
+    const fileName = `brand-story/${user.id}-${Date.now()}.${fileExt}`;
     const { error } = await supabase.storage
-      .from("article-images")
-      .upload(fileName, file, { upsert: true });
+      .from("brand-story-gallery")
+      .upload(fileName, file, { upsert: false, contentType: file.type });
     if (error) throw error;
-    const { data } = supabase.storage.from("article-images").getPublicUrl(fileName);
+    const { data } = supabase.storage.from("brand-story-gallery").getPublicUrl(fileName);
     return data.publicUrl;
   };
 
