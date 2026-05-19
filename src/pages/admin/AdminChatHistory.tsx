@@ -346,6 +346,49 @@ const AdminChatHistory = () => {
     toast.success(`Export ${rows.length} รายการ`);
   };
 
+  const deleteDialog = (
+    <AlertDialog
+      open={!!deleteTarget}
+      onOpenChange={(o) => {
+        if (!o) {
+          setDeleteTarget(null);
+          setDeletePin("");
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>ยืนยันการลบ {deleteTarget?.label}</AlertDialogTitle>
+          <AlertDialogDescription>
+            การลบไม่สามารถกู้คืนได้ กรุณากรอกรหัสยืนยัน 6 หลักเพื่อดำเนินการต่อ
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <Input
+          type="password"
+          inputMode="numeric"
+          maxLength={6}
+          placeholder="รหัสยืนยัน"
+          value={deletePin}
+          onChange={(e) => setDeletePin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          autoFocus
+        />
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>ยกเลิก</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              confirmDelete();
+            }}
+            disabled={deleting || deletePin.length !== 6}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleting ? "กำลังลบ..." : "ยืนยันลบ"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
   if (selectedConversation) {
     const conv = conversations.find((c) => c.id === selectedConversation);
     return (
