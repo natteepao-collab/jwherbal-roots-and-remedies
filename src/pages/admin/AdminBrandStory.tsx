@@ -112,6 +112,9 @@ const AdminBrandStory = () => {
       queryClient.invalidateQueries({ queryKey: ["brand-story"] });
       toast.success("บันทึกข้อมูลเรียบร้อย");
       setImageFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     },
     onError: (error) => {
       toast.error("เกิดข้อผิดพลาด: " + error.message);
