@@ -151,6 +151,7 @@ const App = () => (
           <ScrollToTop />
           <AppContent />
           <ChatbotWidget />
+          <BackToTop />
         </BrowserRouter>
       </TooltipProvider>
     </CartProvider>
