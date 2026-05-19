@@ -167,7 +167,7 @@ serve(async (req) => {
 
     if (convState?.admin_takeover) {
       return new Response(
-        JSON.stringify({ takeover: true, conversationId }),
+        JSON.stringify({ takeover: true, conversationId, staffName: aiStaffName }),
         {
           status: 200,
           headers: {
@@ -175,6 +175,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
             "X-Conversation-Id": conversationId,
             "X-Admin-Takeover": "1",
+            "X-Ai-Staff-Name": aiStaffName,
           },
         },
       );
