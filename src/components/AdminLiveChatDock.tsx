@@ -256,7 +256,7 @@ const AdminLiveChatDock = () => {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="เปิด Admin Live Chat"
-          className="fixed bottom-24 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-6"
+          className="fixed bottom-40 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-24"
         >
           <Headset className="h-5 w-5" />
           {unseenCount > 0 && (
@@ -273,7 +273,7 @@ const AdminLiveChatDock = () => {
       )}
 
       {open && (
-        <Card className="fixed bottom-24 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-6">
+        <Card className="fixed bottom-40 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-24">
           {/* Header */}
           <div className="px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2">
             {selectedId && (
