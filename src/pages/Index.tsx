@@ -621,9 +621,9 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {[
-              { emoji: "🫚", name: "ขิง", sci: "Zingiber officinale", desc: "สมุนไพรไทยที่ใช้สืบทอดมายาวนาน มีรสเผ็ดร้อน ช่วยให้ร่างกายอบอุ่นในชีวิตประจำวัน" },
-              { emoji: "🍒", name: "พุทราจีน", sci: "Ziziphus jujuba", desc: "ผลไม้บำรุงในตำรับแพทย์แผนจีน นิยมใช้เพื่อเสริมการดูแลสุขภาพและการพักผ่อน" },
-              { emoji: "🍄", name: "เห็ดหูหนูดำ", sci: "Auricularia auricula", desc: "เห็ดที่ใช้ในอาหารและตำรับสมุนไพรจีน นิยมเพื่อสนับสนุนการดูแลสุขภาพหลอดเลือด" },
+              { emoji: "🫚", name: "ขิง (Ginger)", sci: "Zingiber officinale", desc: "ต้านการแข็งตัวของหลอดเลือด ลดไขมัน และความดันโลหิต" },
+              { emoji: "🍒", name: "พุทราจีน (Jujube)", sci: "Ziziphus jujuba", desc: "เสริมสารต้านอนุมูลอิสระ เสริมการทำงานของหัวใจ" },
+              { emoji: "🍄", name: "เห็ดหูหนูดำ (Black Wood Ear)", sci: "Auricularia auricula-judae", desc: "ลดหลอดเลือดแข็งตัว เพิ่มการไหลเวียนของเลือด" },
             ].map((it) => (
               <Card key={it.name} className="text-center hover:shadow-lg transition-all hover:-translate-y-1 border-primary/10">
                 <CardContent className="p-6">
