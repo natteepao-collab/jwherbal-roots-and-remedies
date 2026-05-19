@@ -321,14 +321,28 @@ const AdminChatHistory = () => {
             )}
           </div>
           {conv && (
-            <Button
-              size="sm"
-              onClick={() => handleAnalyzeOne(conv.id)}
-              disabled={analyzingId === conv.id}
-            >
-              <Sparkles className="h-4 w-4 mr-1" />
-              {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant={conv.admin_takeover ? "destructive" : "secondary"}
+                onClick={() => toggleTakeover(conv)}
+                disabled={togglingTakeover}
+              >
+                {conv.admin_takeover ? (
+                  <><Undo2 className="h-4 w-4 mr-1" /> คืนให้ AI ดูแล</>
+                ) : (
+                  <><Headset className="h-4 w-4 mr-1" /> เข้าควบคุมแชท</>
+                )}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleAnalyzeOne(conv.id)}
+                disabled={analyzingId === conv.id}
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
+              </Button>
+            </div>
           )}
         </div>
 
