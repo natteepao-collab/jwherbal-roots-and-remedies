@@ -888,6 +888,86 @@ ${bubbles}
 
       {isLoading ? (
         <p className="text-center text-muted-foreground py-8">กำลังโหลด...</p>
+      ) : viewMode === "users" ? (
+        userGroups.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p>ยังไม่มีผู้ใช้ที่ลงทะเบียนเข้ามาแชท</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">
+                ผู้ใช้ที่ลงทะเบียน ({userGroups.length} คน · {userGroups.reduce((s, g) => s + g.convs.length, 0)} สนทนา)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ScrollArea className="max-h-[600px]">
+                {userGroups.map((g) => {
+                  const name = g.profile?.full_name || g.profile?.email || g.convs[0]?.customer_name || "ผู้ใช้ไม่ทราบชื่อ";
+                  const msgs = g.convs.reduce((s, c) => s + (c.message_count || 0), 0);
+                  const bestLead = g.convs.reduce((m, c) => Math.max(m, c.lead_score || 0), 0);
+                  return (
+                    <div
+                      key={g.user_id}
+                      className="px-4 py-3 hover:bg-accent/40 border-b border-border last:border-b-0 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {g.profile?.preferred_avatar ? (
+                            <img src={g.profile.preferred_avatar} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <UserCircle2 className="h-6 w-6 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold">{name}</p>
+                            {g.profile?.email && g.profile?.full_name && (
+                              <span className="text-xs text-muted-foreground">{g.profile.email}</span>
+                            )}
+                            <Badge variant="secondary" className="text-[10px]">{g.convs.length} สนทนา</Badge>
+                            <Badge variant="outline" className="text-[10px]">{msgs} ข้อความ</Badge>
+                            {bestLead >= 70 && (
+                              <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700">⚡ Lead {bestLead}</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ล่าสุด: {format(new Date(g.lastAt), "d MMM yyyy HH:mm", { locale: th })}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {g.convs.slice(0, 5).map((c) => (
+                              <button
+                                key={c.id}
+                                onClick={() => setSelectedConversation(c.id)}
+                                className="text-[11px] px-2 py-0.5 rounded border border-border hover:bg-accent transition-colors"
+                              >
+                                {format(new Date(c.started_at), "d MMM HH:mm", { locale: th })}
+                                {c.intent && ` · ${INTENT_LABEL[c.intent] || c.intent}`}
+                              </button>
+                            ))}
+                            {g.convs.length > 5 && (
+                              <span className="text-[11px] text-muted-foreground self-center">+{g.convs.length - 5}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setUserFilter(g.user_id); setViewMode("conversations"); }}
+                        >
+                          ดูทั้งหมด <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )
       ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
