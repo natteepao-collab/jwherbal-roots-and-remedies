@@ -349,15 +349,33 @@ const AdminLiveChatDock = () => {
 
   return (
     <>
-      {/* Floating launcher button (left side to avoid the customer chatbot on right) */}
+      {/* Floating launcher button (draggable; default bottom-left) */}
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
-          aria-label="เปิด Admin Live Chat"
-          className="fixed bottom-40 left-4 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform lg:bottom-24"
+          onClick={() => {
+            if (dragging) return;
+            setOpen(true);
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          aria-label="เปิด Admin Live Chat (ลากเพื่อย้าย)"
+          title="ลากเพื่อย้ายตำแหน่ง · คลิกเพื่อเปิด"
+          style={
+            pos
+              ? { left: pos.x, top: pos.y, touchAction: "none" }
+              : { touchAction: "none" }
+          }
+          className={cn(
+            "fixed z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-transform select-none",
+            dragging ? "cursor-grabbing scale-110" : "cursor-grab hover:scale-105 active:scale-95",
+            !pos && "bottom-40 left-4 lg:bottom-24"
+          )}
         >
-          <Headset className="h-5 w-5" />
+          <Headset className="h-5 w-5 pointer-events-none" />
+
           {unseenCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
               {unseenCount}
