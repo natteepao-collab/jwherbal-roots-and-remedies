@@ -46,6 +46,34 @@ async function notifyNewChat(supabase: any, messages: any[], language: string) {
 
 const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
 const pickStaffName = () => STAFF_NAMES[Math.floor(Math.random() * STAFF_NAMES.length)];
+
+// Post-stream Thai/brand spelling sanitizer. Fixes common drops we observed
+// from the model (missing chars in Thai words, brand name without space, etc).
+// Applied to the final assembled text only — streaming is not mutated mid-flight.
+function sanitizeThaiOutput(text: string): string {
+  let out = text;
+  const rules: Array<[RegExp, string]> = [
+    // Brand: always "JW HERBAL" with a space
+    [/JW\s*HERBAL/gi, "JW HERBAL"],
+    [/JWHERBAL/g, "JW HERBAL"],
+    // Brand: always "V FLOW" with a space
+    [/V\s*FLOW/gi, "V FLOW"],
+    [/VFLOW/g, "V FLOW"],
+    // Common dropped-character fixes observed in QA
+    [/สนใจึกษา/g, "สนใจศึกษา"],
+    [/ปรกษา/g, "ปรึกษา"],
+    [/\bึกษา\b/g, "ศึกษา"],
+    // "ไหมะ" / "ไหมคะ?" / "ไหมคับ" drops — repair to "ไหมคะ"
+    [/ไหมะ([?\s]|$)/g, "ไหมคะ$1"],
+    [/ใหมคะ/g, "ไหมคะ"],
+    // "ทีมงาน HERBAL" missing "JW"
+    [/ทีมงาน\s+HERBAL/g, "ทีมงาน JW HERBAL"],
+    // Polite ending drops: standalone "ะ" after Thai verb endings → "คะ"
+    [/([ก-๙])\sะ([?\s]|$)/g, "$1 คะ$2"],
+  ];
+  for (const [re, rep] of rules) out = out.replace(re, rep);
+  return out;
+}
 const normalizeStaffName = (raw: unknown): string | null => {
   if (typeof raw !== "string") return null;
   const trimmed = raw.trim();
@@ -275,8 +303,14 @@ serve(async (req) => {
 - ตอบ "สั้น กระชับ เป็นธรรมชาติ" ปกติ 1-3 ประโยคพอ — เหมือนพิมพ์ในไลน์จริง ไม่ใช่ก๊อปจากเว็บ
 - ห้ามตอบเป็นรายการยาวๆ ห้ามใช้ header (#) ห้ามแปะข้อมูลดิบทั้งก้อน เลือกเฉพาะที่ลูกค้าถาม
 - ใช้คำลงท้ายสลับกัน "ค่ะ/นะคะ/เลยค่ะ/ได้เลยค่ะ" ไม่ซ้ำติดกัน ใส่อีโมจิแค่ 0-1 ตัว 🌿😊
-- ห้ามบอกว่าตัวเองเป็น AI/bot — บอกว่า "ทีมงาน JW HERBAL ค่ะ"
+- ห้ามบอกว่าตัวเองเป็น AI/bot — บอกว่า "ทีมงาน JW HERBAL ค่ะ" (ต้องมีเว้นวรรคระหว่าง JW กับ HERBAL เสมอ)
 - ตอบเป็นภาษา${langName} เท่านั้น
+
+✍️ คุณภาพการพิมพ์ (สำคัญมาก — ตรวจก่อนส่งทุกครั้ง):
+- ตรวจสะกดภาษาไทยให้ครบทุกตัวอักษร พยัญชนะ สระ วรรณยุกต์ ห้ามตกหล่นเด็ดขาด
+- คำที่มักพิมพ์ตกบ่อย ระวังเป็นพิเศษ: "ปรึกษา" "ศึกษา" "ไหมคะ" "นะคะ" "ค่ะ" "ที่" "หรือ"
+- ชื่อแบรนด์ต้องเขียนถูกต้องเสมอ: "JW HERBAL" (มีช่องว่าง), "V FLOW" (มีช่องว่าง)
+- ก่อนส่งคำตอบ ให้อ่านทวนในใจ 1 รอบ ว่าทุกคำสะกดครบ อ่านรู้เรื่อง ไม่มีตัวอักษรหาย
 
 💬 วิธีโต้ตอบ (เน้นความจริงใจ ไม่ใช่การขาย):
 - ฟังก่อน ถามให้เข้าใจปัญหา/ความต้องการลูกค้าจริงๆ ก่อนแนะนำสินค้า เช่น "คุณลูกค้ามีอาการแบบไหนคะ?" "ปกติคุณลูกค้าดูแลตัวเองยังไงบ้างคะ?"
@@ -421,13 +455,26 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
           sseBuffer += decoder.decode();
           consume(true);
         } finally {
+          // Apply Thai/brand sanitizer to final assembled text
+          const sanitized = sanitizeThaiOutput(fullAssistantText);
+          // If sanitizer changed anything, push a final "correction" event
+          // so the client can replace the streamed message with the fixed one.
+          if (sanitized !== fullAssistantText) {
+            try {
+              const enc = new TextEncoder();
+              const payload = JSON.stringify({ correction: sanitized });
+              controller.enqueue(enc.encode(`data: ${payload}\n\n`));
+            } catch (e) {
+              console.warn("correction emit failed:", e);
+            }
+          }
           controller.close();
-          // Save assistant response to DB after streaming completes
-          if (fullAssistantText) {
+          // Save sanitized assistant response to DB
+          if (sanitized) {
             await supabase.from("chat_messages").insert({
               conversation_id: conversationId,
               role: "assistant",
-              content: fullAssistantText,
+              content: sanitized,
             });
           }
         }
