@@ -79,7 +79,7 @@ const ArticleFooterMeta = ({
     },
   } as const;
 
-  const t = titles[lang];
+  const t = titles[lang] ?? titles.en;
 
   return (
     <div className="mt-10 space-y-6">
@@ -228,7 +228,8 @@ const ArticleNavButtons = ({
 const ArticleDetail = () => {
   const { slug } = useParams();
   const { t, i18n } = useTranslation();
-  const currentLang = i18n.language as "th" | "en" | "zh";
+  const rawLang = i18n.language?.split("-")[0];
+  const currentLang = (["th", "en", "zh"].includes(rawLang) ? rawLang : "en") as "th" | "en" | "zh";
 
   // Scroll to top on slug change
   useEffect(() => {
