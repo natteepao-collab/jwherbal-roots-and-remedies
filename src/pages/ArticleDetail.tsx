@@ -79,7 +79,7 @@ const ArticleFooterMeta = ({
     },
   } as const;
 
-  const t = titles[lang];
+  const t = titles[lang] ?? titles.en;
 
   return (
     <div className="mt-10 space-y-6">
