@@ -94,7 +94,45 @@ const AdminChatHistory = () => {
   const [adminReply, setAdminReply] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
   const [togglingTakeover, setTogglingTakeover] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ ids: string[]; label: string } | null>(null);
+  const [deletePin, setDeletePin] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const qc = useQueryClient();
+
+  const DELETE_PIN = "696969";
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    if (deletePin !== DELETE_PIN) {
+      toast.error("รหัสไม่ถูกต้อง");
+      return;
+    }
+    setDeleting(true);
+    try {
+      // Delete messages first (no FK cascade), then conversations
+      const { error: msgErr } = await supabase
+        .from("chat_messages")
+        .delete()
+        .in("conversation_id", deleteTarget.ids);
+      if (msgErr) throw msgErr;
+      const { error: convErr } = await supabase
+        .from("chat_conversations")
+        .delete()
+        .in("id", deleteTarget.ids);
+      if (convErr) throw convErr;
+      toast.success(`ลบ ${deleteTarget.ids.length} บทสนทนาเรียบร้อย`);
+      if (selectedConversation && deleteTarget.ids.includes(selectedConversation)) {
+        setSelectedConversation(null);
+      }
+      setDeleteTarget(null);
+      setDeletePin("");
+      qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+    } catch (e: any) {
+      toast.error(e.message || "ลบไม่สำเร็จ");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ["admin-chat-conversations"],
