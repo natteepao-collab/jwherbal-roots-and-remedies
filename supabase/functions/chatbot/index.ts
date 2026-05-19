@@ -413,7 +413,7 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
     });
 
     return new Response(stream, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId },
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId, "X-Ai-Staff-Name": aiStaffName },
     });
   } catch (e) {
     console.error("chatbot error:", e);
