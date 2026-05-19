@@ -55,6 +55,7 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingNotice, setPendingNotice] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -63,7 +64,7 @@ const ChatbotWidget = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, pendingNotice]);
 
   const handleOpen = (customGreeting?: string) => {
     setIsOpen(true);
@@ -191,6 +192,16 @@ const ChatbotWidget = () => {
     setIsLoading(false);
   };
 
+  const scheduleBotReply = (history: { role: string; content: string }[]) => {
+    setPendingNotice(true);
+    setIsLoading(true);
+    const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
+    setTimeout(() => {
+      setPendingNotice(false);
+      streamChat(history);
+    }, delay);
+  };
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -205,7 +216,7 @@ const ChatbotWidget = () => {
       content: m.content,
     }));
 
-    streamChat(history);
+    scheduleBotReply(history);
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -218,7 +229,7 @@ const ChatbotWidget = () => {
       content: m.content,
     }));
 
-    streamChat(history);
+    scheduleBotReply(history);
   };
 
   const quickQuestions = [
@@ -337,6 +348,15 @@ const ChatbotWidget = () => {
                   </div>
                 </div>
               ))}
+
+              {pendingNotice && (
+                <div className="flex justify-start animate-fade-in">
+                  <p className="text-[11px] text-muted-foreground italic px-1">
+                    {t("chatbot.received", "Admin ได้รับข้อความเรียบร้อยแล้ว กรุณารอการตอบกลับสักครู่ค่ะ")}
+                  </p>
+                </div>
+              )}
+
 
               {/* Quick Question Buttons */}
               {showQuickButtons && (
