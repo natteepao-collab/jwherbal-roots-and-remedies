@@ -280,7 +280,7 @@ const ChatbotWidget = () => {
         const greeting: MessageType = {
           id: Date.now() + Math.floor(Math.random() * 1000),
           role: "assistant",
-          content: template(staff),
+          content: template(staff, customerName),
         };
         setMessages((prev) => [...prev, greeting]);
         setHasGreeted(true);
