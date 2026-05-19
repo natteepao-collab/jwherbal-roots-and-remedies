@@ -369,12 +369,13 @@ const AdminLiveChatDock = () => {
               : { touchAction: "none" }
           }
           className={cn(
-            "fixed z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-transform select-none",
+            "fixed z-40 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-transform select-none",
+            "h-11 w-11 md:h-12 md:w-12 lg:h-14 lg:w-14",
             dragging ? "cursor-grabbing scale-110" : "cursor-grab hover:scale-105 active:scale-95",
-            !pos && "bottom-40 left-4 lg:bottom-24"
+            !pos && "bottom-36 left-3 md:bottom-28 md:left-5 lg:bottom-6 lg:left-6"
           )}
         >
-          <Headset className="h-5 w-5 pointer-events-none" />
+          <Headset className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 pointer-events-none" />
 
           {unseenCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
