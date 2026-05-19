@@ -563,20 +563,29 @@ const ChatbotWidget = () => {
           {/* Messages Area */}
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             <div className="space-y-4">
+              {adminTakeover && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-3 py-2 text-[12px] text-green-700 animate-fade-in">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
+                  <span>พนักงาน (มนุษย์) กำลังดูแลแชทนี้แทน AI แล้วค่ะ 🌿</span>
+                </div>
+              )}
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={cn(
-                    "flex animate-fade-in",
+                    "flex animate-fade-in gap-2",
                     message.role === "assistant" ? "justify-start" : "justify-end"
                   )}
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
+                      "max-w-[78%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line",
                       message.role === "assistant"
-                        ? "bg-secondary text-foreground rounded-bl-sm"
-                        : "bg-primary text-primary-foreground rounded-br-sm"
+                        ? "bg-secondary text-foreground rounded-bl-sm order-2"
+                        : "bg-primary text-primary-foreground rounded-br-sm order-1"
                     )}
                   >
                     {message.content ? (
@@ -589,8 +598,24 @@ const ChatbotWidget = () => {
                       </div>
                     )}
                   </div>
+                  {message.role === "user" && (
+                    <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-border bg-muted flex items-center justify-center order-2 self-end">
+                      {customerAvatar ? (
+                        <img
+                          src={customerAvatar}
+                          alt={customerName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[11px] font-semibold text-foreground/70">
+                          {customerName.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
+
 
               {pendingNotice && (
                 <div className="flex flex-col gap-1 animate-fade-in">
