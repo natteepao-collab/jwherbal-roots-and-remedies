@@ -10,8 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   MessageSquare, Clock, Globe, ChevronRight, ArrowLeft, User, Bot,
   Sparkles, Download, Search, Phone, Mail, Smartphone, TrendingUp,
-  Headset, Send, Undo2,
+  Headset, Send, Undo2, Trash2,
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -90,7 +94,45 @@ const AdminChatHistory = () => {
   const [adminReply, setAdminReply] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
   const [togglingTakeover, setTogglingTakeover] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ ids: string[]; label: string } | null>(null);
+  const [deletePin, setDeletePin] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const qc = useQueryClient();
+
+  const DELETE_PIN = "696969";
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    if (deletePin !== DELETE_PIN) {
+      toast.error("รหัสไม่ถูกต้อง");
+      return;
+    }
+    setDeleting(true);
+    try {
+      // Delete messages first (no FK cascade), then conversations
+      const { error: msgErr } = await supabase
+        .from("chat_messages")
+        .delete()
+        .in("conversation_id", deleteTarget.ids);
+      if (msgErr) throw msgErr;
+      const { error: convErr } = await supabase
+        .from("chat_conversations")
+        .delete()
+        .in("id", deleteTarget.ids);
+      if (convErr) throw convErr;
+      toast.success(`ลบ ${deleteTarget.ids.length} บทสนทนาเรียบร้อย`);
+      if (selectedConversation && deleteTarget.ids.includes(selectedConversation)) {
+        setSelectedConversation(null);
+      }
+      setDeleteTarget(null);
+      setDeletePin("");
+      qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+    } catch (e: any) {
+      toast.error(e.message || "ลบไม่สำเร็จ");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ["admin-chat-conversations"],
@@ -304,6 +346,49 @@ const AdminChatHistory = () => {
     toast.success(`Export ${rows.length} รายการ`);
   };
 
+  const deleteDialog = (
+    <AlertDialog
+      open={!!deleteTarget}
+      onOpenChange={(o) => {
+        if (!o) {
+          setDeleteTarget(null);
+          setDeletePin("");
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>ยืนยันการลบ {deleteTarget?.label}</AlertDialogTitle>
+          <AlertDialogDescription>
+            การลบไม่สามารถกู้คืนได้ กรุณากรอกรหัสยืนยัน 6 หลักเพื่อดำเนินการต่อ
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <Input
+          type="password"
+          inputMode="numeric"
+          maxLength={6}
+          placeholder="รหัสยืนยัน"
+          value={deletePin}
+          onChange={(e) => setDeletePin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          autoFocus
+        />
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>ยกเลิก</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              confirmDelete();
+            }}
+            disabled={deleting || deletePin.length !== 6}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleting ? "กำลังลบ..." : "ยืนยันลบ"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
   if (selectedConversation) {
     const conv = conversations.find((c) => c.id === selectedConversation);
     return (
@@ -341,6 +426,13 @@ const AdminChatHistory = () => {
               >
                 <Sparkles className="h-4 w-4 mr-1" />
                 {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setDeleteTarget({ ids: [conv.id], label: "บทสนทนานี้" })}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> ลบ
               </Button>
             </div>
           )}
@@ -477,6 +569,7 @@ const AdminChatHistory = () => {
             </CardContent>
           </Card>
         )}
+        {deleteDialog}
       </div>
     );
   }
@@ -498,6 +591,18 @@ const AdminChatHistory = () => {
           </Button>
           <Button variant="outline" onClick={exportCsv}>
             <Download className="h-4 w-4 mr-1" /> Export CSV
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() =>
+              setDeleteTarget({
+                ids: filtered.map((c) => c.id),
+                label: `${filtered.length} บทสนทนาที่กรองอยู่`,
+              })
+            }
+            disabled={filtered.length === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-1" /> ลบที่กรองอยู่
           </Button>
         </div>
       </div>
@@ -596,10 +701,13 @@ const AdminChatHistory = () => {
           <CardContent className="p-0">
             <ScrollArea className="max-h-[600px]">
               {filtered.map((conv) => (
-                <button
+                <div
                   key={conv.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedConversation(conv.id)}
-                  className="w-full flex items-start justify-between px-4 py-3 hover:bg-accent/50 border-b border-border last:border-b-0 transition-colors text-left gap-3"
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSelectedConversation(conv.id)}
+                  className="w-full flex items-start justify-between px-4 py-3 hover:bg-accent/50 border-b border-border last:border-b-0 transition-colors text-left gap-3 cursor-pointer"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -635,13 +743,27 @@ const AdminChatHistory = () => {
                       </div>
                     )}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
-                </button>
+                  <div className="flex items-center gap-1 flex-shrink-0 mt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTarget({ ids: [conv.id], label: "บทสนทนานี้" });
+                      }}
+                      className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                      aria-label="ลบบทสนทนา"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </div>
               ))}
             </ScrollArea>
           </CardContent>
         </Card>
       )}
+      {deleteDialog}
     </div>
   );
 };
