@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ interface BrandStory {
 
 const AdminBrandStory = () => {
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<BrandStory, "id" | "updated_at">>({
@@ -63,6 +64,7 @@ const AdminBrandStory = () => {
       if (brandStory.image_url) {
         setImagePreview(brandStory.image_url);
       }
+      setImageFile(null);
     }
   }, [brandStory]);
 
@@ -118,14 +120,25 @@ const AdminBrandStory = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+      e.target.value = "";
+      return;
     }
+
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSelectImageClick = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = "";
+    fileInputRef.current.click();
   };
 
   if (isLoading) {
@@ -164,20 +177,27 @@ const AdminBrandStory = () => {
                 </div>
               )}
             </div>
-            <div>
-              <Label htmlFor="image-upload" className="cursor-pointer">
-                <div className="flex items-center justify-center gap-2 p-3 border rounded-lg hover:bg-muted transition-colors">
-                  <Upload className="h-4 w-4" />
-                  <span>เลือกรูปภาพ</span>
-                </div>
-              </Label>
-              <Input
+            <div className="space-y-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2"
+                onClick={handleSelectImageClick}
+              >
+                <Upload className="h-4 w-4" />
+                {imagePreview ? "เปลี่ยนรูปภาพ" : "เลือกรูปภาพ"}
+              </Button>
+              <input
+                ref={fileInputRef}
                 id="image-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
                 className="hidden"
               />
+              <p className="text-sm text-muted-foreground">
+                {imageFile ? `ไฟล์ที่เลือก: ${imageFile.name}` : "รองรับไฟล์รูปภาพทุกชนิด"}
+              </p>
             </div>
           </CardContent>
         </Card>
