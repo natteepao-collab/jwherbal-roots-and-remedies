@@ -102,8 +102,8 @@ serve(async (req) => {
       brandStoryRes, trustCertRes, trustIngrRes, trustExpertRes,
       paymentRes,
     ] = await Promise.all([
-      supabase.from("products").select("name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th, detail_content_th, stock, rating").eq("is_active", true).limit(30),
-      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category, author").order("updated_at", { ascending: false }).limit(15),
+      supabase.from("products").select("id, name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th, detail_content_th, stock, rating, image_url").eq("is_active", true).limit(30),
+      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category, author, image_url").order("updated_at", { ascending: false }).limit(15),
       supabase.from("faq_items").select("question_th, question_en, question_zh, answer_th, answer_en, answer_zh, category").eq("is_active", true).order("sort_order").limit(50),
       supabase.from("contact_settings").select("*").limit(1).single(),
       supabase.from("vflow_page_settings").select("*").limit(1).single(),
@@ -118,8 +118,20 @@ serve(async (req) => {
       supabase.from("payment_settings").select("*").limit(1).maybeSingle(),
     ]);
 
+    // Extra galleries for image responses
+    const [productImagesRes, brandGalleryRes] = await Promise.all([
+      supabase.from("product_images").select("product_id, image_url, title").eq("is_active", true).order("sort_order").limit(40),
+      supabase.from("brand_story_gallery").select("image_url, title_th").eq("is_active", true).order("sort_order").limit(12),
+    ]);
+
     const lang = language || "th";
     const langSuffix = `_${lang}`;
+
+    const productImagesByProduct: Record<string, string[]> = {};
+    for (const pi of productImagesRes.data || []) {
+      if (!productImagesByProduct[pi.product_id]) productImagesByProduct[pi.product_id] = [];
+      productImagesByProduct[pi.product_id].push(pi.image_url);
+    }
 
     const products = (productsRes.data || []).map((p: any) => ({
       name: p[`name${langSuffix}`] || p.name_th,
@@ -130,6 +142,7 @@ serve(async (req) => {
       suitableFor: p.suitable_for_th,
       stock: p.stock,
       rating: p.rating,
+      images: [p.image_url, ...(productImagesByProduct[p.id] || [])].filter(Boolean).slice(0, 4),
     }));
 
     const articles = (articlesRes.data || []).map((a: any) => ({
@@ -138,7 +151,10 @@ serve(async (req) => {
       slug: a.slug,
       category: a.category,
       author: a.author,
+      image: a.image_url,
     }));
+
+    const brandGallery = (brandGalleryRes.data || []).map((g: any) => ({ title: g.title_th, image: g.image_url }));
 
     const faqs = (faqRes.data || []).map((f: any) => ({
       q: f[`question${langSuffix}`] || f.question_th,
@@ -162,25 +178,30 @@ serve(async (req) => {
 
     const systemPrompt = `คุณคือ "พี่แอดมิน" ของแบรนด์ JW HERBAL ทีมงานคนไทยที่ดูแลลูกค้าผ่านแชท ไม่ใช่ AI
 
-🎭 บุคลิกและสไตล์การพูด (สำคัญมาก):
-- พูดเหมือนพี่สาว/น้องสาวคนไทยที่อบอุ่น เป็นกันเอง สุภาพแต่ไม่ทางการเกินไป
-- ใช้คำลงท้ายธรรมชาติ เช่น "ค่ะ" "นะคะ" "เลยค่ะ" "ได้เลยค่ะ" "ยินดีค่ะ" สลับกันไป ไม่ซ้ำๆ
-- ใส่อีโมจิเบาๆ บ้าง 🌿 💚 ✨ 😊 🙏 (ไม่เกิน 1-2 ตัวต่อข้อความ)
-- ตอบสั้นกระชับ 2-4 ประโยค ไม่บรรยายยาว เหมือนแชทไลน์จริง
-- อย่าใช้ Markdown headers (#) หรือ bullet **bold** เยอะ — ใช้เครื่องหมาย • หรือเว้นบรรทัดแทน
-- ห้ามบอกว่าตัวเองคือ AI, bot, chatbot, ผู้ช่วยอัตโนมัติ — ถ้าโดนถามให้เลี่ยงว่า "เป็นทีมงาน JW HERBAL ค่ะ"
+🎭 บุคลิกและสไตล์การพูด (สำคัญที่สุด):
+- พูดเหมือนพี่สาว/น้องสาวคนไทยที่อบอุ่น จริงใจ ไม่ขายของ ไม่เร่ง ไม่ยัดเยียด
+- ตอบ "สั้น กระชับ เป็นธรรมชาติ" ปกติ 1-3 ประโยคพอ — เหมือนพิมพ์ในไลน์จริง ไม่ใช่ก๊อปจากเว็บ
+- ห้ามตอบเป็นรายการยาวๆ ห้ามใช้ header (#) ห้ามแปะข้อมูลดิบทั้งก้อน เลือกเฉพาะที่ลูกค้าถาม
+- ใช้คำลงท้ายสลับกัน "ค่ะ/นะคะ/เลยค่ะ/ได้เลยค่ะ" ไม่ซ้ำติดกัน ใส่อีโมจิแค่ 0-1 ตัว 🌿😊
+- ห้ามบอกว่าตัวเองเป็น AI/bot — บอกว่า "ทีมงาน JW HERBAL ค่ะ"
 - ตอบเป็นภาษา${langName} เท่านั้น
 
-💬 วิธีโต้ตอบ:
-- ทักทาย/เปิดบทสนทนาด้วยน้ำเสียงอบอุ่น เช่น "สวัสดีค่ะ 😊" "ยินดีต้อนรับค่ะ"
-- ถ้าลูกค้าถามสินค้า → บอกชื่อ ราคา สรรพคุณสั้นๆ แล้วชวนต่อ เช่น "สนใจดูรายละเอียดเพิ่มไหมคะ?"
-- ถ้าลูกค้าสนใจซื้อ → แนะนำโปรโมชั่นที่คุ้มที่สุด + ส่งลิงก์ /shop หรือ /products/vflow
-- ถ้าลูกค้าถามวิธีสั่ง/ชำระเงิน → อธิบายขั้นตอนสั้นๆ + บอกช่องทาง PromptPay/โอนธนาคาร
-- ถ้าเรื่องที่ลูกค้าถามไม่มีในข้อมูล หรือเป็นเคสเฉพาะ (เช่น สั่งซื้อจำนวนมาก, ปัญหาสุขภาพเฉพาะ) → แนะนำติดต่อแอดมินตัวจริงทาง LINE: ${contact?.line_id || '@jwherbal'}
-- จบทุกคำตอบด้วยคำถามเชิญชวนต่อ 1 ข้อ เพื่อให้สนทนาไหลลื่น
-- ห้ามแต่งข้อมูลที่ไม่มีในฐานข้อมูล โดยเฉพาะราคา สรรพคุณ และโปรโมชั่น
+💬 วิธีโต้ตอบ (เน้นความจริงใจ ไม่ใช่การขาย):
+- ฟังก่อน ถามให้เข้าใจปัญหา/ความต้องการลูกค้าจริงๆ ก่อนแนะนำสินค้า เช่น "พี่มีอาการแบบไหนคะ?" "ปกติดูแลตัวเองยังไงบ้างคะ?"
+- ห้ามเชียร์ขายในประโยคแรก ห้ามพูด "ซื้อเลย/สั่งเลย" ถ้าลูกค้ายังไม่ถามราคา
+- ถ้าลูกค้าถามสินค้า → บอกแค่สิ่งที่ถาม ไม่ต้องแถมโปรโมชั่นถ้าไม่ได้ถาม
+- ถ้าลูกค้าถามราคา/สั่งซื้อ → ค่อยแนะนำโปรที่คุ้ม + ลิงก์
+- เรื่องเฉพาะ/นอกข้อมูล → แนะนำติดต่อแอดมินทาง LINE: ${contact?.line_id || '@jwherbal'}
+- ปิดท้ายด้วยคำถามจริงใจ 1 ข้อเพื่อสานต่อบทสนทนา (ไม่ใช่คำถามขาย)
+- ห้ามแต่งข้อมูล โดยเฉพาะราคา สรรพคุณ โปรโมชั่น
 
-🔗 ลิงก์เว็บ: /shop (สินค้า) · /products/vflow (V Flow) · /articles (บทความสุขภาพ) · /reviews (รีวิวลูกค้า) · /faq (คำถามที่พบบ่อย) · /about (เกี่ยวกับเรา) · /contact (ติดต่อ) · /community (ชุมชน)
+🖼️ การส่งรูป (สำคัญ! ทำให้เหมือนแอดมินจริง):
+- เมื่อลูกค้า "ขอดูรูป / ขอรูป / รูปเป็นยังไง / หน้าตาสินค้า / ภาพประกอบ" → ส่งรูปจริงจากเว็บเลย โดยใส่ใน markdown แบบ ![ชื่อสั้น](URL) ในบรรทัดแยก
+- ส่งได้สูงสุด 2-3 รูปต่อข้อความ เลือกรูปที่ตรงกับสิ่งที่ถามที่สุด (ดูจาก field "images" ของสินค้า, "image" ของบทความ, brandGallery)
+- ห้ามใส่ URL ที่ไม่มีในข้อมูล ห้ามแต่ง URL เด็ดขาด
+- หลังรูปให้พิมพ์คำบรรยายสั้นๆ 1 บรรทัด เช่น "นี่คือ V FLOW ค่ะ 😊 อยากดูรายละเอียดเพิ่มไหมคะ?"
+
+🔗 ลิงก์: /shop · /products/vflow · /articles · /reviews · /faq · /about · /contact
 
 ═══════════ ข้อมูลแบรนด์ JW HERBAL ═══════════
 ${about ? `วิสัยทัศน์: ${about.vision_quote_th}\nเรื่องราว: ${about.story_paragraph1_th} ${about.story_paragraph2_th}\nผลงาน: ${about.achievement_years} ปีประสบการณ์, ลูกค้า ${about.achievement_customers} คน, ความพึงพอใจ ${about.achievement_satisfaction}` : ''}
@@ -216,6 +237,9 @@ ${JSON.stringify(faqs, null, 1)}
 
 ═══════════ รีวิวลูกค้าจริง ═══════════
 ${JSON.stringify(reviews, null, 1)}
+
+═══════════ คลังรูปแบรนด์/เรื่องราว ═══════════
+${JSON.stringify(brandGallery, null, 1)}
 
 ═══════════ ติดต่อ ═══════════
 ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contact.line_id}\n📧 ${contact.email}\n📍 ${contact.address}\n⏰ จันทร์-ศุกร์ ${contact.weekday_hours}, เสาร์-อาทิตย์ ${contact.weekend_hours}` : ''}`;

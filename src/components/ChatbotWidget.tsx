@@ -18,6 +18,34 @@ type MessageType = {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot`;
 
+// Render assistant message with inline markdown images: ![alt](url)
+const renderMessageContent = (content: string) => {
+  const parts: Array<{ type: "text" | "image"; value: string; alt?: string }> = [];
+  const regex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(content)) !== null) {
+    if (m.index > lastIndex) parts.push({ type: "text", value: content.slice(lastIndex, m.index) });
+    parts.push({ type: "image", value: m[2], alt: m[1] });
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < content.length) parts.push({ type: "text", value: content.slice(lastIndex) });
+
+  return parts.map((p, i) =>
+    p.type === "image" ? (
+      <img
+        key={i}
+        src={p.value}
+        alt={p.alt || "image"}
+        loading="lazy"
+        className="my-2 rounded-xl max-w-full h-auto border border-border/40 shadow-sm"
+      />
+    ) : (
+      <span key={i}>{p.value}</span>
+    )
+  );
+};
+
 const ChatbotWidget = () => {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -267,7 +295,9 @@ const ChatbotWidget = () => {
                         : "bg-primary text-primary-foreground rounded-br-sm"
                     )}
                   >
-                    {message.content || (
+                    {message.content ? (
+                      renderMessageContent(message.content)
+                    ) : (
                       <div className="flex gap-1">
                         <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                         <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
