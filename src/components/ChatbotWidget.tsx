@@ -91,6 +91,7 @@ const ChatbotWidget = () => {
     const loadName = async (user: User | null) => {
       if (!user) {
         setCustomerName("ลูกค้า");
+        setCustomerAvatar(null);
         return;
       }
       const fallback =
@@ -100,29 +101,32 @@ const ChatbotWidget = () => {
       try {
         const { data } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, preferred_avatar")
           .eq("id", user.id)
           .maybeSingle();
         const name = data?.full_name?.trim() || fallback;
         setCustomerName(name.split(" ")[0] || fallback);
+        setCustomerAvatar(data?.preferred_avatar || null);
       } catch {
         setCustomerName(fallback);
+        setCustomerAvatar(null);
       }
     };
 
     const restoreHistory = async (user: User | null) => {
       if (!user) {
-        // Reset to a fresh anonymous session
         setMessages([]);
         setHasGreeted(false);
         setHistoryLoaded(false);
+        setConversationId(null);
+        setAdminTakeover(false);
         setSessionId(crypto.randomUUID());
         return;
       }
       try {
         const { data: conv } = await supabase
           .from("chat_conversations")
-          .select("id, session_id")
+          .select("id, session_id, admin_takeover")
           .eq("user_id", user.id)
           .order("last_message_at", { ascending: false })
           .limit(1)
@@ -130,6 +134,8 @@ const ChatbotWidget = () => {
 
         if (conv?.session_id) {
           setSessionId(conv.session_id);
+          setConversationId(conv.id);
+          setAdminTakeover(!!conv.admin_takeover);
           const { data: msgs } = await supabase
             .from("chat_messages")
             .select("id, role, content, created_at")
@@ -144,13 +150,13 @@ const ChatbotWidget = () => {
                 content: m.content,
               }))
             );
-            // Don't re-greet — they're continuing an existing conversation
             setHasGreeted(true);
           }
         } else {
-          // First-time logged-in user: keep the fresh sessionId, no history yet
           setMessages([]);
           setHasGreeted(false);
+          setConversationId(null);
+          setAdminTakeover(false);
         }
       } catch (e) {
         console.error("restoreHistory error:", e);
@@ -158,6 +164,7 @@ const ChatbotWidget = () => {
         setHistoryLoaded(true);
       }
     };
+
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthUser(session?.user ?? null);
