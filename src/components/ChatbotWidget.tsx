@@ -236,7 +236,7 @@ const ChatbotWidget = () => {
       {/* Side Tab Toggle */}
       {!isOpen && isTabVisible && (
         <button
-          onClick={handleOpen}
+          onClick={() => handleOpen()}
           className={cn(
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
             hideOnScroll ? "translate-x-full" : "translate-x-0"
