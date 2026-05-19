@@ -97,6 +97,30 @@ function isCrawler(ua: string): boolean {
   return bots.some((b) => lower.includes(b));
 }
 
+async function proxyImage(url: string): Promise<Response> {
+  const response = await fetch(url, {
+    headers: {
+      Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+    },
+  });
+
+  if (!response.ok || !response.body) {
+    throw new Error(`Image fetch failed: ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type") || "image/jpeg";
+  return new Response(response.body, {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": contentType,
+      "Cache-Control": "public, max-age=3600, s-maxage=86400",
+      "Content-Length": response.headers.get("content-length") || undefined,
+    },
+  });
+}
+
 function renderHtml(opts: {
   title: string;
   description: string;
@@ -149,6 +173,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const slug = (url.searchParams.get("slug") || "").trim();
     const siteParam = (url.searchParams.get("site") || "").trim();
+    const mode = (url.searchParams.get("mode") || "").trim();
     const site = /^https?:\/\//i.test(siteParam) ? siteParam.replace(/\/$/, "") : DEFAULT_SITE;
     const ua = req.headers.get("user-agent") || "";
 
@@ -158,6 +183,19 @@ Deno.serve(async (req) => {
 
     const redirectUrl = `${site}/articles/${encodeURIComponent(slug)}`;
 
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: article } = await sb
+      .from("articles")
+      .select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, image_url")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    const ogImage = normalizeOgImage(article?.image_url, site);
+
+    if (mode === "image") {
+      return await proxyImage(ogImage.url);
+    }
+
     // Humans: redirect immediately — no need to render OG.
     if (!isCrawler(ua)) {
       return new Response(null, {
@@ -166,26 +204,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Crawlers: fetch article and render OG tags.
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const { data: article } = await sb
-      .from("articles")
-      .select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, image_url")
-      .eq("slug", slug)
-      .maybeSingle();
-
     const title = article?.title_th || article?.title_en || "JW HERBAL";
     const description =
       article?.excerpt_th ||
       article?.excerpt_en ||
       "บทความสุขภาพและสมุนไพรจาก JW HERBAL";
 
-    const ogImage = normalizeOgImage(article?.image_url, site);
+    const shareImageUrl = `${SUPABASE_URL}/functions/v1/share-article?slug=${encodeURIComponent(
+      slug,
+    )}&site=${encodeURIComponent(site)}&mode=image`;
 
     const html = renderHtml({
       title,
       description,
-      image: ogImage.url,
+      image: shareImageUrl,
       imageType: ogImage.type,
       url: redirectUrl,
       redirect: redirectUrl,
