@@ -73,11 +73,11 @@ const ArticleLikeShare = ({
     localStorage.setItem("likedArticles", JSON.stringify(likedArticles));
   };
 
-  // Edge URL used for social share buttons (FB/LINE/Twitter) so their crawlers
-  // can read Open Graph tags and show the article image + title in the preview.
+  // Edge URL used everywhere a link can land on a social crawler (FB/LINE/Twitter
+  // share buttons, copy-link, native share). The edge function reads Open Graph
+  // tags for crawlers and 302-redirects real humans back to the JW Herbal article
+  // page — so the UX is identical but FB/LINE previews show the article image.
   const shareUrl = buildShareUrl(articleUrl);
-  // Clean canonical URL shown to the user when copying / native-sharing.
-  const cleanUrl = articleUrl;
 
   const handleNativeShare = async () => {
     if (typeof navigator !== "undefined" && (navigator as any).share) {
@@ -85,7 +85,7 @@ const ArticleLikeShare = ({
         await (navigator as any).share({
           title: articleTitle,
           text: articleTitle,
-          url: cleanUrl,
+          url: shareUrl,
         });
         toast.success(t("articles.shareSuccess"));
       } catch {
@@ -98,7 +98,7 @@ const ArticleLikeShare = ({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(cleanUrl);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       toast.success(t("articles.linkCopied", "คัดลอกลิงก์แล้ว"));
       setTimeout(() => setCopied(false), 2000);
