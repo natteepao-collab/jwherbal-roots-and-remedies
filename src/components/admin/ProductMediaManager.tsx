@@ -80,8 +80,13 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-media", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-media-product", productId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
       queryClient.invalidateQueries({ queryKey: ["product-images", productId] });
       queryClient.invalidateQueries({ queryKey: ["vflow-product-images"] });
+      queryClient.invalidateQueries({ queryKey: ["vflow-products"] });
       toast.success("ลบสื่อเรียบร้อย");
     },
     onError: (e) => toast.error("ลบไม่สำเร็จ: " + e.message),
