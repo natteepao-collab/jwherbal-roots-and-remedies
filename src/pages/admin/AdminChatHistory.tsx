@@ -87,6 +87,9 @@ const AdminChatHistory = () => {
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
   const [analyzingAll, setAnalyzingAll] = useState(false);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+  const [adminReply, setAdminReply] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const [togglingTakeover, setTogglingTakeover] = useState(false);
   const qc = useQueryClient();
 
   const { data: conversations = [], isLoading } = useQuery({
