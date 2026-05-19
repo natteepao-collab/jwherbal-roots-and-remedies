@@ -327,6 +327,12 @@ const ChatbotWidget = () => {
         }),
       });
 
+      // Capture conversation id for realtime subscription
+      const respConvId = resp.headers.get("x-conversation-id");
+      if (respConvId && respConvId !== conversationId) {
+        setConversationId(respConvId);
+      }
+
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
         toast.error(errData.error || "เกิดข้อผิดพลาด กรุณาลองใหม่");
@@ -335,6 +341,17 @@ const ChatbotWidget = () => {
         setIsTyping(false);
         return;
       }
+
+      // Admin has taken over — no AI reply will come. Wait for human via realtime.
+      if (resp.headers.get("x-admin-takeover") === "1") {
+        setAdminTakeover(true);
+        setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+        setIsLoading(false);
+        setIsTyping(false);
+        toast.info("พนักงานกำลังดูแลแชทนี้ค่ะ กรุณารอการตอบกลับสักครู่");
+        return;
+      }
+
 
       const reader = resp.body!.getReader();
       const decoder = new TextDecoder();
