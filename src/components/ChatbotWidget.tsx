@@ -209,7 +209,7 @@ const ChatbotWidget = () => {
           onClick={handleOpen}
           className={cn(
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
-            hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
+            hideOnScroll ? "translate-x-full" : "translate-x-0"
           )}
           aria-label="JWHERBAL SUPPORT 24hr."
         >
@@ -234,7 +234,7 @@ const ChatbotWidget = () => {
           onClick={() => setIsTabVisible(true)}
           className={cn(
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-primary/80 text-primary-foreground p-1.5 rounded-l-md shadow-md hover:bg-primary transition-all duration-300 ease-out",
-            hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
+            hideOnScroll ? "translate-x-full" : "translate-x-0"
           )}
           aria-label="Show Help Tab"
         >
