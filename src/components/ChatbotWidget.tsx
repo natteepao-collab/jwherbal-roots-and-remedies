@@ -406,6 +406,15 @@ const ChatbotWidget = () => {
 
           try {
             const parsed = JSON.parse(jsonStr);
+            // Server-side correction event: replace the whole assistant
+            // message with the sanitized version (fixes Thai/brand drops)
+            if (typeof parsed?.correction === "string") {
+              assistantContent = parsed.correction;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
+              );
+              continue;
+            }
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
               assistantContent += content;
