@@ -315,6 +315,7 @@ const ChatbotWidget = () => {
           language: i18n.language,
           sessionId,
           userJwt: accessToken,
+          staffName: currentStaff,
           context: {
             pageUrl: typeof window !== "undefined" ? window.location.href : null,
             referrer: typeof document !== "undefined" ? document.referrer : null,
@@ -332,6 +333,13 @@ const ChatbotWidget = () => {
       if (respConvId && respConvId !== conversationId) {
         setConversationId(respConvId);
       }
+
+      // Sync the server-enforced staff name (server is source of truth)
+      const respStaff = resp.headers.get("x-ai-staff-name");
+      if (respStaff && respStaff !== currentStaff) {
+        setCurrentStaff(respStaff);
+      }
+
 
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
