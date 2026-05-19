@@ -6,6 +6,7 @@ import { DesktopQuickAccess } from "./DesktopQuickAccess";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { MobileStickyCTA } from "./MobileStickyCTA";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePageViewTracker } from "@/hooks/usePageViewTracker";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 
@@ -27,6 +28,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile();
+  usePageViewTracker();
   
   // Read cookie state synchronously - SidebarProvider handles persistence internally
   const defaultOpen = isMobile ? false : getSidebarStateFromCookie();
