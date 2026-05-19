@@ -569,6 +569,7 @@ const AdminChatHistory = () => {
             </CardContent>
           </Card>
         )}
+        {deleteDialog}
       </div>
     );
   }
