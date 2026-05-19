@@ -64,7 +64,7 @@ const ChatbotWidget = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, pendingNotice]);
 
   const handleOpen = (customGreeting?: string) => {
     setIsOpen(true);
