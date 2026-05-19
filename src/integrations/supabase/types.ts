@@ -975,6 +975,36 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          path: string
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          path: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          path?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       payment_settings: {
         Row: {
           bank_account_name: string
@@ -1360,6 +1390,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seo_targets: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          metric_key: string
+          period: string
+          target_value: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          metric_key: string
+          period?: string
+          target_value?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          metric_key?: string
+          period?: string
+          target_value?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {
