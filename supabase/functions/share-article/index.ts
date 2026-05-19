@@ -210,7 +210,9 @@ Deno.serve(async (req) => {
       article?.excerpt_en ||
       "บทความสุขภาพและสมุนไพรจาก JW HERBAL";
 
-    const shareImageUrl = `${site}/og/article/${encodeURIComponent(slug)}.jpg`;
+    const shareImageUrl = `${SUPABASE_URL}/functions/v1/share-article?slug=${encodeURIComponent(
+      slug,
+    )}&site=${encodeURIComponent(site)}&mode=image`;
 
     const html = renderHtml({
       title,
