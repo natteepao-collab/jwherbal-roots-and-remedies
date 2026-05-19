@@ -11,7 +11,7 @@ const ShippingPolicy = ({ variant = "default", title = "นโยบายกา
     {
       icon: Truck,
       title: "จัดส่งฟรีทั่วประเทศ",
-      desc: "จัดส่งโดย Kerry / Flash / ไปรษณีย์ไทย ฟรีค่าจัดส่งทุกออเดอร์",
+      desc: "จัดส่งด้วย Flash Express เท่านั้น ฟรีค่าจัดส่งทุกออเดอร์",
     },
     {
       icon: Clock,
