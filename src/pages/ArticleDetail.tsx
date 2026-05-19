@@ -104,21 +104,38 @@ const ArticleFooterMeta = ({
               const m = line.match(urlRegex);
               if (m) {
                 const url = m[1];
-                const label = line.replace(url, "").trim() || url;
+                const rawLabel = line.replace(url, "").trim() || url;
+                // Shorten very long labels/URLs: keep host + ellipsis
+                const isLongUrlLabel = rawLabel === url && rawLabel.length > 60;
+                let displayLabel = rawLabel;
+                if (isLongUrlLabel) {
+                  try {
+                    const u = new URL(url);
+                    displayLabel = `${u.hostname}${u.pathname.length > 1 ? "/…" : ""}`;
+                  } catch {
+                    displayLabel = rawLabel.slice(0, 60) + "…";
+                  }
+                }
                 return (
-                  <li key={i}>
+                  <li key={i} className="min-w-0">
                     <a
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer nofollow"
-                      className="text-primary hover:underline inline-flex items-center gap-1"
+                      title={rawLabel}
+                      className="text-primary hover:underline inline-flex items-center gap-1 max-w-full align-bottom"
                     >
-                      {label} <ExternalLink className="h-3 w-3" />
+                      <span className="line-clamp-2 break-words">{displayLabel}</span>
+                      <ExternalLink className="h-3 w-3 flex-shrink-0" />
                     </a>
                   </li>
                 );
               }
-              return <li key={i}>{line}</li>;
+              return (
+                <li key={i} className="line-clamp-3 break-words">
+                  {line}
+                </li>
+              );
             })}
           </ul>
         </div>
