@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, Facebook, Twitter } from "lucide-react";
+import { Heart, Share2, Facebook, Twitter, Link2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
@@ -13,9 +14,26 @@ import { toast } from "sonner";
 interface ArticleLikeShareProps {
   articleId: number | string;
   articleTitle: string;
+  /** Canonical article URL (e.g. https://site.com/articles/<slug>) */
   articleUrl: string;
   initialLikes?: number;
 }
+
+// Public edge endpoint that serves Open Graph tags for crawlers and redirects humans.
+// This makes Facebook/LINE/Twitter previews show the article's image + title.
+const SHARE_ENDPOINT =
+  "https://guauobzuxgvkluxwfvxt.supabase.co/functions/v1/share-article";
+
+const buildShareUrl = (articleUrl: string): string => {
+  try {
+    const u = new URL(articleUrl);
+    const slug = u.pathname.split("/").filter(Boolean).pop() || "";
+    const site = `${u.protocol}//${u.host}`;
+    return `${SHARE_ENDPOINT}?slug=${encodeURIComponent(slug)}&site=${encodeURIComponent(site)}`;
+  } catch {
+    return articleUrl;
+  }
+};
 
 const ArticleLikeShare = ({
   articleId,
@@ -26,65 +44,89 @@ const ArticleLikeShare = ({
   const { t } = useTranslation();
   const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  // Load like status from localStorage
   useEffect(() => {
     const likedArticles = JSON.parse(localStorage.getItem("likedArticles") || "{}");
     const articleLikes = parseInt(localStorage.getItem(`article_${articleId}_likes`) || "0");
-    
     setHasLiked(likedArticles[articleId] === true);
-    if (articleLikes > 0) {
-      setLikes(articleLikes);
-    }
+    if (articleLikes > 0) setLikes(articleLikes);
   }, [articleId]);
 
   const handleLike = () => {
     const likedArticles = JSON.parse(localStorage.getItem("likedArticles") || "{}");
-    
     if (hasLiked) {
-      // Unlike
-      const newLikes = Math.max(0, likes - 1);
-      setLikes(newLikes);
+      const n = Math.max(0, likes - 1);
+      setLikes(n);
       setHasLiked(false);
       likedArticles[articleId] = false;
-      localStorage.setItem(`article_${articleId}_likes`, newLikes.toString());
+      localStorage.setItem(`article_${articleId}_likes`, n.toString());
       toast.success(t("articles.unliked"));
     } else {
-      // Like
-      const newLikes = likes + 1;
-      setLikes(newLikes);
+      const n = likes + 1;
+      setLikes(n);
       setHasLiked(true);
       likedArticles[articleId] = true;
-      localStorage.setItem(`article_${articleId}_likes`, newLikes.toString());
+      localStorage.setItem(`article_${articleId}_likes`, n.toString());
       toast.success(t("articles.liked"));
     }
-    
     localStorage.setItem("likedArticles", JSON.stringify(likedArticles));
   };
 
+  const shareUrl = buildShareUrl(articleUrl);
+
+  const handleNativeShare = async () => {
+    // Native share sheet on mobile — best UX, link preview rendered by the receiving app.
+    if (typeof navigator !== "undefined" && (navigator as any).share) {
+      try {
+        await (navigator as any).share({
+          title: articleTitle,
+          text: articleTitle,
+          url: shareUrl,
+        });
+        toast.success(t("articles.shareSuccess"));
+      } catch {
+        // user dismissed — ignore
+      }
+    } else {
+      handleCopy();
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success(t("articles.linkCopied", "คัดลอกลิงก์แล้ว"));
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error(t("common.error", "เกิดข้อผิดพลาด"));
+    }
+  };
+
   const handleShare = (platform: string) => {
-    const url = encodeURIComponent(articleUrl);
+    const url = encodeURIComponent(shareUrl);
     const title = encodeURIComponent(articleTitle);
-    
-    let shareUrl = "";
-    
+    let target = "";
     switch (platform) {
       case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        target = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
         break;
       case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+        target = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
         break;
       case "line":
-        shareUrl = `https://line.me/R/msg/text/?${title}%20${url}`;
+        target = `https://social-plugins.line.me/lineit/share?url=${url}`;
         break;
     }
-    
-    if (shareUrl) {
-      window.open(shareUrl, "_blank", "width=600,height=400");
+    if (target) {
+      window.open(target, "_blank", "width=600,height=600,noopener,noreferrer");
       toast.success(t("articles.shareSuccess"));
     }
   };
+
+  const canNativeShare =
+    typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
 
   return (
     <div className="flex items-center gap-2">
@@ -100,25 +142,45 @@ const ArticleLikeShare = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="default" size="sm" className="gap-2">
             <Share2 className="h-4 w-4" />
             <span>{t("articles.share")}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end" className="w-56">
+          {canNativeShare && (
+            <>
+              <DropdownMenuItem onClick={handleNativeShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                {t("articles.shareNative", "แชร์ผ่านแอป...")}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          <DropdownMenuItem onClick={() => handleShare("line")}>
+            <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="#06C755">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.771.039 1.086l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+            </svg>
+            LINE
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShare("facebook")}>
-            <Facebook className="h-4 w-4 mr-2" />
+            <Facebook className="h-4 w-4 mr-2 text-[#1877F2]" />
             Facebook
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleShare("line")}>
-            <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.771.039 1.086l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
-            </svg>
-            Line
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShare("twitter")}>
-            <Twitter className="h-4 w-4 mr-2" />
-            Twitter
+            <Twitter className="h-4 w-4 mr-2 text-[#1DA1F2]" />
+            Twitter / X
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleCopy}>
+            {copied ? (
+              <Check className="h-4 w-4 mr-2 text-primary" />
+            ) : (
+              <Link2 className="h-4 w-4 mr-2" />
+            )}
+            {copied
+              ? t("articles.linkCopied", "คัดลอกลิงก์แล้ว")
+              : t("articles.copyLink", "คัดลอกลิงก์")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

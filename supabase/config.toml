@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.articles-api]
 verify_jwt = false
+
+[functions.share-article]
+verify_jwt = false
