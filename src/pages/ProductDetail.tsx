@@ -61,7 +61,7 @@ const ProductDetail = () => {
   const { data: allTiers } = usePromotionTiers();
 
   // ---- All hooks must be called before any early return ----
-  const mainImage = product ? (productImages[product.id] || product.image_url) : "";
+  const mainImage = product ? (product.image_url || productImages[product.id]) : "";
 
   const firstVideo = galleryMedia?.find((m) => (m as any).media_type === "video");
   const currentMedia = selectedMedia || (firstVideo ? { url: firstVideo.image_url, type: "video" } : { url: mainImage, type: "image" });

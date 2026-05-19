@@ -334,7 +334,7 @@ const Index = () => {
                     id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
                     name: getText(product.name_th, product.name_en, product.name_zh),
                     price: product.price,
-                    image: productImages[product.id] || product.image_url,
+                    image: product.image_url || productImages[product.id],
                     category: product.category,
                     description: getText(product.description_th, product.description_en, product.description_zh),
                     rating: product.rating || 0,
@@ -420,7 +420,7 @@ const Index = () => {
                         {/* Image Section */}
                         <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
                           <img
-                            src={productImages[product.id] || product.image_url}
+                            src={product.image_url || productImages[product.id]}
                             alt={getText(product.name_th, product.name_en, product.name_zh)}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />

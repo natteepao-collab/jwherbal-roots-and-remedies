@@ -135,7 +135,7 @@ const VFlowProduct = () => {
         id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
         name: getText(product.name_th, product.name_en, product.name_zh),
         price: product.price,
-        image: productImages[product.id] || product.image_url,
+        image: product.image_url || productImages[product.id],
       });
       toast.success("เพิ่มสินค้าลงในตะกร้าแล้ว");
     }
@@ -410,7 +410,7 @@ const VFlowProduct = () => {
                         <Card className="overflow-hidden h-full border-border/50 hover:shadow-lg transition-shadow duration-300">
                           <div className="aspect-[4/3] bg-muted/30 overflow-hidden">
                             <img
-                              src={productImages[product.id] || product.image_url}
+                              src={product.image_url || productImages[product.id]}
                               alt={getText(product.name_th, product.name_en, product.name_zh)}
                               className="w-full h-full object-cover"
                             />
@@ -962,7 +962,7 @@ const VFlowProduct = () => {
             open={modalOpen}
             onOpenChange={setModalOpen}
             productName={getText(selectedPromoProduct.name_th, selectedPromoProduct.name_en, selectedPromoProduct.name_zh)}
-            productImage={productImages[selectedPromoProduct.id] || selectedPromoProduct.image_url}
+            productImage={selectedPromoProduct.image_url || productImages[selectedPromoProduct.id]}
             productId={parseInt(selectedPromoProduct.id.replace(/-/g, "").slice(0, 8), 16)}
             tiers={promoTiers}
           />

@@ -205,7 +205,7 @@ const Shop = () => {
                         id: parseInt(product.id.replace(/-/g, "").slice(0, 8), 16),
                         name,
                         price: product.price,
-                        image: productImages[product.id] || product.image_url,
+                        image: product.image_url || productImages[product.id],
                         category: product.category,
                         description: getProductDescription(product),
                         rating: product.rating || 0,

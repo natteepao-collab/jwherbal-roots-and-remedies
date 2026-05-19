@@ -375,7 +375,7 @@ const AdminProducts = () => {
                 />
                 {formData.image_url && !imageFile && (
                   <img
-                    src={productImages[editingProduct?.id || ''] || formData.image_url}
+                    src={formData.image_url || productImages[editingProduct?.id || '']}
                     alt="Preview"
                     className="mt-2 h-20 w-20 object-cover rounded"
                   />
@@ -434,9 +434,9 @@ const AdminProducts = () => {
                 {products?.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
-                      {(productImages[product.id] || product.image_url) ? (
+                      {(product.image_url || productImages[product.id]) ? (
                         <img
-                          src={productImages[product.id] || product.image_url}
+                          src={product.image_url || productImages[product.id]}
                           alt={product.name_th}
                           className="h-12 w-12 object-cover rounded"
                         />
