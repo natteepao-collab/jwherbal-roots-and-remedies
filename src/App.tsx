@@ -153,6 +153,7 @@ const App = () => (
           <AppContent />
           <ChatbotWidget />
           <BackToTop />
+          <AdminLiveChatDock />
         </BrowserRouter>
       </TooltipProvider>
     </CartProvider>
