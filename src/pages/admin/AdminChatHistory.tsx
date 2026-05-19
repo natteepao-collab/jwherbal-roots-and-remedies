@@ -149,6 +149,26 @@ const AdminChatHistory = () => {
     },
   });
 
+  // Profiles for registered users that appear in conversations
+  const userIds = useMemo(
+    () => Array.from(new Set((conversations || []).map((c: any) => c.user_id).filter(Boolean))) as string[],
+    [conversations]
+  );
+  const { data: profilesMap = {} } = useQuery({
+    queryKey: ["admin-chat-profiles", userIds.sort().join(",")],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, preferred_avatar")
+        .in("id", userIds);
+      if (error) throw error;
+      const map: Record<string, { full_name: string | null; email: string | null; preferred_avatar: string | null }> = {};
+      (data || []).forEach((p: any) => { map[p.id] = p; });
+      return map;
+    },
+  });
+
   const { data: messages = [], isLoading: messagesLoading } = useQuery({
     queryKey: ["admin-chat-messages", selectedConversation],
     queryFn: async () => {
