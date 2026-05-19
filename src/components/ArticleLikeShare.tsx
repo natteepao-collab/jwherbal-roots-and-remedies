@@ -86,9 +86,8 @@ const ArticleLikeShare = ({
         await (navigator as any).share({
           title: articleTitle,
           text: articleTitle,
-          // Use preview URL so the receiving app (FB Messenger, LINE, etc.)
-          // can render the article image and title in its link preview.
-          url: shareUrl,
+          // Use the clean branded jwherbal.com URL — pretty for users.
+          url: cleanUrl,
         });
         toast.success(t("articles.shareSuccess"));
       } catch {
@@ -101,19 +100,10 @@ const ArticleLikeShare = ({
 
   const handleCopy = async () => {
     try {
-      // Copy the preview URL so when pasted into Facebook/LINE the article
-      // image + title show up. Humans clicking it are 302-redirected back
-      // to the canonical jwherbal.com article page instantly.
-      await navigator.clipboard.writeText(shareUrl);
+      // Copy the clean jwherbal.com URL so users see a pretty branded link.
+      await navigator.clipboard.writeText(cleanUrl);
       setCopied(true);
-      toast.success(
-        t("articles.linkCopied", "คัดลอกลิงก์แล้ว") +
-          " — " +
-          t(
-            "articles.linkCopiedHint",
-            "พร้อมแสดงรูปบนโซเชียล (เปิดแล้วจะไปยัง jwherbal.com)",
-          ),
-      );
+      toast.success(t("articles.linkCopied", "คัดลอกลิงก์แล้ว"));
       setTimeout(() => setCopied(false), 2500);
     } catch {
       toast.error(t("common.error", "เกิดข้อผิดพลาด"));
