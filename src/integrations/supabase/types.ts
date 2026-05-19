@@ -487,33 +487,84 @@ export type Database = {
       }
       chat_conversations: {
         Row: {
+          admin_notes: string | null
+          analyzed_at: string | null
+          customer_email: string | null
+          customer_line: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          device_type: string | null
           id: string
+          intent: string | null
           language: string | null
           last_message_at: string
+          lead_score: number | null
           message_count: number
+          page_url: string | null
+          products_mentioned: string[] | null
+          referrer: string | null
+          sentiment: string | null
           session_id: string
           started_at: string
           status: string
+          summary: string | null
+          tags: string[] | null
+          topics: string[] | null
+          user_agent: string | null
           user_id: string | null
         }
         Insert: {
+          admin_notes?: string | null
+          analyzed_at?: string | null
+          customer_email?: string | null
+          customer_line?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          device_type?: string | null
           id?: string
+          intent?: string | null
           language?: string | null
           last_message_at?: string
+          lead_score?: number | null
           message_count?: number
+          page_url?: string | null
+          products_mentioned?: string[] | null
+          referrer?: string | null
+          sentiment?: string | null
           session_id: string
           started_at?: string
           status?: string
+          summary?: string | null
+          tags?: string[] | null
+          topics?: string[] | null
+          user_agent?: string | null
           user_id?: string | null
         }
         Update: {
+          admin_notes?: string | null
+          analyzed_at?: string | null
+          customer_email?: string | null
+          customer_line?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          device_type?: string | null
           id?: string
+          intent?: string | null
           language?: string | null
           last_message_at?: string
+          lead_score?: number | null
           message_count?: number
+          page_url?: string | null
+          products_mentioned?: string[] | null
+          referrer?: string | null
+          sentiment?: string | null
           session_id?: string
           started_at?: string
           status?: string
+          summary?: string | null
+          tags?: string[] | null
+          topics?: string[] | null
+          user_agent?: string | null
           user_id?: string | null
         }
         Relationships: []

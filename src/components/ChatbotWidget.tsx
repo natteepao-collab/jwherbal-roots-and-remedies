@@ -138,6 +138,15 @@ const ChatbotWidget = () => {
           messages: chatMessages,
           language: i18n.language,
           sessionId,
+          context: {
+            pageUrl: typeof window !== "undefined" ? window.location.href : null,
+            referrer: typeof document !== "undefined" ? document.referrer : null,
+            userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+            deviceType:
+              typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches
+                ? "mobile"
+                : "desktop",
+          },
         }),
       });
 
