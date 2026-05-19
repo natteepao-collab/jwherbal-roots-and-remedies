@@ -455,13 +455,26 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
           sseBuffer += decoder.decode();
           consume(true);
         } finally {
+          // Apply Thai/brand sanitizer to final assembled text
+          const sanitized = sanitizeThaiOutput(fullAssistantText);
+          // If sanitizer changed anything, push a final "correction" event
+          // so the client can replace the streamed message with the fixed one.
+          if (sanitized !== fullAssistantText) {
+            try {
+              const enc = new TextEncoder();
+              const payload = JSON.stringify({ correction: sanitized });
+              controller.enqueue(enc.encode(`data: ${payload}\n\n`));
+            } catch (e) {
+              console.warn("correction emit failed:", e);
+            }
+          }
           controller.close();
-          // Save assistant response to DB after streaming completes
-          if (fullAssistantText) {
+          // Save sanitized assistant response to DB
+          if (sanitized) {
             await supabase.from("chat_messages").insert({
               conversation_id: conversationId,
               role: "assistant",
-              content: fullAssistantText,
+              content: sanitized,
             });
           }
         }
