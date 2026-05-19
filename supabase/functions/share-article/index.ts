@@ -106,7 +106,7 @@ function isCrawler(ua: string): boolean {
     "redditbot",
   ];
   const lower = ua.toLowerCase();
-  return bots.some((b) => lower.includes(b));
+  return lower.includes("line/") || bots.some((b) => lower.includes(b));
 }
 
 async function proxyImage(url: string, site: string): Promise<Response> {
