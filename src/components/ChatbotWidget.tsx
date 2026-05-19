@@ -363,10 +363,15 @@ const ChatbotWidget = () => {
               ))}
 
               {pendingNotice && (
-                <div className="flex justify-start animate-fade-in">
+                <div className="flex flex-col gap-1 animate-fade-in">
                   <p className="text-[11px] text-muted-foreground italic px-1">
-                    {t("chatbot.received", "Admin ได้รับข้อความเรียบร้อยแล้ว กรุณารอการตอบกลับสักครู่ค่ะ")}
+                    ได้รับข้อความเรียบร้อยแล้ว กรุณารอการตอบกลับสักครู่ค่ะ
                   </p>
+                  {currentStaff && (
+                    <p className="text-[11px] text-primary/80 px-1">
+                      • พนักงาน {currentStaff} กำลังเข้ามาให้บริการในแชท...
+                    </p>
+                  )}
                 </div>
               )}
 
