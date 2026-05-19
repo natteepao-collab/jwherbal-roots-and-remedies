@@ -119,6 +119,85 @@ const AdminChatHistory = () => {
     enabled: !!selectedConversation,
   });
 
+  // Realtime: refresh messages + conversation when changes occur in the selected chat
+  useEffect(() => {
+    if (!selectedConversation) return;
+    const channel = supabase
+      .channel(`admin-chat-${selectedConversation}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat_messages",
+          filter: `conversation_id=eq.${selectedConversation}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["admin-chat-messages", selectedConversation] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_conversations",
+          filter: `id=eq.${selectedConversation}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConversation, qc]);
+
+  const toggleTakeover = async (conv: Conversation) => {
+    setTogglingTakeover(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const next = !conv.admin_takeover;
+      const { error } = await supabase
+        .from("chat_conversations")
+        .update({
+          admin_takeover: next,
+          admin_takeover_by: next ? user?.id ?? null : null,
+          admin_takeover_at: next ? new Date().toISOString() : null,
+        })
+        .eq("id", conv.id);
+      if (error) throw error;
+      toast.success(next ? "เข้าควบคุมแชทเรียบร้อย" : "ส่งคืนให้ AI ดูแลแล้ว");
+      qc.invalidateQueries({ queryKey: ["admin-chat-conversations"] });
+    } catch (e: any) {
+      toast.error(e.message || "ดำเนินการไม่สำเร็จ");
+    } finally {
+      setTogglingTakeover(false);
+    }
+  };
+
+  const sendAdminReply = async () => {
+    const text = adminReply.trim();
+    if (!text || !selectedConversation) return;
+    setSendingReply(true);
+    try {
+      const { error } = await supabase.from("chat_messages").insert({
+        conversation_id: selectedConversation,
+        role: "assistant",
+        content: text,
+      });
+      if (error) throw error;
+      setAdminReply("");
+      qc.invalidateQueries({ queryKey: ["admin-chat-messages", selectedConversation] });
+    } catch (e: any) {
+      toast.error(e.message || "ส่งข้อความไม่สำเร็จ");
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
+
   const langLabel = (lang: string) => {
     switch (lang) {
       case "th": return "ไทย";
