@@ -135,14 +135,14 @@ const Index = () => {
     staleTime: 60_000,
   });
 
-  // Fetch featured articles from DB (6 articles with is_featured = true)
+  // Fetch latest articles from DB (ordered by upload date desc)
   const { data: latestDbArticles } = useQuery({
-    queryKey: ["home-featured-articles"],
+    queryKey: ["home-latest-articles"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
         .select("*")
-        .eq("is_featured", true)
+        .order("created_at", { ascending: false })
         .order("published_date", { ascending: false })
         .limit(6);
       if (error) throw error;
