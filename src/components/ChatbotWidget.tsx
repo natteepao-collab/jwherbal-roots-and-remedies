@@ -90,8 +90,8 @@ const ChatbotWidget = () => {
     setIsLoading(true);
     let assistantContent = "";
 
-    // Add placeholder assistant message
-    const assistantId = Date.now();
+    // Add placeholder assistant message (use random id to avoid collision with user msg)
+    const assistantId = Date.now() + Math.floor(Math.random() * 1_000_000) + 1;
     setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
 
     try {
