@@ -253,6 +253,7 @@ const ChatbotWidget = () => {
           messages: chatMessages,
           language: i18n.language,
           sessionId,
+          userJwt: accessToken,
           context: {
             pageUrl: typeof window !== "undefined" ? window.location.href : null,
             referrer: typeof document !== "undefined" ? document.referrer : null,
