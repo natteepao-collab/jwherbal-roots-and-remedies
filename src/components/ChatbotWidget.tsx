@@ -184,6 +184,57 @@ const ChatbotWidget = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Realtime: listen for admin replies + takeover state on the current conversation
+  useEffect(() => {
+    if (!conversationId) return;
+    const channel = supabase
+      .channel(`chat-${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "chat_messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const row = payload.new as { role: string; content: string; created_at: string };
+          if (row.role !== "assistant") return;
+          setMessages((prev) => {
+            // Avoid duplicating a streamed message we just appended ourselves
+            if (prev.some((m) => m.role === "assistant" && m.content === row.content)) return prev;
+            return [
+              ...prev,
+              {
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                role: "assistant",
+                content: row.content,
+              },
+            ];
+          });
+          setIsTyping(false);
+          setPendingNotice(false);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_conversations",
+          filter: `id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const row = payload.new as { admin_takeover: boolean };
+          setAdminTakeover(!!row.admin_takeover);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
 
 
   useEffect(() => {
