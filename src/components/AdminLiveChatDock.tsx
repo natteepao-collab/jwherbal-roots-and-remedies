@@ -273,7 +273,7 @@ const AdminLiveChatDock = () => {
       )}
 
       {open && (
-        <Card className="fixed bottom-24 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-6">
+        <Card className="fixed bottom-40 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-24">
           {/* Header */}
           <div className="px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2">
             {selectedId && (
