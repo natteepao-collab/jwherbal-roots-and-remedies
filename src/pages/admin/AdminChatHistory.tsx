@@ -847,6 +847,21 @@ ${bubbles}
               <SelectItem value="negative">🙁 ลบ</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={userTypeFilter} onValueChange={(v: any) => setUserTypeFilter(v)}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="ประเภทผู้ใช้" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">ผู้ใช้ทุกประเภท</SelectItem>
+              <SelectItem value="registered">เฉพาะลงทะเบียน</SelectItem>
+              <SelectItem value="guest">เฉพาะ Guest</SelectItem>
+            </SelectContent>
+          </Select>
+          {userFilter && (
+            <Button variant="outline" size="sm" onClick={() => setUserFilter(null)}>
+              ล้างตัวกรองผู้ใช้
+            </Button>
+          )}
         </CardContent>
       </Card>
 
