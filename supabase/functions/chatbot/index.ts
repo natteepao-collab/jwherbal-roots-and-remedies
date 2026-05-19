@@ -47,13 +47,20 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, language, sessionId } = await req.json();
+    const { messages, language, sessionId, context } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const convContext = {
+      page_url: context?.pageUrl || null,
+      referrer: context?.referrer || null,
+      user_agent: context?.userAgent || null,
+      device_type: context?.deviceType || null,
+    };
 
     // Get or create conversation
     let conversationId: string;
@@ -69,7 +76,7 @@ serve(async (req) => {
       } else {
         const { data: created } = await supabase
           .from("chat_conversations")
-          .insert({ session_id: sessionId, language: language || "th" })
+          .insert({ session_id: sessionId, language: language || "th", ...convContext })
           .select("id")
           .single();
         conversationId = created!.id;
@@ -78,7 +85,7 @@ serve(async (req) => {
     } else {
       const { data: created } = await supabase
         .from("chat_conversations")
-        .insert({ session_id: crypto.randomUUID(), language: language || "th" })
+        .insert({ session_id: crypto.randomUUID(), language: language || "th", ...convContext })
         .select("id")
         .single();
       conversationId = created!.id;
