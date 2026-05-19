@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, HelpCircle, ChevronLeft } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 import jwherbalLogo from "@/assets/jwherbal-logo-new.png";
 import { toast } from "sonner";
 import { useHideOnScroll } from "@/hooks/useScrollDirection";
+
 
 type MessageType = {
   id: number;
@@ -63,7 +65,7 @@ const ChatbotWidget = () => {
     }
   }, [messages]);
 
-  const handleOpen = () => {
+  const handleOpen = (customGreeting?: string) => {
     setIsOpen(true);
     setIsTabVisible(false);
     if (messages.length === 0) {
@@ -72,10 +74,12 @@ const ChatbotWidget = () => {
         {
           id: Date.now(),
           role: "assistant",
-          content: t(
-            "chatbot.greeting",
-            "สวัสดีค่ะ ยินดีต้อนรับสู่ JWHERBAL 🌿 มีอะไรให้ช่วยสอบถามไหมคะ? เลือกหัวข้อด้านล่าง หรือพิมพ์คำถามได้เลยค่ะ"
-          ),
+          content:
+            customGreeting ||
+            t(
+              "chatbot.greeting",
+              "สวัสดีค่ะ ยินดีต้อนรับสู่ JWHERBAL 🌿 มีอะไรให้ช่วยสอบถามไหมคะ? เลือกหัวข้อด้านล่าง หรือพิมพ์คำถามได้เลยค่ะ"
+            ),
         },
       ]);
     }
@@ -85,6 +89,32 @@ const ChatbotWidget = () => {
     setIsOpen(false);
     setIsTabVisible(true);
   };
+
+  // Proactive open after 15s on product pages
+  const location = useLocation();
+  useEffect(() => {
+    const path = location.pathname;
+    const isProductPage =
+      /^\/shop\/[^/]+/.test(path) || path === "/products/vflow";
+    if (!isProductPage) return;
+    if (isOpen) return;
+    if (sessionStorage.getItem("jwh_proactive_chat_shown") === "1") return;
+
+    const timer = setTimeout(() => {
+      if (sessionStorage.getItem("jwh_proactive_chat_shown") === "1") return;
+      sessionStorage.setItem("jwh_proactive_chat_shown", "1");
+      handleOpen(
+        t(
+          "chatbot.proactive",
+          "สวัสดีค่ะคุณลูกค้า 🌿 เห็นคุณลูกค้ากำลังดูสินค้าอยู่ มีเรื่องใดที่ต้องการสอบถามเพิ่มเติมเพื่อช่วยในการตัดสินใจไหมคะ?"
+        )
+      );
+    }, 15000);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
 
   const streamChat = async (chatMessages: { role: string; content: string }[], isGreeting = false) => {
     setIsLoading(true);
@@ -206,7 +236,7 @@ const ChatbotWidget = () => {
       {/* Side Tab Toggle */}
       {!isOpen && isTabVisible && (
         <button
-          onClick={handleOpen}
+          onClick={() => handleOpen()}
           className={cn(
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
             hideOnScroll ? "translate-x-full" : "translate-x-0"
