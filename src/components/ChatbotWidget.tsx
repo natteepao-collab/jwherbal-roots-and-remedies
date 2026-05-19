@@ -221,7 +221,7 @@ const ChatbotWidget = () => {
                   <img src={jwherbalLogo} alt="JWHERBAL" className="h-6 w-6 object-contain" />
                 </div>
                 <div>
-                  <CardTitle className="text-base">JWHERBAL Help</CardTitle>
+                  <CardTitle className="text-base">สอบถามข้อมูลเพิ่มเติมกับ Admin Online</CardTitle>
                   <p className="text-[11px] opacity-80 flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
                     Online
