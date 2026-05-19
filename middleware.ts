@@ -16,7 +16,7 @@
 import { next, rewrite } from "@vercel/edge";
 
 export const config = {
-  matcher: "/articles/:slug*",
+  matcher: ["/articles/:slug*", "/og/article/:path*"],
 };
 
 const SUPABASE_PROJECT_REF = "guauobzuxgvkluxwfvxt";
@@ -29,6 +29,16 @@ const BOT_UA_REGEX =
 export default function middleware(request: Request) {
   const url = new URL(request.url);
   const userAgent = request.headers.get("user-agent") || "";
+
+  const ogImageMatch = url.pathname.match(/^\/og\/article\/([^\/]+)\.jpg$/);
+  if (ogImageMatch) {
+    const slug = ogImageMatch[1];
+    const target = `${SHARE_FUNCTION_URL}?slug=${encodeURIComponent(
+      slug
+    )}&site=${encodeURIComponent(url.origin)}&mode=image`;
+
+    return rewrite(target);
+  }
 
   // เฉพาะหน้า article detail (มี slug)
   const match = url.pathname.match(/^\/articles\/([^\/]+)\/?$/);
