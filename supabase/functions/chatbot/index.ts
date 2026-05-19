@@ -238,6 +238,9 @@ ${JSON.stringify(faqs, null, 1)}
 ═══════════ รีวิวลูกค้าจริง ═══════════
 ${JSON.stringify(reviews, null, 1)}
 
+═══════════ คลังรูปแบรนด์/เรื่องราว ═══════════
+${JSON.stringify(brandGallery, null, 1)}
+
 ═══════════ ติดต่อ ═══════════
 ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contact.line_id}\n📧 ${contact.email}\n📍 ${contact.address}\n⏰ จันทร์-ศุกร์ ${contact.weekday_hours}, เสาร์-อาทิตย์ ${contact.weekend_hours}` : ''}`;
 
