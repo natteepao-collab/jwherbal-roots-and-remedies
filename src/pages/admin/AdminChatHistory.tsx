@@ -740,7 +740,20 @@ const AdminChatHistory = () => {
                       </div>
                     )}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
+                  <div className="flex items-center gap-1 flex-shrink-0 mt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTarget({ ids: [conv.id], label: "บทสนทนานี้" });
+                      }}
+                      className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                      aria-label="ลบบทสนทนา"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </button>
               ))}
             </ScrollArea>
