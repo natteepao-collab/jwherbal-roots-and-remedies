@@ -18,7 +18,7 @@ import { FadeImage } from "@/components/ui/FadeImage";
 import { communityPosts } from "@/data/community";
 import { reviews } from "@/data/reviews";
 import heroImage from "@/assets/hero-herbal.jpg";
-import vflowProduct from "@/assets/vflow-product-transparent.png";
+import vflowProduct from "@/assets/vflow-hero-combo.png";
 import trustPharmacist from "@/assets/trust-pharmacist.jpg";
 import trustIngredients from "@/assets/trust-ingredients.jpg";
 import { useTranslation } from "react-i18next";
@@ -212,12 +212,12 @@ const Index = () => {
               <div className="relative animate-fade-in-up">
                 <img
                   src={vflowProduct}
-                  alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
-                  width={576}
-                  height={576}
+                  alt="V FLOW Capsule และ V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
+                  width={1000}
+                  height={1000}
                   {...({ fetchpriority: "high" } as any)}
                   decoding="async"
-                  className="w-48 sm:w-56 md:w-72 h-auto object-contain drop-shadow-2xl animate-float"
+                  className="w-64 sm:w-72 md:w-96 h-auto object-contain drop-shadow-2xl animate-float"
                 />
               </div>
             </div>
@@ -232,7 +232,7 @@ const Index = () => {
                 <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">V FLOW</span>
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground animate-fade-in-up animation-delay-400 max-w-lg mx-auto">
-                เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
+                ผลิตภัณฑ์ V FLOW Capsule และ V FLOW Herbal Drink ผ่านการวิจัยจากมหาวิทยาลัยเชียงใหม่ ในการทำสารสกัดด้วยกรรมวิธีทางเภสัชศาสตร์ที่เหมาะสม คงฤทธิ์ของสารที่มีคุณสมบัติที่ดีต่อสุขภาพและหลอดเลือด พร้อมวัตถุดิบที่ได้รับการคัดสรรให้มีคุณภาพที่ดี
               </p>
               <div className="flex flex-col sm:flex-row gap-3 animate-fade-in-up animation-delay-600 justify-center">
                 <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform w-full sm:w-auto">
@@ -269,7 +269,7 @@ const Index = () => {
                 <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">V FLOW</span>
               </p>
               <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-200 max-w-lg">
-                เครื่องดื่มสมุนไพรจาก ขิง พุทราจีน และเห็ดหูหนูดำ เหมาะสำหรับผู้ที่ต้องการดูแลสุขภาพหัวใจและหลอดเลือดในชีวิตประจำวัน
+                ผลิตภัณฑ์ V FLOW Capsule และ V FLOW Herbal Drink ผ่านการวิจัยจากมหาวิทยาลัยเชียงใหม่ ในการทำสารสกัดด้วยกรรมวิธีทางเภสัชศาสตร์ที่เหมาะสม คงฤทธิ์ของสารที่มีคุณสมบัติที่ดีต่อสุขภาพและหลอดเลือด พร้อมวัตถุดิบที่ได้รับการคัดสรรให้มีคุณภาพที่ดี
               </p>
               <div className="flex flex-row flex-wrap gap-3 animate-fade-in-up animation-delay-400 justify-start">
                 <Button size="lg" asChild className="gap-2 hover:scale-105 transition-transform">
@@ -295,12 +295,12 @@ const Index = () => {
               <div className="relative animate-fade-in-right">
                 <img
                   src={vflowProduct}
-                  alt="V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
-                  width={576}
-                  height={576}
+                  alt="V FLOW Capsule และ V FLOW Herbal Drink ผลิตภัณฑ์เสริมอาหารดูแลระบบไหลเวียนโลหิต"
+                  width={1000}
+                  height={1000}
                   {...({ fetchpriority: "high" } as any)}
                   decoding="async"
-                  className="w-80 lg:w-full lg:max-w-lg h-auto object-contain drop-shadow-2xl animate-float"
+                  className="w-80 lg:w-full lg:max-w-xl h-auto object-contain drop-shadow-2xl animate-float"
                 />
                 <div className="steam-container">
                   <span className="steam steam-1"></span>
