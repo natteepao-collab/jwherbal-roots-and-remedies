@@ -150,6 +150,21 @@ const Index = () => {
     },
   });
 
+  // Fetch featured/recommended articles (admin starred)
+  const { data: featuredDbArticles } = useQuery({
+    queryKey: ["home-featured-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("is_featured", true)
+        .order("updated_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch latest community posts from DB (updated_at desc)
   const { data: latestCommunityPosts } = useQuery({
     queryKey: ["home-latest-community"],
@@ -766,6 +781,58 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured/Recommended Articles - admin starred */}
+      {featuredDbArticles && featuredDbArticles.length > 0 && (
+        <section id="recommended-articles" className="py-10 md:py-16 scroll-mt-28">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+                <Star className="h-5 w-5 md:h-6 md:w-6 fill-amber-500 text-amber-500" />
+                {t("sections.featuredArticles")}
+              </h2>
+              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                <Link to="/articles">{t("sections.viewAll")}</Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
+              {featuredDbArticles.map((article: any) => (
+                <Card key={article.id} className="hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col relative">
+                  <div className="absolute top-2 left-2 z-10 bg-amber-500 text-white text-2xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
+                    <Star className="h-3 w-3 fill-white" />
+                    <span>{t("sections.featuredArticles")}</span>
+                  </div>
+                  {article.image_url && (
+                    <Link to={`/articles/${article.slug || article.id}`} className="relative w-full pb-[100%] bg-muted overflow-hidden block">
+                      <FadeImage
+                        src={article.image_url}
+                        alt={article.title_th || article.title}
+                        loading="lazy"
+                        decoding="async"
+                        wrapperClassName="absolute inset-0"
+                        className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      />
+                    </Link>
+                  )}
+                  <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
+                    <div className="text-2xs text-primary font-medium mb-1 md:mb-2">{article.category}</div>
+                    <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 line-clamp-2 flex-grow">
+                      {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
+                      <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
+                      <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
+                        <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Community Highlights - from DB */}
       <section className="py-10 md:py-16">
         <div className="container mx-auto px-4 sm:px-6">
