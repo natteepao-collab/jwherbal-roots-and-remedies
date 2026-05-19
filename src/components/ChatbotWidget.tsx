@@ -410,11 +410,9 @@ const ChatbotWidget = () => {
   const scheduleBotReply = (history: { role: string; content: string }[]) => {
     setPendingNotice(true);
     setIsLoading(true);
-    // Rotate staff sequentially (round-robin) starting from a random index per session
-    const idx = (staffStartIndex.current + staffTurn.current) % STAFF_NAMES.length;
-    const staff = STAFF_NAMES[idx];
-    staffTurn.current += 1;
-    setCurrentStaff(staff);
+    // Lock staff name per session — use the same name throughout this chat
+    const staff = currentStaff || STAFF_NAMES[staffStartIndex.current];
+    if (!currentStaff) setCurrentStaff(staff);
     const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
     setTimeout(() => {
       setPendingNotice(false);
