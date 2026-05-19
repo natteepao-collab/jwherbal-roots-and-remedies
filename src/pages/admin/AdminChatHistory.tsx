@@ -701,10 +701,13 @@ const AdminChatHistory = () => {
           <CardContent className="p-0">
             <ScrollArea className="max-h-[600px]">
               {filtered.map((conv) => (
-                <button
+                <div
                   key={conv.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedConversation(conv.id)}
-                  className="w-full flex items-start justify-between px-4 py-3 hover:bg-accent/50 border-b border-border last:border-b-0 transition-colors text-left gap-3"
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSelectedConversation(conv.id)}
+                  className="w-full flex items-start justify-between px-4 py-3 hover:bg-accent/50 border-b border-border last:border-b-0 transition-colors text-left gap-3 cursor-pointer"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
