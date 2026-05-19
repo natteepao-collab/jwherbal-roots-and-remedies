@@ -197,10 +197,21 @@ const ChatbotWidget = () => {
   const scheduleBotReply = (history: { role: string; content: string }[]) => {
     setPendingNotice(true);
     setIsLoading(true);
+    // pick a staff name different from the previous one
+    const pool = STAFF_NAMES.filter((n) => n !== currentStaff);
+    const staff = pool[Math.floor(Math.random() * pool.length)];
+    setCurrentStaff(staff);
     const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
     setTimeout(() => {
       setPendingNotice(false);
-      streamChat(history);
+      const greeting: MessageType = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        role: "assistant",
+        content: `สวัสดีค่ะ ดิฉัน ${staff} ยินดีให้บริการค่ะ 🌿`,
+      };
+      setMessages((prev) => [...prev, greeting]);
+      // small pause before the actual answer streams in
+      setTimeout(() => streamChat(history), 800);
     }, delay);
   };
 
