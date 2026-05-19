@@ -102,8 +102,8 @@ serve(async (req) => {
       brandStoryRes, trustCertRes, trustIngrRes, trustExpertRes,
       paymentRes,
     ] = await Promise.all([
-      supabase.from("products").select("name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th, detail_content_th, stock, rating").eq("is_active", true).limit(30),
-      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category, author").order("updated_at", { ascending: false }).limit(15),
+      supabase.from("products").select("id, name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th, detail_content_th, stock, rating, image_url").eq("is_active", true).limit(30),
+      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category, author, image_url").order("updated_at", { ascending: false }).limit(15),
       supabase.from("faq_items").select("question_th, question_en, question_zh, answer_th, answer_en, answer_zh, category").eq("is_active", true).order("sort_order").limit(50),
       supabase.from("contact_settings").select("*").limit(1).single(),
       supabase.from("vflow_page_settings").select("*").limit(1).single(),
@@ -118,8 +118,20 @@ serve(async (req) => {
       supabase.from("payment_settings").select("*").limit(1).maybeSingle(),
     ]);
 
+    // Extra galleries for image responses
+    const [productImagesRes, brandGalleryRes] = await Promise.all([
+      supabase.from("product_images").select("product_id, image_url, title").eq("is_active", true).order("sort_order").limit(40),
+      supabase.from("brand_story_gallery").select("image_url, title_th").eq("is_active", true).order("sort_order").limit(12),
+    ]);
+
     const lang = language || "th";
     const langSuffix = `_${lang}`;
+
+    const productImagesByProduct: Record<string, string[]> = {};
+    for (const pi of productImagesRes.data || []) {
+      if (!productImagesByProduct[pi.product_id]) productImagesByProduct[pi.product_id] = [];
+      productImagesByProduct[pi.product_id].push(pi.image_url);
+    }
 
     const products = (productsRes.data || []).map((p: any) => ({
       name: p[`name${langSuffix}`] || p.name_th,
@@ -130,6 +142,7 @@ serve(async (req) => {
       suitableFor: p.suitable_for_th,
       stock: p.stock,
       rating: p.rating,
+      images: [p.image_url, ...(productImagesByProduct[p.id] || [])].filter(Boolean).slice(0, 4),
     }));
 
     const articles = (articlesRes.data || []).map((a: any) => ({
