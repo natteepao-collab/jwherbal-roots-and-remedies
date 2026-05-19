@@ -217,26 +217,34 @@ const ChatbotWidget = () => {
     }
 
     setIsLoading(false);
+    setIsTyping(false);
   };
 
   const scheduleBotReply = (history: { role: string; content: string }[]) => {
     setPendingNotice(true);
     setIsLoading(true);
-    // pick a staff name different from the previous one
-    const pool = STAFF_NAMES.filter((n) => n !== currentStaff);
-    const staff = pool[Math.floor(Math.random() * pool.length)];
+    // Rotate staff sequentially (round-robin) starting from a random index per session
+    const idx = (staffStartIndex.current + staffTurn.current) % STAFF_NAMES.length;
+    const staff = STAFF_NAMES[idx];
+    staffTurn.current += 1;
     setCurrentStaff(staff);
     const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
     setTimeout(() => {
       setPendingNotice(false);
-      const greeting: MessageType = {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        role: "assistant",
-        content: `สวัสดีค่ะ ดิฉัน ${staff} ยินดีให้บริการค่ะ 🌿`,
-      };
-      setMessages((prev) => [...prev, greeting]);
-      // small pause before the actual answer streams in
-      setTimeout(() => streamChat(history), 800);
+      // Only greet on first turn of the conversation, not on every user message
+      if (!hasGreeted) {
+        const template = GREETING_TEMPLATES[Math.floor(Math.random() * GREETING_TEMPLATES.length)];
+        const greeting: MessageType = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          role: "assistant",
+          content: template(staff),
+        };
+        setMessages((prev) => [...prev, greeting]);
+        setHasGreeted(true);
+        setTimeout(() => streamChat(history), 800);
+      } else {
+        streamChat(history);
+      }
     }, delay);
   };
 
