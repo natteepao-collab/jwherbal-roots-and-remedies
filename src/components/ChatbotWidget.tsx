@@ -126,7 +126,7 @@ const ChatbotWidget = () => {
       try {
         const { data: conv } = await supabase
           .from("chat_conversations")
-          .select("id, session_id, admin_takeover")
+          .select("id, session_id, admin_takeover, ai_staff_name")
           .eq("user_id", user.id)
           .order("last_message_at", { ascending: false })
           .limit(1)
@@ -136,6 +136,9 @@ const ChatbotWidget = () => {
           setSessionId(conv.session_id);
           setConversationId(conv.id);
           setAdminTakeover(!!conv.admin_takeover);
+          if (conv.ai_staff_name && STAFF_NAMES.includes(conv.ai_staff_name)) {
+            setCurrentStaff(conv.ai_staff_name);
+          }
           const { data: msgs } = await supabase
             .from("chat_messages")
             .select("id, role, content, created_at")
@@ -315,6 +318,7 @@ const ChatbotWidget = () => {
           language: i18n.language,
           sessionId,
           userJwt: accessToken,
+          staffName: currentStaff,
           context: {
             pageUrl: typeof window !== "undefined" ? window.location.href : null,
             referrer: typeof document !== "undefined" ? document.referrer : null,
@@ -332,6 +336,14 @@ const ChatbotWidget = () => {
       if (respConvId && respConvId !== conversationId) {
         setConversationId(respConvId);
       }
+
+      // Sync the server-enforced staff name (server is source of truth)
+      const respStaffRaw = resp.headers.get("x-ai-staff-name");
+      const respStaff = respStaffRaw ? decodeURIComponent(respStaffRaw) : null;
+      if (respStaff && respStaff !== currentStaff) {
+        setCurrentStaff(respStaff);
+      }
+
 
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));

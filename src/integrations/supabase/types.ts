@@ -491,6 +491,7 @@ export type Database = {
           admin_takeover: boolean
           admin_takeover_at: string | null
           admin_takeover_by: string | null
+          ai_staff_name: string | null
           analyzed_at: string | null
           customer_email: string | null
           customer_line: string | null
@@ -521,6 +522,7 @@ export type Database = {
           admin_takeover?: boolean
           admin_takeover_at?: string | null
           admin_takeover_by?: string | null
+          ai_staff_name?: string | null
           analyzed_at?: string | null
           customer_email?: string | null
           customer_line?: string | null
@@ -551,6 +553,7 @@ export type Database = {
           admin_takeover?: boolean
           admin_takeover_at?: string | null
           admin_takeover_by?: string | null
+          ai_staff_name?: string | null
           analyzed_at?: string | null
           customer_email?: string | null
           customer_line?: string | null

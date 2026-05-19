@@ -5,6 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Expose-Headers": "X-Conversation-Id, X-Admin-Takeover, X-Ai-Staff-Name",
 };
 
 async function notifyNewChat(supabase: any, messages: any[], language: string) {
@@ -43,11 +44,19 @@ async function notifyNewChat(supabase: any, messages: any[], language: string) {
   }
 }
 
+const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
+const pickStaffName = () => STAFF_NAMES[Math.floor(Math.random() * STAFF_NAMES.length)];
+const normalizeStaffName = (raw: unknown): string | null => {
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  return STAFF_NAMES.includes(trimmed) ? trimmed : null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, language, sessionId, context, userJwt } = await req.json();
+    const { messages, language, sessionId, context, userJwt, staffName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -73,17 +82,32 @@ serve(async (req) => {
       device_type: context?.deviceType || null,
     };
 
+    // Server-side enforcement of the AI staff name per conversation/session.
+    // The first valid client-provided name is persisted; subsequent calls always
+    // use the persisted value regardless of what the client sends.
+    const clientStaff = normalizeStaffName(staffName);
+
     // Get or create conversation
     let conversationId: string;
+    let aiStaffName: string;
     if (sessionId) {
       const { data: existing } = await supabase
         .from("chat_conversations")
-        .select("id, user_id")
+        .select("id, user_id, ai_staff_name")
         .eq("session_id", sessionId)
         .maybeSingle();
 
       if (existing) {
         conversationId = existing.id;
+        if (existing.ai_staff_name) {
+          aiStaffName = existing.ai_staff_name;
+        } else {
+          aiStaffName = clientStaff || pickStaffName();
+          await supabase
+            .from("chat_conversations")
+            .update({ ai_staff_name: aiStaffName })
+            .eq("id", conversationId);
+        }
         // Backfill user_id once the visitor logs in mid-conversation
         if (authUserId && !existing.user_id) {
           await supabase
@@ -92,12 +116,14 @@ serve(async (req) => {
             .eq("id", conversationId);
         }
       } else {
+        aiStaffName = clientStaff || pickStaffName();
         const { data: created } = await supabase
           .from("chat_conversations")
           .insert({
             session_id: sessionId,
             language: language || "th",
             user_id: authUserId,
+            ai_staff_name: aiStaffName,
             ...convContext,
           })
           .select("id")
@@ -106,12 +132,14 @@ serve(async (req) => {
         await notifyNewChat(supabase, messages, language || "th");
       }
     } else {
+      aiStaffName = clientStaff || pickStaffName();
       const { data: created } = await supabase
         .from("chat_conversations")
         .insert({
           session_id: crypto.randomUUID(),
           language: language || "th",
           user_id: authUserId,
+          ai_staff_name: aiStaffName,
           ...convContext,
         })
         .select("id")
@@ -119,6 +147,7 @@ serve(async (req) => {
       conversationId = created!.id;
       await notifyNewChat(supabase, messages, language || "th");
     }
+
 
     // Save the latest user message
     const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
@@ -139,7 +168,7 @@ serve(async (req) => {
 
     if (convState?.admin_takeover) {
       return new Response(
-        JSON.stringify({ takeover: true, conversationId }),
+        JSON.stringify({ takeover: true, conversationId, staffName: aiStaffName }),
         {
           status: 200,
           headers: {
@@ -147,6 +176,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
             "X-Conversation-Id": conversationId,
             "X-Admin-Takeover": "1",
+            "X-Ai-Staff-Name": encodeURIComponent(aiStaffName),
           },
         },
       );
@@ -235,6 +265,8 @@ serve(async (req) => {
     const langName = lang === 'th' ? 'ไทย' : lang === 'en' ? 'อังกฤษ' : lang === 'zh' ? 'จีน' : 'ญี่ปุ่น';
 
     const systemPrompt = `คุณคือ "พี่แอดมิน" ของแบรนด์ JW HERBAL ทีมงานคนไทยที่ดูแลลูกค้าผ่านแชท ไม่ใช่ AI
+ชื่อพนักงานของคุณในแชทนี้คือ "${aiStaffName}" — ห้ามเปลี่ยนชื่อระหว่างการสนทนาเด็ดขาด หากต้องแนะนำตัวให้ใช้ชื่อนี้เท่านั้น
+
 
 🎭 บุคลิกและสไตล์การพูด (สำคัญที่สุด):
 - พูดเหมือนแอดมินคนไทยที่อบอุ่น สุภาพ จริงใจ ไม่ขายของ ไม่เร่ง ไม่ยัดเยียด
@@ -322,20 +354,26 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
     });
 
     if (!response.ok) {
+      const errHeaders = {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Conversation-Id": conversationId,
+        "X-Ai-Staff-Name": encodeURIComponent(aiStaffName),
+      };
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง" }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: errHeaders,
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "ระบบไม่พร้อมให้บริการชั่วคราว" }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: errHeaders,
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(JSON.stringify({ error: "เกิดข้อผิดพลาด กรุณาลองใหม่" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: errHeaders,
       });
     }
 
@@ -384,7 +422,7 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
     });
 
     return new Response(stream, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId },
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId, "X-Ai-Staff-Name": encodeURIComponent(aiStaffName) },
     });
   } catch (e) {
     console.error("chatbot error:", e);
