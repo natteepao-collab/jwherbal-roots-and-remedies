@@ -204,8 +204,26 @@ const ChatbotWidget = () => {
           const row = payload.new as { role: string; content: string; created_at: string };
           if (row.role !== "assistant") return;
           setMessages((prev) => {
-            // Avoid duplicating a streamed message we just appended ourselves
-            if (prev.some((m) => m.role === "assistant" && m.content === row.content)) return prev;
+            // Robust dedupe: skip if any existing assistant message either
+            // matches exactly, or one is a prefix/superset of the other
+            // (handles cases where streamed text and DB-saved text differ
+            // slightly, e.g. partial SSE chunks).
+            const incoming = row.content.trim();
+            const isDuplicate = prev.some((m) => {
+              if (m.role !== "assistant") return false;
+              const existing = m.content.trim();
+              if (!existing) return false;
+              if (existing === incoming) return true;
+              const shorter = existing.length < incoming.length ? existing : incoming;
+              const longer = existing.length < incoming.length ? incoming : existing;
+              // Treat as duplicate if ≥70% of the shorter text is contained in
+              // the longer one — covers the "garbled-vs-clean" mismatch case.
+              if (shorter.length >= 20 && longer.includes(shorter.slice(0, Math.floor(shorter.length * 0.7)))) {
+                return true;
+              }
+              return false;
+            });
+            if (isDuplicate) return prev;
             return [
               ...prev,
               {
