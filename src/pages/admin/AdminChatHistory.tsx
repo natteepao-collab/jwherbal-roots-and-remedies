@@ -931,6 +931,14 @@ ${bubbles}
                       )}
                       <Badge variant="secondary" className="text-[10px]">{conv.message_count} ข้อความ</Badge>
                       <Badge variant="outline" className="text-[10px]">{langLabel(conv.language || "th")}</Badge>
+                      {conv.user_id ? (
+                        <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-700 border-blue-500/30">
+                          <UserCircle2 className="h-3 w-3 mr-0.5" />
+                          {profilesMap[conv.user_id]?.full_name || profilesMap[conv.user_id]?.email || "ลงทะเบียนแล้ว"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] text-muted-foreground">Guest</Badge>
+                      )}
                     </div>
                     {conv.summary ? (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{conv.summary}</p>
