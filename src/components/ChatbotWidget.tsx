@@ -260,7 +260,15 @@ const ChatbotWidget = () => {
     }
 
     setIsLoading(false);
-    setIsTyping(false);
+    // Linger the "typing..." status proportional to the response length,
+    // simulating a human taking time to finish typing the message.
+    // ~25ms per char + small jitter, clamped between 600ms and 4500ms.
+    const charCount = assistantContent.trim().length;
+    const lingerMs = Math.min(
+      4500,
+      Math.max(600, charCount * 25 + Math.floor(Math.random() * 600))
+    );
+    setTimeout(() => setIsTyping(false), lingerMs);
   };
 
   const scheduleBotReply = (history: { role: string; content: string }[]) => {
