@@ -349,6 +349,15 @@ const ChatbotWidget = () => {
                 </div>
               ))}
 
+              {pendingNotice && (
+                <div className="flex justify-start animate-fade-in">
+                  <p className="text-[11px] text-muted-foreground italic px-1">
+                    {t("chatbot.received", "Admin ได้รับข้อความเรียบร้อยแล้ว กรุณารอการตอบกลับสักครู่ค่ะ")}
+                  </p>
+                </div>
+              )}
+
+
               {/* Quick Question Buttons */}
               {showQuickButtons && (
                 <div className="flex flex-wrap gap-2 mt-3 animate-fade-in">
