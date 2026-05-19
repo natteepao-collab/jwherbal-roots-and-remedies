@@ -408,6 +408,13 @@ const ChatbotWidget = () => {
                 </div>
               )}
 
+              {isTyping && !pendingNotice && currentStaff && (
+                <p className="text-[11px] text-primary/80 italic px-1 animate-fade-in">
+                  • พนักงาน {currentStaff} กำลังพิมพ์ตอบ...
+                </p>
+              )}
+
+
 
               {/* Quick Question Buttons */}
               {showQuickButtons && (
