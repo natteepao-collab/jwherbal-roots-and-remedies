@@ -135,6 +135,7 @@ const ChatbotWidget = () => {
 
   const streamChat = async (chatMessages: { role: string; content: string }[], isGreeting = false) => {
     setIsLoading(true);
+    setIsTyping(true);
     let assistantContent = "";
 
     // Add placeholder assistant message (use random id to avoid collision with user msg)
