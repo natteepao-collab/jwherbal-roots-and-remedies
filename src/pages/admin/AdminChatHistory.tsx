@@ -384,6 +384,13 @@ const AdminChatHistory = () => {
                 <Sparkles className="h-4 w-4 mr-1" />
                 {analyzingId === conv.id ? "กำลังวิเคราะห์..." : conv.analyzed_at ? "วิเคราะห์ใหม่" : "วิเคราะห์ด้วย AI"}
               </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setDeleteTarget({ ids: [conv.id], label: "บทสนทนานี้" })}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> ลบ
+              </Button>
             </div>
           )}
         </div>
