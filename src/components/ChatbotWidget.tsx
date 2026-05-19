@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, HelpCircle, ChevronLeft } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { MessageCircle, X, Send, HelpCircle, ChevronLeft, LogIn } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import jwherbalLogo from "@/assets/jwherbal-logo-new.png";
 import { toast } from "sonner";
 import { useHideOnScroll } from "@/hooks/useScrollDirection";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 
 type MessageType = {
