@@ -40,10 +40,10 @@ export const ImageUpload = ({
     }
 
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 20 * 1024 * 1024) {
       toast({
         title: "ไฟล์ใหญ่เกินไป",
-        description: "ขนาดไฟล์ต้องไม่เกิน 5MB",
+        description: "ขนาดไฟล์ต้องไม่เกิน 20MB",
         variant: "destructive",
       });
       return;
@@ -168,7 +168,7 @@ export const ImageUpload = ({
             <>
               <ImageIcon className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">คลิกเพื่อเลือกรูปภาพ</p>
-              <p className="text-xs text-muted-foreground">PNG, JPG, WEBP (สูงสุด 5MB)</p>
+              <p className="text-xs text-muted-foreground">PNG, JPG, WEBP (สูงสุด 20MB)</p>
             </>
           )}
         </div>
