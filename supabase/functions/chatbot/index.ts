@@ -46,6 +46,34 @@ async function notifyNewChat(supabase: any, messages: any[], language: string) {
 
 const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
 const pickStaffName = () => STAFF_NAMES[Math.floor(Math.random() * STAFF_NAMES.length)];
+
+// Post-stream Thai/brand spelling sanitizer. Fixes common drops we observed
+// from the model (missing chars in Thai words, brand name without space, etc).
+// Applied to the final assembled text only — streaming is not mutated mid-flight.
+function sanitizeThaiOutput(text: string): string {
+  let out = text;
+  const rules: Array<[RegExp, string]> = [
+    // Brand: always "JW HERBAL" with a space
+    [/JW\s*HERBAL/gi, "JW HERBAL"],
+    [/JWHERBAL/g, "JW HERBAL"],
+    // Brand: always "V FLOW" with a space
+    [/V\s*FLOW/gi, "V FLOW"],
+    [/VFLOW/g, "V FLOW"],
+    // Common dropped-character fixes observed in QA
+    [/สนใจึกษา/g, "สนใจศึกษา"],
+    [/ปรกษา/g, "ปรึกษา"],
+    [/\bึกษา\b/g, "ศึกษา"],
+    // "ไหมะ" / "ไหมคะ?" / "ไหมคับ" drops — repair to "ไหมคะ"
+    [/ไหมะ([?\s]|$)/g, "ไหมคะ$1"],
+    [/ใหมคะ/g, "ไหมคะ"],
+    // "ทีมงาน HERBAL" missing "JW"
+    [/ทีมงาน\s+HERBAL/g, "ทีมงาน JW HERBAL"],
+    // Polite ending drops: standalone "ะ" after Thai verb endings → "คะ"
+    [/([ก-๙])\sะ([?\s]|$)/g, "$1 คะ$2"],
+  ];
+  for (const [re, rep] of rules) out = out.replace(re, rep);
+  return out;
+}
 const normalizeStaffName = (raw: unknown): string | null => {
   if (typeof raw !== "string") return null;
   const trimmed = raw.trim();
