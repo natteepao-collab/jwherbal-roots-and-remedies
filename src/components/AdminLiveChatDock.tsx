@@ -437,6 +437,7 @@ const AdminLiveChatDock = () => {
                 setOpen(false);
                 setSelectedId(null);
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               aria-label="ปิด"
               className="p-1 hover:bg-white/15 rounded"
             >
