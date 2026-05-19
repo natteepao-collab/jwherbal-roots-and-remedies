@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, HelpCircle, ChevronLeft } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { MessageCircle, X, Send, HelpCircle, ChevronLeft, LogIn } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import jwherbalLogo from "@/assets/jwherbal-logo-new.png";
 import { toast } from "sonner";
 import { useHideOnScroll } from "@/hooks/useScrollDirection";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 
 type MessageType = {
@@ -66,15 +68,56 @@ const ChatbotWidget = () => {
     STAFF_NAMES[staffStartIndex.current]
   );
   const GREETING_TEMPLATES = [
-    (name: string) => `สวัสดีค่ะ ดิฉัน ${name} ยินดีให้บริการค่ะ 🌿 คุณลูกค้าต้องการสอบถามข้อมูลด้านใดคะ?`,
-    (name: string) => `สวัสดีค่า ${name} เองนะคะ 😊 มีอะไรให้ช่วยดูแลไหมคะ?`,
-    (name: string) => `สวัสดีค่ะคุณลูกค้า ${name} รับเรื่องต่อเองนะคะ 🙏 ขออนุญาตช่วยตอบคำถามค่ะ`,
-    (name: string) => `หวัดดีค่า~ ${name} มาแล้วนะคะ 🌿 บอกได้เลยค่ะว่าอยากทราบเรื่องไหน`,
-    (name: string) => `สวัสดีค่ะ ${name} ยินดีต้อนรับสู่ JWHERBAL ค่ะ ✨ มีคำถามอะไรสอบถามได้เลยนะคะ`,
+    (staff: string, customer: string) => `สวัสดีค่ะคุณ ${customer} 🌿 ดิฉัน ${staff} ยินดีให้บริการค่ะ คุณลูกค้าต้องการสอบถามข้อมูลด้านใดคะ?`,
+    (staff: string, customer: string) => `สวัสดีค่า คุณ ${customer} 😊 ${staff} เองนะคะ มีอะไรให้ช่วยดูแลไหมคะ?`,
+    (staff: string, customer: string) => `สวัสดีค่ะคุณ ${customer} 🙏 ${staff} รับเรื่องต่อเองนะคะ ขออนุญาตช่วยตอบคำถามค่ะ`,
+    (staff: string, customer: string) => `หวัดดีค่า~ คุณ ${customer} 🌿 ${staff} มาแล้วนะคะ บอกได้เลยค่ะว่าอยากทราบเรื่องไหน`,
+    (staff: string, customer: string) => `สวัสดีค่ะคุณ ${customer} ✨ ${staff} ยินดีต้อนรับสู่ JWHERBAL ค่ะ มีคำถามอะไรสอบถามได้เลยนะคะ`,
   ];
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [customerName, setCustomerName] = useState<string>("ลูกค้า");
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Track auth + load profile display name
+  useEffect(() => {
+    const loadName = async (user: User | null) => {
+      if (!user) {
+        setCustomerName("ลูกค้า");
+        return;
+      }
+      const fallback =
+        (user.user_metadata?.full_name as string | undefined) ||
+        (user.email ? user.email.split("@")[0] : "") ||
+        "ลูกค้า";
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .maybeSingle();
+        const name = data?.full_name?.trim() || fallback;
+        // Use the first word/name only for a natural greeting
+        setCustomerName(name.split(" ")[0] || fallback);
+      } catch {
+        setCustomerName(fallback);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthUser(session?.user ?? null);
+      setAuthChecked(true);
+      loadName(session?.user ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setAuthUser(session?.user ?? null);
+      setTimeout(() => loadName(session?.user ?? null), 0);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -237,7 +280,7 @@ const ChatbotWidget = () => {
         const greeting: MessageType = {
           id: Date.now() + Math.floor(Math.random() * 1000),
           role: "assistant",
-          content: template(staff),
+          content: template(staff, customerName),
         };
         setMessages((prev) => [...prev, greeting]);
         setHasGreeted(true);
@@ -248,8 +291,17 @@ const ChatbotWidget = () => {
     }, delay);
   };
 
+  const requireAuth = () => {
+    if (!authUser) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนพูดคุยกับเจ้าหน้าที่ค่ะ");
+      return false;
+    }
+    return true;
+  };
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || isLoading) return;
+    if (!requireAuth()) return;
 
     const userMessage = inputValue.trim();
     setInputValue("");
@@ -267,6 +319,7 @@ const ChatbotWidget = () => {
 
   const handleQuickQuestion = (question: string) => {
     if (isLoading) return;
+    if (!requireAuth()) return;
     const userMsg: MessageType = { id: Date.now(), role: "user", content: question };
     setMessages((prev) => [...prev, userMsg]);
 
@@ -437,19 +490,35 @@ const ChatbotWidget = () => {
 
           {/* Input Area */}
           <CardContent className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder={t("chatbot.placeholder")}
-                className="flex-1 rounded-xl"
-                disabled={isLoading}
-              />
-              <Button size="icon" onClick={handleSendMessage} className="rounded-xl" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {!authChecked ? (
+              <div className="h-10 rounded-xl bg-muted/40 animate-pulse" />
+            ) : !authUser ? (
+              <div className="flex flex-col items-center gap-2 text-center py-1">
+                <p className="text-xs text-muted-foreground">
+                  กรุณาเข้าสู่ระบบเพื่อพูดคุยกับเจ้าหน้าที่ค่ะ 🌿
+                </p>
+                <Button asChild size="sm" className="rounded-xl w-full" onClick={handleClose}>
+                  <Link to="/auth">
+                    <LogIn className="h-4 w-4 mr-1.5" />
+                    เข้าสู่ระบบ / สมัครสมาชิก
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  placeholder={t("chatbot.placeholder")}
+                  className="flex-1 rounded-xl"
+                  disabled={isLoading}
+                />
+                <Button size="icon" onClick={handleSendMessage} className="rounded-xl" disabled={isLoading}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
