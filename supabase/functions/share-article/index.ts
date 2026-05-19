@@ -13,7 +13,19 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const DEFAULT_SITE = "https://jwherbal-roots-and-remedies.lovable.app";
-const DEFAULT_IMAGE = `${DEFAULT_SITE}/favicon.png`;
+const FALLBACK_IMAGE_PATH = "/og-default.jpg";
+const DEFAULT_IMAGE = `${DEFAULT_SITE}${FALLBACK_IMAGE_PATH}`;
+
+// image_url ที่ชี้ไปยัง bundled assets (เช่น /src/assets/...) ไม่สามารถ
+// เข้าถึงจาก crawler ภายนอกได้ — ให้ถือว่าใช้ไม่ได้และ fallback แทน
+function isReachableImage(raw: string | null | undefined): boolean {
+  if (!raw) return false;
+  const v = raw.trim();
+  if (!v) return false;
+  if (v.startsWith("/src/")) return false;
+  if (v.startsWith("src/")) return false;
+  return true;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -97,27 +109,39 @@ function isCrawler(ua: string): boolean {
   return bots.some((b) => lower.includes(b));
 }
 
-async function proxyImage(url: string): Promise<Response> {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-      "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
-    },
-  });
+async function proxyImage(url: string, site: string): Promise<Response> {
+  const fallbackUrl = `${site}${FALLBACK_IMAGE_PATH}`;
+  const candidates = [url, fallbackUrl, `${DEFAULT_SITE}${FALLBACK_IMAGE_PATH}`];
 
-  if (!response.ok || !response.body) {
-    throw new Error(`Image fetch failed: ${response.status}`);
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, {
+        headers: {
+          Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+          "User-Agent":
+            "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+        },
+      });
+
+      if (!response.ok || !response.body) continue;
+
+      const contentType = response.headers.get("content-type") || "image/jpeg";
+      return new Response(response.body, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=3600, s-maxage=86400",
+        },
+      });
+    } catch (err) {
+      console.error("proxyImage candidate failed", candidate, err);
+    }
   }
 
-  const contentType = response.headers.get("content-type") || "image/jpeg";
-  return new Response(response.body, {
-    status: 200,
-    headers: {
-      ...corsHeaders,
-      "Content-Type": contentType,
-      "Cache-Control": "public, max-age=3600, s-maxage=86400",
-      "Content-Length": response.headers.get("content-length") || undefined,
-    },
+  return new Response("Image unavailable", {
+    status: 502,
+    headers: corsHeaders,
   });
 }
 
@@ -190,10 +214,11 @@ Deno.serve(async (req) => {
       .eq("slug", slug)
       .maybeSingle();
 
-    const ogImage = normalizeOgImage(article?.image_url, site);
+    const rawImage = isReachableImage(article?.image_url) ? article!.image_url : null;
+    const ogImage = normalizeOgImage(rawImage, site);
 
     if (mode === "image") {
-      return await proxyImage(ogImage.url);
+      return await proxyImage(ogImage.url, site);
     }
 
     // Humans: redirect immediately — no need to render OG.
