@@ -20,6 +20,47 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function normalizeOgImage(rawImage: string | null | undefined, site: string): {
+  url: string;
+  type: string;
+} {
+  let image = (rawImage || "").trim() || DEFAULT_IMAGE;
+
+  if (!/^https?:\/\//i.test(image)) {
+    image = image.startsWith("/") ? `${site}${image}` : `${site}/${image}`;
+  }
+
+  try {
+    const parsed = new URL(image);
+
+    if (parsed.hostname.includes("unsplash.com") || parsed.hostname.includes("imgix.net")) {
+      parsed.searchParams.set("fm", "jpg");
+      parsed.searchParams.set("fit", "crop");
+      parsed.searchParams.set("w", "1200");
+      parsed.searchParams.set("h", "630");
+      parsed.searchParams.set("q", "85");
+      parsed.searchParams.delete("auto");
+
+      return {
+        url: parsed.toString(),
+        type: "image/jpeg",
+      };
+    }
+
+    const pathname = parsed.pathname.toLowerCase();
+    if (pathname.endsWith(".png")) {
+      return { url: parsed.toString(), type: "image/png" };
+    }
+    if (pathname.endsWith(".webp")) {
+      return { url: parsed.toString(), type: "image/webp" };
+    }
+
+    return { url: parsed.toString(), type: "image/jpeg" };
+  } catch {
+    return { url: image, type: "image/jpeg" };
+  }
+}
+
 function escapeHtml(s: string): string {
   return (s || "")
     .replace(/&/g, "&amp;")
@@ -60,10 +101,11 @@ function renderHtml(opts: {
   title: string;
   description: string;
   image: string;
+  imageType: string;
   url: string;
   redirect: string;
 }): string {
-  const { title, description, image, url, redirect } = opts;
+  const { title, description, image, imageType, url, redirect } = opts;
   return `<!doctype html>
 <html lang="th">
 <head>
@@ -76,6 +118,8 @@ function renderHtml(opts: {
 <meta property="og:title" content="${escapeHtml(title)}" />
 <meta property="og:description" content="${escapeHtml(description)}" />
 <meta property="og:image" content="${escapeHtml(image)}" />
+<meta property="og:image:secure_url" content="${escapeHtml(image)}" />
+<meta property="og:image:type" content="${escapeHtml(imageType)}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:url" content="${escapeHtml(url)}" />
@@ -136,16 +180,13 @@ Deno.serve(async (req) => {
       article?.excerpt_en ||
       "บทความสุขภาพและสมุนไพรจาก JW HERBAL";
 
-    let image = article?.image_url || DEFAULT_IMAGE;
-    // Make image absolute if it's a relative URL
-    if (image && !/^https?:\/\//i.test(image)) {
-      image = image.startsWith("/") ? `${site}${image}` : `${site}/${image}`;
-    }
+    const ogImage = normalizeOgImage(article?.image_url, site);
 
     const html = renderHtml({
       title,
       description,
-      image,
+      image: ogImage.url,
+      imageType: ogImage.type,
       url: redirectUrl,
       redirect: redirectUrl,
     });
