@@ -56,8 +56,22 @@ const ChatbotWidget = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [pendingNotice, setPendingNotice] = useState(false);
-  const [currentStaff, setCurrentStaff] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [hasGreeted, setHasGreeted] = useState(false);
   const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
+  // Pick a starting index once per chat session, then rotate sequentially
+  const staffStartIndex = useRef(Math.floor(Math.random() * STAFF_NAMES.length));
+  const staffTurn = useRef(0);
+  const [currentStaff, setCurrentStaff] = useState<string>(
+    STAFF_NAMES[staffStartIndex.current]
+  );
+  const GREETING_TEMPLATES = [
+    (name: string) => `สวัสดีค่ะ ดิฉัน ${name} ยินดีให้บริการค่ะ 🌿 คุณลูกค้าต้องการสอบถามข้อมูลด้านใดคะ?`,
+    (name: string) => `สวัสดีค่า ${name} เองนะคะ 😊 มีอะไรให้ช่วยดูแลไหมคะ?`,
+    (name: string) => `สวัสดีค่ะคุณลูกค้า ${name} รับเรื่องต่อเองนะคะ 🙏 ขออนุญาตช่วยตอบคำถามค่ะ`,
+    (name: string) => `หวัดดีค่า~ ${name} มาแล้วนะคะ 🌿 บอกได้เลยค่ะว่าอยากทราบเรื่องไหน`,
+    (name: string) => `สวัสดีค่ะ ${name} ยินดีต้อนรับสู่ JWHERBAL ค่ะ ✨ มีคำถามอะไรสอบถามได้เลยนะคะ`,
+  ];
   const [sessionId] = useState(() => crypto.randomUUID());
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -66,7 +80,7 @@ const ChatbotWidget = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, pendingNotice]);
+  }, [messages, pendingNotice, isTyping]);
 
   const handleOpen = (customGreeting?: string) => {
     setIsOpen(true);
@@ -121,6 +135,7 @@ const ChatbotWidget = () => {
 
   const streamChat = async (chatMessages: { role: string; content: string }[], isGreeting = false) => {
     setIsLoading(true);
+    setIsTyping(true);
     let assistantContent = "";
 
     // Add placeholder assistant message (use random id to avoid collision with user msg)
@@ -155,6 +170,7 @@ const ChatbotWidget = () => {
         toast.error(errData.error || "เกิดข้อผิดพลาด กรุณาลองใหม่");
         setMessages((prev) => prev.filter((m) => m.id !== assistantId));
         setIsLoading(false);
+        setIsTyping(false);
         return;
       }
 
@@ -201,26 +217,34 @@ const ChatbotWidget = () => {
     }
 
     setIsLoading(false);
+    setIsTyping(false);
   };
 
   const scheduleBotReply = (history: { role: string; content: string }[]) => {
     setPendingNotice(true);
     setIsLoading(true);
-    // pick a staff name different from the previous one
-    const pool = STAFF_NAMES.filter((n) => n !== currentStaff);
-    const staff = pool[Math.floor(Math.random() * pool.length)];
+    // Rotate staff sequentially (round-robin) starting from a random index per session
+    const idx = (staffStartIndex.current + staffTurn.current) % STAFF_NAMES.length;
+    const staff = STAFF_NAMES[idx];
+    staffTurn.current += 1;
     setCurrentStaff(staff);
     const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
     setTimeout(() => {
       setPendingNotice(false);
-      const greeting: MessageType = {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        role: "assistant",
-        content: `สวัสดีค่ะ ดิฉัน ${staff} ยินดีให้บริการค่ะ 🌿`,
-      };
-      setMessages((prev) => [...prev, greeting]);
-      // small pause before the actual answer streams in
-      setTimeout(() => streamChat(history), 800);
+      // Only greet on first turn of the conversation, not on every user message
+      if (!hasGreeted) {
+        const template = GREETING_TEMPLATES[Math.floor(Math.random() * GREETING_TEMPLATES.length)];
+        const greeting: MessageType = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          role: "assistant",
+          content: template(staff),
+        };
+        setMessages((prev) => [...prev, greeting]);
+        setHasGreeted(true);
+        setTimeout(() => streamChat(history), 800);
+      } else {
+        streamChat(history);
+      }
     }, delay);
   };
 
@@ -383,6 +407,13 @@ const ChatbotWidget = () => {
                   )}
                 </div>
               )}
+
+              {isTyping && !pendingNotice && currentStaff && (
+                <p className="text-[11px] text-primary/80 italic px-1 animate-fade-in">
+                  • พนักงาน {currentStaff} กำลังพิมพ์ตอบ...
+                </p>
+              )}
+
 
 
               {/* Quick Question Buttons */}
