@@ -3,6 +3,7 @@ import { FileText, Users, MessageSquare, Eye, ShoppingCart, Package, TrendingUp,
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import SeoAnalyticsSection from "@/components/admin/SeoAnalyticsSection";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
