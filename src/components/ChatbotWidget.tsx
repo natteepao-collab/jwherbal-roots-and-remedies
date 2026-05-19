@@ -211,7 +211,7 @@ const ChatbotWidget = () => {
             "fixed right-0 top-1/2 -translate-y-1/2 z-50 group transition-transform duration-300 ease-out",
             hideOnScroll ? "translate-x-full md:translate-x-0" : "translate-x-0"
           )}
-          aria-label="สอบถามเพิ่มเติมแบบ Online"
+          aria-label="JWHERBAL SUPPORT 24hr."
         >
           <div className="relative flex items-center gap-2 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground pl-3 pr-3.5 py-3 rounded-l-2xl shadow-xl ring-1 ring-white/20 transition-all duration-300 hover:shadow-2xl hover:pl-4">
             <span className="absolute -left-1 top-1/2 -translate-y-1/2 flex h-2.5 w-2.5">
@@ -222,7 +222,7 @@ const ChatbotWidget = () => {
               className="text-xs font-medium leading-tight tracking-wide"
               style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
             >
-              สอบถามเพิ่มเติมแบบ Online
+              JWHERBAL SUPPORT 24hr.
             </span>
           </div>
         </button>
@@ -258,7 +258,7 @@ const ChatbotWidget = () => {
                   <img src={jwherbalLogo} alt="JWHERBAL" className="h-6 w-6 object-contain" />
                 </div>
                 <div>
-                  <CardTitle className="text-base">สอบถามข้อมูลเพิ่มเติมกับ Admin Online</CardTitle>
+                  <CardTitle className="text-base">JWHERBAL SUPPORT 24hr.</CardTitle>
                   <p className="text-[11px] opacity-80 flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
                     Online
