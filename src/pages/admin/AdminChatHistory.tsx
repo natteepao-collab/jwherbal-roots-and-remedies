@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   MessageSquare, Clock, Globe, ChevronRight, ArrowLeft, User, Bot,
   Sparkles, Download, Search, Phone, Mail, Smartphone, TrendingUp,
-  Headset, Send, Undo2, Trash2,
+  Headset, Send, Undo2, Trash2, UserCircle2, Users,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
