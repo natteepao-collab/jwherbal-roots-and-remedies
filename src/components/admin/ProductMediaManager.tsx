@@ -80,6 +80,8 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-media", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-images", productId] });
+      queryClient.invalidateQueries({ queryKey: ["vflow-product-images"] });
       toast.success("ลบสื่อเรียบร้อย");
     },
     onError: (e) => toast.error("ลบไม่สำเร็จ: " + e.message),
@@ -99,7 +101,9 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-images", productId] });
       queryClient.invalidateQueries({ queryKey: ["vflow-products"] });
+      queryClient.invalidateQueries({ queryKey: ["vflow-product-images"] });
       toast.success("อัปเดตรูปหลักเรียบร้อย");
     },
     onError: (e) => toast.error("เปลี่ยนรูปหลักไม่สำเร็จ: " + e.message),
@@ -142,7 +146,9 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-images", productId] });
       queryClient.invalidateQueries({ queryKey: ["vflow-products"] });
+      queryClient.invalidateQueries({ queryKey: ["vflow-product-images"] });
       toast.success("ตั้งค่ารูปหลักเรียบร้อย");
     },
     onError: (e) => toast.error("ตั้งค่ารูปหลักไม่สำเร็จ: " + e.message),
@@ -208,7 +214,9 @@ const ProductMediaManager = ({ productId, productName }: ProductMediaManagerProp
     queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     queryClient.invalidateQueries({ queryKey: ["products"] });
     queryClient.invalidateQueries({ queryKey: ["product", productId] });
+    queryClient.invalidateQueries({ queryKey: ["product-images", productId] });
     queryClient.invalidateQueries({ queryKey: ["vflow-products"] });
+    queryClient.invalidateQueries({ queryKey: ["vflow-product-images"] });
     setUploading(false);
     setUploadProgress(0);
     if (completed > 0) toast.success("อัปโหลดรูปสินค้าเรียบร้อย");
