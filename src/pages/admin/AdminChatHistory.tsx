@@ -89,6 +89,9 @@ const AdminChatHistory = () => {
   const [search, setSearch] = useState("");
   const [intentFilter, setIntentFilter] = useState<string>("all");
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
+  const [userTypeFilter, setUserTypeFilter] = useState<"all" | "registered" | "guest">("all");
+  const [userFilter, setUserFilter] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"conversations" | "users">("conversations");
   const [analyzingAll, setAnalyzingAll] = useState(false);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [adminReply, setAdminReply] = useState("");
