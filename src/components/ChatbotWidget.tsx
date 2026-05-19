@@ -480,19 +480,35 @@ const ChatbotWidget = () => {
 
           {/* Input Area */}
           <CardContent className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder={t("chatbot.placeholder")}
-                className="flex-1 rounded-xl"
-                disabled={isLoading}
-              />
-              <Button size="icon" onClick={handleSendMessage} className="rounded-xl" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {!authChecked ? (
+              <div className="h-10 rounded-xl bg-muted/40 animate-pulse" />
+            ) : !authUser ? (
+              <div className="flex flex-col items-center gap-2 text-center py-1">
+                <p className="text-xs text-muted-foreground">
+                  กรุณาเข้าสู่ระบบเพื่อพูดคุยกับเจ้าหน้าที่ค่ะ 🌿
+                </p>
+                <Button asChild size="sm" className="rounded-xl w-full" onClick={handleClose}>
+                  <Link to="/auth">
+                    <LogIn className="h-4 w-4 mr-1.5" />
+                    เข้าสู่ระบบ / สมัครสมาชิก
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  placeholder={t("chatbot.placeholder")}
+                  className="flex-1 rounded-xl"
+                  disabled={isLoading}
+                />
+                <Button size="icon" onClick={handleSendMessage} className="rounded-xl" disabled={isLoading}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
