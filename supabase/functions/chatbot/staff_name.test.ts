@@ -30,7 +30,8 @@ async function callChat(opts: {
       messages: [{ role: "user", content: opts.userMessage }],
     }),
   });
-  const staff = res.headers.get("x-ai-staff-name");
+  const raw = res.headers.get("x-ai-staff-name");
+  const staff = raw ? decodeURIComponent(raw) : null;
   // Consume body to avoid resource leak (stream or json)
   try { await res.body?.cancel(); } catch { /* ignore */ }
   return staff;
