@@ -73,16 +73,19 @@ const ArticleLikeShare = ({
     localStorage.setItem("likedArticles", JSON.stringify(likedArticles));
   };
 
+  // Edge URL used for social share buttons (FB/LINE/Twitter) so their crawlers
+  // can read Open Graph tags and show the article image + title in the preview.
   const shareUrl = buildShareUrl(articleUrl);
+  // Clean canonical URL shown to the user when copying / native-sharing.
+  const cleanUrl = articleUrl;
 
   const handleNativeShare = async () => {
-    // Native share sheet on mobile — best UX, link preview rendered by the receiving app.
     if (typeof navigator !== "undefined" && (navigator as any).share) {
       try {
         await (navigator as any).share({
           title: articleTitle,
           text: articleTitle,
-          url: shareUrl,
+          url: cleanUrl,
         });
         toast.success(t("articles.shareSuccess"));
       } catch {
@@ -95,7 +98,7 @@ const ArticleLikeShare = ({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(cleanUrl);
       setCopied(true);
       toast.success(t("articles.linkCopied", "คัดลอกลิงก์แล้ว"));
       setTimeout(() => setCopied(false), 2000);
