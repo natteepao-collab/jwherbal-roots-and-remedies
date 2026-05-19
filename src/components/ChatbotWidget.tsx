@@ -192,6 +192,16 @@ const ChatbotWidget = () => {
     setIsLoading(false);
   };
 
+  const scheduleBotReply = (history: { role: string; content: string }[]) => {
+    setPendingNotice(true);
+    setIsLoading(true);
+    const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
+    setTimeout(() => {
+      setPendingNotice(false);
+      streamChat(history);
+    }, delay);
+  };
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -206,7 +216,7 @@ const ChatbotWidget = () => {
       content: m.content,
     }));
 
-    streamChat(history);
+    scheduleBotReply(history);
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -219,7 +229,7 @@ const ChatbotWidget = () => {
       content: m.content,
     }));
 
-    streamChat(history);
+    scheduleBotReply(history);
   };
 
   const quickQuestions = [
