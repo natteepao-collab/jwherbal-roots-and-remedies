@@ -196,12 +196,6 @@ const ChatbotWidget = () => {
             >
               สอบถามเพิ่มเติมแบบ Online
             </span>
-            <span
-              className="text-xs font-medium leading-tight tracking-wide"
-              style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-            >
-              สอบถามเพิ่มเติมแบบ Online
-            </span>
           </div>
         </button>
       )}
