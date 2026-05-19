@@ -95,13 +95,27 @@ serve(async (req) => {
       });
     }
 
-    // Fetch real data from database
-    const [productsRes, articlesRes, faqRes, contactRes, vflowRes] = await Promise.all([
-      supabase.from("products").select("name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th").eq("is_active", true).limit(20),
-      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category").order("updated_at", { ascending: false }).limit(10),
-      supabase.from("faq_items").select("question_th, question_en, question_zh, answer_th, answer_en, answer_zh, category").eq("is_active", true).order("sort_order").limit(20),
+    // Fetch comprehensive data from database
+    const [
+      productsRes, articlesRes, faqRes, contactRes, vflowRes,
+      promoTiersRes, promoSettingsRes, reviewsRes, aboutRes,
+      brandStoryRes, trustCertRes, trustIngrRes, trustExpertRes,
+      paymentRes,
+    ] = await Promise.all([
+      supabase.from("products").select("name_th, name_en, name_zh, price, description_th, description_en, description_zh, category, usage_instructions_th, suitable_for_th, detail_content_th, stock, rating").eq("is_active", true).limit(30),
+      supabase.from("articles").select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, slug, category, author").order("updated_at", { ascending: false }).limit(15),
+      supabase.from("faq_items").select("question_th, question_en, question_zh, answer_th, answer_en, answer_zh, category").eq("is_active", true).order("sort_order").limit(50),
       supabase.from("contact_settings").select("*").limit(1).single(),
-      supabase.from("vflow_page_settings").select("description, tagline, highlights, how_to_use, faqs").limit(1).single(),
+      supabase.from("vflow_page_settings").select("*").limit(1).single(),
+      supabase.from("promotion_tiers").select("quantity, unit, price, normal_price, is_best_seller, product_id").eq("is_active", true).order("sort_order"),
+      supabase.from("promotion_settings").select("title, is_active, is_monthly, custom_end_date").eq("is_active", true).limit(1).maybeSingle(),
+      supabase.from("reviews").select("author_name, rating, comment").eq("is_approved", true).order("created_at", { ascending: false }).limit(10),
+      supabase.from("about_settings").select("*").limit(1).maybeSingle(),
+      supabase.from("brand_story").select("*").limit(1).maybeSingle(),
+      supabase.from("trust_certifications").select("title_th, description_th").eq("is_active", true).order("sort_order"),
+      supabase.from("trust_ingredients").select("name_th, description_th").eq("is_active", true).order("sort_order"),
+      supabase.from("trust_expert").select("*").limit(1).maybeSingle(),
+      supabase.from("payment_settings").select("*").limit(1).maybeSingle(),
     ]);
 
     const lang = language || "th";
@@ -114,6 +128,8 @@ serve(async (req) => {
       category: p.category,
       usage: p.usage_instructions_th,
       suitableFor: p.suitable_for_th,
+      stock: p.stock,
+      rating: p.rating,
     }));
 
     const articles = (articlesRes.data || []).map((a: any) => ({
@@ -121,43 +137,88 @@ serve(async (req) => {
       excerpt: a[`excerpt${langSuffix}`] || a.excerpt_th,
       slug: a.slug,
       category: a.category,
+      author: a.author,
     }));
 
     const faqs = (faqRes.data || []).map((f: any) => ({
-      question: f[`question${langSuffix}`] || f.question_th,
-      answer: f[`answer${langSuffix}`] || f.answer_th,
+      q: f[`question${langSuffix}`] || f.question_th,
+      a: f[`answer${langSuffix}`] || f.answer_th,
+      category: f.category,
     }));
 
     const contact = contactRes.data;
     const vflow = vflowRes.data;
+    const promoTiers = promoTiersRes.data || [];
+    const promoSettings = promoSettingsRes.data;
+    const reviews = (reviewsRes.data || []).map((r: any) => ({ name: r.author_name, rating: r.rating, comment: r.comment }));
+    const about = aboutRes.data;
+    const brandStory = brandStoryRes.data;
+    const certifications = (trustCertRes.data || []).map((c: any) => `${c.title_th}: ${c.description_th}`);
+    const ingredients = (trustIngrRes.data || []).map((i: any) => `${i.name_th}: ${i.description_th}`);
+    const expert = trustExpertRes.data;
+    const payment = paymentRes.data;
 
-    const systemPrompt = `คุณคือผู้ช่วยของเว็บไซต์ JWHERBAL ร้านขายสมุนไพรและผลิตภัณฑ์เพื่อสุขภาพ
+    const langName = lang === 'th' ? 'ไทย' : lang === 'en' ? 'อังกฤษ' : lang === 'zh' ? 'จีน' : 'ญี่ปุ่น';
 
-กฎสำคัญ:
-1. ตอบสั้นกระชับ ไม่เกิน 2-3 ประโยค ตรงประเด็น
-2. หลังตอบแต่ละครั้ง ให้แนะนำคำถามต่อ 1-2 ข้อที่เกี่ยวข้อง เพื่อให้ลูกค้าสนทนาต่อ
-3. ใช้ข้อมูลจริงจากฐานข้อมูลเท่านั้น ห้ามแต่งเอง
-4. พูดจาสุภาพ เป็นมิตร ใช้ภาษา${lang === 'th' ? 'ไทย' : lang === 'en' ? 'อังกฤษ' : 'จีนตัวย่อ'}
-5. หากลูกค้าถามเรื่องที่ไม่มีในข้อมูล ให้แนะนำติดต่อแอดมินผ่าน LINE
-6. เมื่อเหมาะสม ให้แนะนำลิงก์ไปยังหน้าต่างๆ ของเว็บไซต์ เช่น /shop, /articles, /products/vflow, /faq, /contact, /reviews
-7. ถ้าลูกค้าทักทาย ให้แนะนำตัวสั้นๆ แล้วถามว่าสนใจเรื่องอะไร พร้อมแนะนำหัวข้อ เช่น สินค้า, บทความสุขภาพ, โปรโมชั่น
+    const systemPrompt = `คุณคือ "พี่แอดมิน" ของแบรนด์ JW HERBAL ทีมงานคนไทยที่ดูแลลูกค้าผ่านแชท ไม่ใช่ AI
 
-ข้อมูลสินค้า:
+🎭 บุคลิกและสไตล์การพูด (สำคัญมาก):
+- พูดเหมือนพี่สาว/น้องสาวคนไทยที่อบอุ่น เป็นกันเอง สุภาพแต่ไม่ทางการเกินไป
+- ใช้คำลงท้ายธรรมชาติ เช่น "ค่ะ" "นะคะ" "เลยค่ะ" "ได้เลยค่ะ" "ยินดีค่ะ" สลับกันไป ไม่ซ้ำๆ
+- ใส่อีโมจิเบาๆ บ้าง 🌿 💚 ✨ 😊 🙏 (ไม่เกิน 1-2 ตัวต่อข้อความ)
+- ตอบสั้นกระชับ 2-4 ประโยค ไม่บรรยายยาว เหมือนแชทไลน์จริง
+- อย่าใช้ Markdown headers (#) หรือ bullet **bold** เยอะ — ใช้เครื่องหมาย • หรือเว้นบรรทัดแทน
+- ห้ามบอกว่าตัวเองคือ AI, bot, chatbot, ผู้ช่วยอัตโนมัติ — ถ้าโดนถามให้เลี่ยงว่า "เป็นทีมงาน JW HERBAL ค่ะ"
+- ตอบเป็นภาษา${langName} เท่านั้น
+
+💬 วิธีโต้ตอบ:
+- ทักทาย/เปิดบทสนทนาด้วยน้ำเสียงอบอุ่น เช่น "สวัสดีค่ะ 😊" "ยินดีต้อนรับค่ะ"
+- ถ้าลูกค้าถามสินค้า → บอกชื่อ ราคา สรรพคุณสั้นๆ แล้วชวนต่อ เช่น "สนใจดูรายละเอียดเพิ่มไหมคะ?"
+- ถ้าลูกค้าสนใจซื้อ → แนะนำโปรโมชั่นที่คุ้มที่สุด + ส่งลิงก์ /shop หรือ /products/vflow
+- ถ้าลูกค้าถามวิธีสั่ง/ชำระเงิน → อธิบายขั้นตอนสั้นๆ + บอกช่องทาง PromptPay/โอนธนาคาร
+- ถ้าเรื่องที่ลูกค้าถามไม่มีในข้อมูล หรือเป็นเคสเฉพาะ (เช่น สั่งซื้อจำนวนมาก, ปัญหาสุขภาพเฉพาะ) → แนะนำติดต่อแอดมินตัวจริงทาง LINE: ${contact?.line_id || '@jwherbal'}
+- จบทุกคำตอบด้วยคำถามเชิญชวนต่อ 1 ข้อ เพื่อให้สนทนาไหลลื่น
+- ห้ามแต่งข้อมูลที่ไม่มีในฐานข้อมูล โดยเฉพาะราคา สรรพคุณ และโปรโมชั่น
+
+🔗 ลิงก์เว็บ: /shop (สินค้า) · /products/vflow (V Flow) · /articles (บทความสุขภาพ) · /reviews (รีวิวลูกค้า) · /faq (คำถามที่พบบ่อย) · /about (เกี่ยวกับเรา) · /contact (ติดต่อ) · /community (ชุมชน)
+
+═══════════ ข้อมูลแบรนด์ JW HERBAL ═══════════
+${about ? `วิสัยทัศน์: ${about.vision_quote_th}\nเรื่องราว: ${about.story_paragraph1_th} ${about.story_paragraph2_th}\nผลงาน: ${about.achievement_years} ปีประสบการณ์, ลูกค้า ${about.achievement_customers} คน, ความพึงพอใจ ${about.achievement_satisfaction}` : ''}
+
+${brandStory ? `\nเรื่องราวแบรนด์: ${brandStory.title_th} - ${brandStory.description_th}` : ''}
+
+ผู้เชี่ยวชาญ: ${expert ? `${expert.title_th} - ${expert.description_th}` : ''}
+
+═══════════ มาตรฐาน & การรับรอง ═══════════
+${certifications.join('\n')}
+
+═══════════ วัตถุดิบหลัก ═══════════
+${ingredients.join('\n')}
+
+═══════════ สินค้าทั้งหมด (${products.length} รายการ) ═══════════
 ${JSON.stringify(products, null, 1)}
 
-ข้อมูล V Flow (สินค้าแนะนำ):
+═══════════ V FLOW (สินค้าเรือธง) ═══════════
 ${vflow ? JSON.stringify(vflow, null, 1) : 'ไม่มีข้อมูล'}
 
-บทความล่าสุด:
+═══════════ โปรโมชั่นปัจจุบัน ═══════════
+${promoSettings ? `🎁 ${promoSettings.title}` : ''}
+${promoTiers.length > 0 ? `ราคาแพ็คเกจ:\n${promoTiers.map((t: any) => `• ${t.quantity} ${t.unit} = ${t.price} บาท (ปกติ ${t.normal_price}) ${t.is_best_seller ? '⭐ ขายดี' : ''}`).join('\n')}` : ''}
+
+═══════════ ช่องทางชำระเงิน ═══════════
+${payment ? `PromptPay: ${payment.promptpay_number} (${payment.promptpay_name})\nโอนธนาคาร: ${payment.bank_name} - ${payment.bank_account_number} (${payment.bank_account_name})` : ''}
+
+═══════════ บทความสุขภาพล่าสุด ═══════════
 ${JSON.stringify(articles, null, 1)}
 
-คำถามที่พบบ่อย:
+═══════════ คำถามที่พบบ่อย (${faqs.length} ข้อ) ═══════════
 ${JSON.stringify(faqs, null, 1)}
 
-ข้อมูลติดต่อ:
-${contact ? `โทร: ${contact.phone}, LINE: ${contact.line_id}, อีเมล: ${contact.email}` : 'ไม่มีข้อมูล'}
+═══════════ รีวิวลูกค้าจริง ═══════════
+${JSON.stringify(reviews, null, 1)}
 
-URL เว็บไซต์หลัก: /shop (สินค้า), /articles (บทความ), /products/vflow (V Flow), /faq (ถามตอบ), /contact (ติดต่อ), /reviews (รีวิว)`;
+═══════════ ติดต่อ ═══════════
+${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contact.line_id}\n📧 ${contact.email}\n📍 ${contact.address}\n⏰ จันทร์-ศุกร์ ${contact.weekday_hours}, เสาร์-อาทิตย์ ${contact.weekend_hours}` : ''}`;
 
     // Call AI with streaming
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
