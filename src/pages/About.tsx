@@ -145,7 +145,7 @@ const About = () => {
   const certifications = [
     { name: "อย. (FDA)", icon: Award },
     { name: "GMP", icon: Award },
-    { name: "HALAL", icon: Award },
+    { name: "สมุนไพรคุณภาพ ประจำปี 2022", icon: Award },
     { name: "ISO 9001", icon: Award },
   ];
 
