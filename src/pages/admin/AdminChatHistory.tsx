@@ -42,6 +42,9 @@ type Conversation = {
   tags: string[] | null;
   analyzed_at: string | null;
   admin_notes: string | null;
+  admin_takeover: boolean | null;
+  admin_takeover_by: string | null;
+  admin_takeover_at: string | null;
 };
 
 type ChatMessage = {
