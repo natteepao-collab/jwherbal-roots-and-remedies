@@ -74,14 +74,16 @@ const ChatbotWidget = () => {
     (staff: string, customer: string) => `หวัดดีค่า~ คุณ ${customer} 🌿 ${staff} มาแล้วนะคะ บอกได้เลยค่ะว่าอยากทราบเรื่องไหน`,
     (staff: string, customer: string) => `สวัสดีค่ะคุณ ${customer} ✨ ${staff} ยินดีต้อนรับสู่ JWHERBAL ค่ะ มีคำถามอะไรสอบถามได้เลยนะคะ`,
   ];
-  const [sessionId] = useState(() => crypto.randomUUID());
+  const [sessionId, setSessionId] = useState<string>(() => crypto.randomUUID());
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [customerName, setCustomerName] = useState<string>("ลูกค้า");
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Track auth + load profile display name
+  // Track auth + load profile display name + restore per-user chat history
   useEffect(() => {
     const loadName = async (user: User | null) => {
       if (!user) {
@@ -99,24 +101,79 @@ const ChatbotWidget = () => {
           .eq("id", user.id)
           .maybeSingle();
         const name = data?.full_name?.trim() || fallback;
-        // Use the first word/name only for a natural greeting
         setCustomerName(name.split(" ")[0] || fallback);
       } catch {
         setCustomerName(fallback);
       }
     };
 
+    const restoreHistory = async (user: User | null) => {
+      if (!user) {
+        // Reset to a fresh anonymous session
+        setMessages([]);
+        setHasGreeted(false);
+        setHistoryLoaded(false);
+        setSessionId(crypto.randomUUID());
+        return;
+      }
+      try {
+        const { data: conv } = await supabase
+          .from("chat_conversations")
+          .select("id, session_id")
+          .eq("user_id", user.id)
+          .order("last_message_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (conv?.session_id) {
+          setSessionId(conv.session_id);
+          const { data: msgs } = await supabase
+            .from("chat_messages")
+            .select("id, role, content, created_at")
+            .eq("conversation_id", conv.id)
+            .order("created_at", { ascending: true });
+
+          if (msgs && msgs.length > 0) {
+            setMessages(
+              msgs.map((m, i) => ({
+                id: Date.now() + i,
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              }))
+            );
+            // Don't re-greet — they're continuing an existing conversation
+            setHasGreeted(true);
+          }
+        } else {
+          // First-time logged-in user: keep the fresh sessionId, no history yet
+          setMessages([]);
+          setHasGreeted(false);
+        }
+      } catch (e) {
+        console.error("restoreHistory error:", e);
+      } finally {
+        setHistoryLoaded(true);
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthUser(session?.user ?? null);
+      setAccessToken(session?.access_token ?? null);
       setAuthChecked(true);
       loadName(session?.user ?? null);
+      restoreHistory(session?.user ?? null);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthUser(session?.user ?? null);
-      setTimeout(() => loadName(session?.user ?? null), 0);
+      setAccessToken(session?.access_token ?? null);
+      setTimeout(() => {
+        loadName(session?.user ?? null);
+        restoreHistory(session?.user ?? null);
+      }, 0);
     });
     return () => subscription.unsubscribe();
   }, []);
+
 
 
   useEffect(() => {
