@@ -527,6 +527,22 @@ ${bubbles}
               </Button>
               <Button
                 size="sm"
+                variant="outline"
+                onClick={() => exportTranscriptCsv(conv, messages)}
+                disabled={messagesLoading || messages.length === 0}
+              >
+                <Download className="h-4 w-4 mr-1" /> CSV
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => exportTranscriptPdf(conv, messages)}
+                disabled={messagesLoading || messages.length === 0}
+              >
+                <Download className="h-4 w-4 mr-1" /> PDF
+              </Button>
+              <Button
+                size="sm"
                 variant="destructive"
                 onClick={() => setDeleteTarget({ ids: [conv.id], label: "บทสนทนานี้" })}
               >
