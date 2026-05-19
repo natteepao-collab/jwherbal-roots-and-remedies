@@ -183,6 +183,19 @@ Deno.serve(async (req) => {
 
     const redirectUrl = `${site}/articles/${encodeURIComponent(slug)}`;
 
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: article } = await sb
+      .from("articles")
+      .select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, image_url")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    const ogImage = normalizeOgImage(article?.image_url, site);
+
+    if (mode === "image") {
+      return await proxyImage(ogImage.url);
+    }
+
     // Humans: redirect immediately — no need to render OG.
     if (!isCrawler(ua)) {
       return new Response(null, {
@@ -191,25 +204,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Crawlers: fetch article and render OG tags.
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const { data: article } = await sb
-      .from("articles")
-      .select("title_th, title_en, title_zh, excerpt_th, excerpt_en, excerpt_zh, image_url")
-      .eq("slug", slug)
-      .maybeSingle();
-
     const title = article?.title_th || article?.title_en || "JW HERBAL";
     const description =
       article?.excerpt_th ||
       article?.excerpt_en ||
       "บทความสุขภาพและสมุนไพรจาก JW HERBAL";
-
-    const ogImage = normalizeOgImage(article?.image_url, site);
-
-    if (mode === "image") {
-      return await proxyImage(ogImage.url);
-    }
 
     const shareImageUrl = `${site}/og/article/${encodeURIComponent(slug)}.jpg`;
 
