@@ -56,8 +56,22 @@ const ChatbotWidget = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [pendingNotice, setPendingNotice] = useState(false);
-  const [currentStaff, setCurrentStaff] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [hasGreeted, setHasGreeted] = useState(false);
   const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
+  // Pick a starting index once per chat session, then rotate sequentially
+  const staffStartIndex = useRef(Math.floor(Math.random() * STAFF_NAMES.length));
+  const staffTurn = useRef(0);
+  const [currentStaff, setCurrentStaff] = useState<string>(
+    STAFF_NAMES[staffStartIndex.current]
+  );
+  const GREETING_TEMPLATES = [
+    (name: string) => `สวัสดีค่ะ ดิฉัน ${name} ยินดีให้บริการค่ะ 🌿 คุณลูกค้าต้องการสอบถามข้อมูลด้านใดคะ?`,
+    (name: string) => `สวัสดีค่า ${name} เองนะคะ 😊 มีอะไรให้ช่วยดูแลไหมคะ?`,
+    (name: string) => `สวัสดีค่ะคุณลูกค้า ${name} รับเรื่องต่อเองนะคะ 🙏 ขออนุญาตช่วยตอบคำถามค่ะ`,
+    (name: string) => `หวัดดีค่า~ ${name} มาแล้วนะคะ 🌿 บอกได้เลยค่ะว่าอยากทราบเรื่องไหน`,
+    (name: string) => `สวัสดีค่ะ ${name} ยินดีต้อนรับสู่ JWHERBAL ค่ะ ✨ มีคำถามอะไรสอบถามได้เลยนะคะ`,
+  ];
   const [sessionId] = useState(() => crypto.randomUUID());
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
