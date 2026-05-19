@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import BackToTop from "@/components/BackToTop";
+import AdminLiveChatDock from "@/components/AdminLiveChatDock";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import Index from "./pages/Index";
 import About from "./pages/About";
