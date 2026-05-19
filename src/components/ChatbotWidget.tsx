@@ -170,6 +170,7 @@ const ChatbotWidget = () => {
         toast.error(errData.error || "เกิดข้อผิดพลาด กรุณาลองใหม่");
         setMessages((prev) => prev.filter((m) => m.id !== assistantId));
         setIsLoading(false);
+        setIsTyping(false);
         return;
       }
 
