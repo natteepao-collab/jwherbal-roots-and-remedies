@@ -273,21 +273,49 @@ const AdminChatHistory = () => {
   };
 
   const filtered = useMemo(() => {
-    return conversations.filter((c) => {
+    return conversations.filter((c: any) => {
       if (intentFilter !== "all" && c.intent !== intentFilter) return false;
       if (sentimentFilter !== "all" && c.sentiment !== sentimentFilter) return false;
+      if (userTypeFilter === "registered" && !c.user_id) return false;
+      if (userTypeFilter === "guest" && c.user_id) return false;
+      if (userFilter && c.user_id !== userFilter) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
+        const prof = c.user_id ? profilesMap[c.user_id] : null;
         const hay = [
           c.summary, c.customer_name, c.customer_phone, c.customer_email,
-          c.customer_line, ...(c.topics || []), ...(c.products_mentioned || []),
+          c.customer_line, prof?.full_name, prof?.email,
+          ...(c.topics || []), ...(c.products_mentioned || []),
           ...(c.tags || []),
         ].filter(Boolean).join(" ").toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [conversations, intentFilter, sentimentFilter, search]);
+  }, [conversations, intentFilter, sentimentFilter, search, userTypeFilter, userFilter, profilesMap]);
+
+  // Group filtered conversations by registered user
+  const userGroups = useMemo(() => {
+    const map = new Map<string, { user_id: string; profile: any; convs: Conversation[]; lastAt: number }>();
+    for (const c of filtered) {
+      if (!c.user_id) continue;
+      const g = map.get(c.user_id) || {
+        user_id: c.user_id,
+        profile: (profilesMap as any)[c.user_id] || null,
+        convs: [] as Conversation[],
+        lastAt: 0,
+      };
+      g.convs.push(c);
+      const t = new Date(c.last_message_at).getTime();
+      if (t > g.lastAt) g.lastAt = t;
+      map.set(c.user_id, g);
+    }
+    return Array.from(map.values()).sort((a, b) => b.lastAt - a.lastAt);
+  }, [filtered, profilesMap]);
+  const registeredCount = useMemo(
+    () => new Set(conversations.filter((c: any) => c.user_id).map((c: any) => c.user_id)).size,
+    [conversations]
+  );
 
   const analyze = async (ids: string[]) => {
     const { data, error } = await supabase.functions.invoke("analyze-chat", {
