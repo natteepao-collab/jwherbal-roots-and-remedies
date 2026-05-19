@@ -190,7 +190,6 @@ const ChatbotWidget = () => {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white" />
             </span>
-            <MessageCircle className="h-5 w-5" />
             <span
               className="text-xs font-medium leading-tight tracking-wide"
               style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
