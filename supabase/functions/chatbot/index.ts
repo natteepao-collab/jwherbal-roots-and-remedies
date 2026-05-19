@@ -151,7 +151,10 @@ serve(async (req) => {
       slug: a.slug,
       category: a.category,
       author: a.author,
+      image: a.image_url,
     }));
+
+    const brandGallery = (brandGalleryRes.data || []).map((g: any) => ({ title: g.title_th, image: g.image_url }));
 
     const faqs = (faqRes.data || []).map((f: any) => ({
       q: f[`question${langSuffix}`] || f.question_th,
