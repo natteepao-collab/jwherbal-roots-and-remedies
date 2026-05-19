@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   MessageSquare, Clock, Globe, ChevronRight, ArrowLeft, User, Bot,
   Sparkles, Download, Search, Phone, Mail, Smartphone, TrendingUp,
-  Headset, Send, Undo2, Trash2,
+  Headset, Send, Undo2, Trash2, UserCircle2, Users,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -24,6 +24,7 @@ import { toast } from "sonner";
 type Conversation = {
   id: string;
   session_id: string;
+  user_id: string | null;
   started_at: string;
   last_message_at: string;
   message_count: number;
@@ -89,6 +90,9 @@ const AdminChatHistory = () => {
   const [search, setSearch] = useState("");
   const [intentFilter, setIntentFilter] = useState<string>("all");
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
+  const [userTypeFilter, setUserTypeFilter] = useState<"all" | "registered" | "guest">("all");
+  const [userFilter, setUserFilter] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"conversations" | "users">("conversations");
   const [analyzingAll, setAnalyzingAll] = useState(false);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [adminReply, setAdminReply] = useState("");
@@ -143,6 +147,26 @@ const AdminChatHistory = () => {
         .order("last_message_at", { ascending: false });
       if (error) throw error;
       return data as Conversation[];
+    },
+  });
+
+  // Profiles for registered users that appear in conversations
+  const userIds = useMemo(
+    () => Array.from(new Set((conversations || []).map((c: any) => c.user_id).filter(Boolean))) as string[],
+    [conversations]
+  );
+  const { data: profilesMap = {} } = useQuery({
+    queryKey: ["admin-chat-profiles", userIds.sort().join(",")],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, preferred_avatar")
+        .in("id", userIds);
+      if (error) throw error;
+      const map: Record<string, { full_name: string | null; email: string | null; preferred_avatar: string | null }> = {};
+      (data || []).forEach((p: any) => { map[p.id] = p; });
+      return map;
     },
   });
 
@@ -250,21 +274,49 @@ const AdminChatHistory = () => {
   };
 
   const filtered = useMemo(() => {
-    return conversations.filter((c) => {
+    return conversations.filter((c: any) => {
       if (intentFilter !== "all" && c.intent !== intentFilter) return false;
       if (sentimentFilter !== "all" && c.sentiment !== sentimentFilter) return false;
+      if (userTypeFilter === "registered" && !c.user_id) return false;
+      if (userTypeFilter === "guest" && c.user_id) return false;
+      if (userFilter && c.user_id !== userFilter) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
+        const prof = c.user_id ? profilesMap[c.user_id] : null;
         const hay = [
           c.summary, c.customer_name, c.customer_phone, c.customer_email,
-          c.customer_line, ...(c.topics || []), ...(c.products_mentioned || []),
+          c.customer_line, prof?.full_name, prof?.email,
+          ...(c.topics || []), ...(c.products_mentioned || []),
           ...(c.tags || []),
         ].filter(Boolean).join(" ").toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [conversations, intentFilter, sentimentFilter, search]);
+  }, [conversations, intentFilter, sentimentFilter, search, userTypeFilter, userFilter, profilesMap]);
+
+  // Group filtered conversations by registered user
+  const userGroups = useMemo(() => {
+    const map = new Map<string, { user_id: string; profile: any; convs: Conversation[]; lastAt: number }>();
+    for (const c of filtered) {
+      if (!c.user_id) continue;
+      const g = map.get(c.user_id) || {
+        user_id: c.user_id,
+        profile: (profilesMap as any)[c.user_id] || null,
+        convs: [] as Conversation[],
+        lastAt: 0,
+      };
+      g.convs.push(c);
+      const t = new Date(c.last_message_at).getTime();
+      if (t > g.lastAt) g.lastAt = t;
+      map.set(c.user_id, g);
+    }
+    return Array.from(map.values()).sort((a, b) => b.lastAt - a.lastAt);
+  }, [filtered, profilesMap]);
+  const registeredCount = useMemo(
+    () => new Set(conversations.filter((c: any) => c.user_id).map((c: any) => c.user_id)).size,
+    [conversations]
+  );
 
   const analyze = async (ids: string[]) => {
     const { data, error } = await supabase.functions.invoke("analyze-chat", {
@@ -762,6 +814,27 @@ ${bubbles}
         </Card>
       </div>
 
+      <div className="flex items-center gap-2 border-b">
+        <button
+          onClick={() => setViewMode("conversations")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+            viewMode === "conversations" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <MessageSquare className="inline h-4 w-4 mr-1" /> รายการสนทนา ({conversations.length})
+        </button>
+        <button
+          onClick={() => setViewMode("users")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+            viewMode === "users" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Users className="inline h-4 w-4 mr-1" /> ผู้ใช้ที่ลงทะเบียน ({registeredCount})
+        </button>
+      </div>
+
       <Card>
         <CardContent className="p-4 flex flex-wrap gap-2">
           <div className="relative flex-1 min-w-[200px]">
@@ -795,11 +868,106 @@ ${bubbles}
               <SelectItem value="negative">🙁 ลบ</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={userTypeFilter} onValueChange={(v: any) => setUserTypeFilter(v)}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="ประเภทผู้ใช้" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">ผู้ใช้ทุกประเภท</SelectItem>
+              <SelectItem value="registered">เฉพาะลงทะเบียน</SelectItem>
+              <SelectItem value="guest">เฉพาะ Guest</SelectItem>
+            </SelectContent>
+          </Select>
+          {userFilter && (
+            <Button variant="outline" size="sm" onClick={() => setUserFilter(null)}>
+              ล้างตัวกรองผู้ใช้
+            </Button>
+          )}
         </CardContent>
       </Card>
 
       {isLoading ? (
         <p className="text-center text-muted-foreground py-8">กำลังโหลด...</p>
+      ) : viewMode === "users" ? (
+        userGroups.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p>ยังไม่มีผู้ใช้ที่ลงทะเบียนเข้ามาแชท</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">
+                ผู้ใช้ที่ลงทะเบียน ({userGroups.length} คน · {userGroups.reduce((s, g) => s + g.convs.length, 0)} สนทนา)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ScrollArea className="max-h-[600px]">
+                {userGroups.map((g) => {
+                  const name = g.profile?.full_name || g.profile?.email || g.convs[0]?.customer_name || "ผู้ใช้ไม่ทราบชื่อ";
+                  const msgs = g.convs.reduce((s, c) => s + (c.message_count || 0), 0);
+                  const bestLead = g.convs.reduce((m, c) => Math.max(m, c.lead_score || 0), 0);
+                  return (
+                    <div
+                      key={g.user_id}
+                      className="px-4 py-3 hover:bg-accent/40 border-b border-border last:border-b-0 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {g.profile?.preferred_avatar ? (
+                            <img src={g.profile.preferred_avatar} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <UserCircle2 className="h-6 w-6 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold">{name}</p>
+                            {g.profile?.email && g.profile?.full_name && (
+                              <span className="text-xs text-muted-foreground">{g.profile.email}</span>
+                            )}
+                            <Badge variant="secondary" className="text-[10px]">{g.convs.length} สนทนา</Badge>
+                            <Badge variant="outline" className="text-[10px]">{msgs} ข้อความ</Badge>
+                            {bestLead >= 70 && (
+                              <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700">⚡ Lead {bestLead}</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ล่าสุด: {format(new Date(g.lastAt), "d MMM yyyy HH:mm", { locale: th })}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {g.convs.slice(0, 5).map((c) => (
+                              <button
+                                key={c.id}
+                                onClick={() => setSelectedConversation(c.id)}
+                                className="text-[11px] px-2 py-0.5 rounded border border-border hover:bg-accent transition-colors"
+                              >
+                                {format(new Date(c.started_at), "d MMM HH:mm", { locale: th })}
+                                {c.intent && ` · ${INTENT_LABEL[c.intent] || c.intent}`}
+                              </button>
+                            ))}
+                            {g.convs.length > 5 && (
+                              <span className="text-[11px] text-muted-foreground self-center">+{g.convs.length - 5}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setUserFilter(g.user_id); setViewMode("conversations"); }}
+                        >
+                          ดูทั้งหมด <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )
       ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
@@ -843,6 +1011,14 @@ ${bubbles}
                       )}
                       <Badge variant="secondary" className="text-[10px]">{conv.message_count} ข้อความ</Badge>
                       <Badge variant="outline" className="text-[10px]">{langLabel(conv.language || "th")}</Badge>
+                      {conv.user_id ? (
+                        <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-700 border-blue-500/30">
+                          <UserCircle2 className="h-3 w-3 mr-0.5" />
+                          {profilesMap[conv.user_id]?.full_name || profilesMap[conv.user_id]?.email || "ลงทะเบียนแล้ว"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] text-muted-foreground">Guest</Badge>
+                      )}
                     </div>
                     {conv.summary ? (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{conv.summary}</p>
