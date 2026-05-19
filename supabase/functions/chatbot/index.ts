@@ -383,30 +383,43 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
 
     const stream = new ReadableStream({
       async start(controller) {
-        const encoder = new TextEncoder();
         const decoder = new TextDecoder();
+        // Buffer partial SSE lines that get split across TCP chunks so we
+        // never silently drop deltas whose JSON spans two reads.
+        let sseBuffer = "";
+
+        const consume = (flush = false) => {
+          // Split on newlines, keep last partial line in buffer unless flushing
+          const parts = sseBuffer.split("\n");
+          sseBuffer = flush ? "" : parts.pop() ?? "";
+          for (let line of parts) {
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr || jsonStr === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) fullAssistantText += content;
+            } catch {
+              // Truly malformed line — log and keep going (do not silently drop)
+              console.warn("SSE parse skip:", jsonStr.slice(0, 120));
+            }
+          }
+        };
 
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            
-            // Forward chunk to client
+            // Forward chunk to client untouched
             controller.enqueue(value);
-
-            // Parse to collect full text
-            const chunk = decoder.decode(value, { stream: true });
-            for (const line of chunk.split("\n")) {
-              if (!line.startsWith("data: ")) continue;
-              const jsonStr = line.slice(6).trim();
-              if (jsonStr === "[DONE]") continue;
-              try {
-                const parsed = JSON.parse(jsonStr);
-                const content = parsed.choices?.[0]?.delta?.content;
-                if (content) fullAssistantText += content;
-              } catch { /* partial */ }
-            }
+            sseBuffer += decoder.decode(value, { stream: true });
+            consume(false);
           }
+          // Flush whatever remained
+          sseBuffer += decoder.decode();
+          consume(true);
         } finally {
           controller.close();
           // Save assistant response to DB after streaming completes
@@ -420,6 +433,7 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
         }
       },
     });
+
 
     return new Response(stream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Conversation-Id": conversationId, "X-Ai-Staff-Name": encodeURIComponent(aiStaffName) },
