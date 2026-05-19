@@ -55,6 +55,7 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingNotice, setPendingNotice] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
