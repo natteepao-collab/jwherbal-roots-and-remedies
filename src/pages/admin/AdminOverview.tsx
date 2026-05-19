@@ -338,6 +338,11 @@ const AdminOverview = () => {
         />
       </div>
 
+      {/* SEO & Traffic Analytics */}
+      <SeoAnalyticsSection />
+
+
+
       {/* Recent Orders */}
       <Card>
         <CardHeader>
