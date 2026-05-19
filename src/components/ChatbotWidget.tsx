@@ -338,7 +338,8 @@ const ChatbotWidget = () => {
       }
 
       // Sync the server-enforced staff name (server is source of truth)
-      const respStaff = resp.headers.get("x-ai-staff-name");
+      const respStaffRaw = resp.headers.get("x-ai-staff-name");
+      const respStaff = respStaffRaw ? decodeURIComponent(respStaffRaw) : null;
       if (respStaff && respStaff !== currentStaff) {
         setCurrentStaff(respStaff);
       }
