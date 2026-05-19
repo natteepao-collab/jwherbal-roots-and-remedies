@@ -78,8 +78,11 @@ const ChatbotWidget = () => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [customerName, setCustomerName] = useState<string>("ลูกค้า");
+  const [customerAvatar, setCustomerAvatar] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [adminTakeover, setAdminTakeover] = useState(false);
   const hideOnScroll = useHideOnScroll();
   const scrollRef = useRef<HTMLDivElement>(null);
 
