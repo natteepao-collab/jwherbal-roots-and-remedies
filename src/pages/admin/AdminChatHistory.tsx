@@ -455,6 +455,28 @@ const AdminChatHistory = () => {
             )}
           </CardContent>
         </Card>
+
+        {conv?.admin_takeover && (
+          <Card>
+            <CardContent className="p-3">
+              <div className="flex gap-2">
+                <Input
+                  value={adminReply}
+                  onChange={(e) => setAdminReply(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendAdminReply())}
+                  placeholder="พิมพ์ข้อความตอบลูกค้า (ส่งในนามแอดมิน)..."
+                  disabled={sendingReply}
+                />
+                <Button onClick={sendAdminReply} disabled={sendingReply || !adminReply.trim()}>
+                  <Send className="h-4 w-4 mr-1" /> ส่ง
+                </Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                ลูกค้าจะเห็นข้อความนี้ทันทีในแชทผ่าน Realtime — AI ถูกพักไว้จนกว่าจะกด "คืนให้ AI ดูแล"
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }
