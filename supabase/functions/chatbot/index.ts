@@ -43,11 +43,19 @@ async function notifyNewChat(supabase: any, messages: any[], language: string) {
   }
 }
 
+const STAFF_NAMES = ["เอมอร", "นันนพัส", "ธัญญ์สิริน", "ชญานิศ", "ณัฐวรินทร์"];
+const pickStaffName = () => STAFF_NAMES[Math.floor(Math.random() * STAFF_NAMES.length)];
+const normalizeStaffName = (raw: unknown): string | null => {
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  return STAFF_NAMES.includes(trimmed) ? trimmed : null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, language, sessionId, context, userJwt } = await req.json();
+    const { messages, language, sessionId, context, userJwt, staffName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -73,17 +81,32 @@ serve(async (req) => {
       device_type: context?.deviceType || null,
     };
 
+    // Server-side enforcement of the AI staff name per conversation/session.
+    // The first valid client-provided name is persisted; subsequent calls always
+    // use the persisted value regardless of what the client sends.
+    const clientStaff = normalizeStaffName(staffName);
+
     // Get or create conversation
     let conversationId: string;
+    let aiStaffName: string;
     if (sessionId) {
       const { data: existing } = await supabase
         .from("chat_conversations")
-        .select("id, user_id")
+        .select("id, user_id, ai_staff_name")
         .eq("session_id", sessionId)
         .maybeSingle();
 
       if (existing) {
         conversationId = existing.id;
+        if (existing.ai_staff_name) {
+          aiStaffName = existing.ai_staff_name;
+        } else {
+          aiStaffName = clientStaff || pickStaffName();
+          await supabase
+            .from("chat_conversations")
+            .update({ ai_staff_name: aiStaffName })
+            .eq("id", conversationId);
+        }
         // Backfill user_id once the visitor logs in mid-conversation
         if (authUserId && !existing.user_id) {
           await supabase
@@ -92,12 +115,14 @@ serve(async (req) => {
             .eq("id", conversationId);
         }
       } else {
+        aiStaffName = clientStaff || pickStaffName();
         const { data: created } = await supabase
           .from("chat_conversations")
           .insert({
             session_id: sessionId,
             language: language || "th",
             user_id: authUserId,
+            ai_staff_name: aiStaffName,
             ...convContext,
           })
           .select("id")
@@ -106,12 +131,14 @@ serve(async (req) => {
         await notifyNewChat(supabase, messages, language || "th");
       }
     } else {
+      aiStaffName = clientStaff || pickStaffName();
       const { data: created } = await supabase
         .from("chat_conversations")
         .insert({
           session_id: crypto.randomUUID(),
           language: language || "th",
           user_id: authUserId,
+          ai_staff_name: aiStaffName,
           ...convContext,
         })
         .select("id")
@@ -119,6 +146,7 @@ serve(async (req) => {
       conversationId = created!.id;
       await notifyNewChat(supabase, messages, language || "th");
     }
+
 
     // Save the latest user message
     const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
