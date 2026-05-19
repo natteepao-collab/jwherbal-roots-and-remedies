@@ -47,13 +47,24 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, language, sessionId, context } = await req.json();
+    const { messages, language, sessionId, context, userJwt } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Resolve authenticated user from JWT (if provided) to bind conversation to account
+    let authUserId: string | null = null;
+    if (userJwt && typeof userJwt === "string") {
+      try {
+        const { data: userData } = await supabase.auth.getUser(userJwt);
+        authUserId = userData?.user?.id ?? null;
+      } catch (e) {
+        console.warn("getUser failed:", e);
+      }
+    }
 
     const convContext = {
       page_url: context?.pageUrl || null,
@@ -67,16 +78,28 @@ serve(async (req) => {
     if (sessionId) {
       const { data: existing } = await supabase
         .from("chat_conversations")
-        .select("id")
+        .select("id, user_id")
         .eq("session_id", sessionId)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         conversationId = existing.id;
+        // Backfill user_id once the visitor logs in mid-conversation
+        if (authUserId && !existing.user_id) {
+          await supabase
+            .from("chat_conversations")
+            .update({ user_id: authUserId })
+            .eq("id", conversationId);
+        }
       } else {
         const { data: created } = await supabase
           .from("chat_conversations")
-          .insert({ session_id: sessionId, language: language || "th", ...convContext })
+          .insert({
+            session_id: sessionId,
+            language: language || "th",
+            user_id: authUserId,
+            ...convContext,
+          })
           .select("id")
           .single();
         conversationId = created!.id;
@@ -85,12 +108,18 @@ serve(async (req) => {
     } else {
       const { data: created } = await supabase
         .from("chat_conversations")
-        .insert({ session_id: crypto.randomUUID(), language: language || "th", ...convContext })
+        .insert({
+          session_id: crypto.randomUUID(),
+          language: language || "th",
+          user_id: authUserId,
+          ...convContext,
+        })
         .select("id")
         .single();
       conversationId = created!.id;
       await notifyNewChat(supabase, messages, language || "th");
     }
+
 
     // Save the latest user message
     const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
