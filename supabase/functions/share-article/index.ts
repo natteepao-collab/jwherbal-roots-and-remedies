@@ -214,10 +214,11 @@ Deno.serve(async (req) => {
       .eq("slug", slug)
       .maybeSingle();
 
-    const ogImage = normalizeOgImage(article?.image_url, site);
+    const rawImage = isReachableImage(article?.image_url) ? article!.image_url : null;
+    const ogImage = normalizeOgImage(rawImage, site);
 
     if (mode === "image") {
-      return await proxyImage(ogImage.url);
+      return await proxyImage(ogImage.url, site);
     }
 
     // Humans: redirect immediately — no need to render OG.
