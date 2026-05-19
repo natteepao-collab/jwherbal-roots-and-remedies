@@ -354,20 +354,26 @@ ${contact ? `📞 ${contact.phone} (${contact.phone_hours})\n💬 LINE: ${contac
     });
 
     if (!response.ok) {
+      const errHeaders = {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Conversation-Id": conversationId,
+        "X-Ai-Staff-Name": aiStaffName,
+      };
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง" }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: errHeaders,
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "ระบบไม่พร้อมให้บริการชั่วคราว" }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: errHeaders,
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(JSON.stringify({ error: "เกิดข้อผิดพลาด กรุณาลองใหม่" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: errHeaders,
       });
     }
 
