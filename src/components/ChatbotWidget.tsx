@@ -95,7 +95,7 @@ const ChatbotWidget = () => {
   useEffect(() => {
     const path = location.pathname;
     const isProductPage =
-      /^\/shop\/[^/]+/.test(path) || path === "/products/vflow";
+      path === "/shop" || /^\/shop\/[^/]+/.test(path) || path === "/products/vflow";
     if (!isProductPage) return;
     if (isOpen) return;
     if (sessionStorage.getItem("jwh_proactive_chat_shown") === "1") return;
