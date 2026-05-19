@@ -8,6 +8,7 @@ import aloeCream from './aloe-cream.jpg';
 import hempOil from './hemp-oil.jpg';
 
 import vflowProduct from '../vflow-product.png';
+import vflowCapsule from '../vflow-capsule.png';
 
 export const productImages: Record<string, string> = {
   '8ff16e0a-b394-4f0b-b275-137077cb0d9c': greenTea,           // ชาเขียวสมุนไพร GreenEase
@@ -18,7 +19,7 @@ export const productImages: Record<string, string> = {
   'b1b1a4c9-ef1b-4394-a698-c29ead53d87d': blackGingerCapsule, // แคปซูลกระชายดำ BlackGinger Plus
   '427ce8a3-d057-470d-94af-8a75de766fb9': aloeCream,          // ครีมว่านหางจระเข้ AloeVera Care
   '3db10bae-ba78-4b2c-9591-35b9ae79c526': hempOil,            // น้ำมันสกัดกัญชง HempOil Wellness
-  'a1f1c1d1-1111-4111-8111-111111111111': vflowProduct,       // V Flow 60 แคปซูล
+  'a1f1c1d1-1111-4111-8111-111111111111': vflowCapsule,      // V Flow 60 แคปซูล
   'b2f2c2d2-2222-4222-8222-222222222222': vflowProduct,       // V Flow Herbal Drink
 };
 
