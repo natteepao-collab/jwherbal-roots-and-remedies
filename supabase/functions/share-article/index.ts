@@ -13,7 +13,19 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const DEFAULT_SITE = "https://jwherbal-roots-and-remedies.lovable.app";
-const DEFAULT_IMAGE = `${DEFAULT_SITE}/favicon.png`;
+const FALLBACK_IMAGE_PATH = "/og-default.jpg";
+const DEFAULT_IMAGE = `${DEFAULT_SITE}${FALLBACK_IMAGE_PATH}`;
+
+// image_url ที่ชี้ไปยัง bundled assets (เช่น /src/assets/...) ไม่สามารถ
+// เข้าถึงจาก crawler ภายนอกได้ — ให้ถือว่าใช้ไม่ได้และ fallback แทน
+function isReachableImage(raw: string | null | undefined): boolean {
+  if (!raw) return false;
+  const v = raw.trim();
+  if (!v) return false;
+  if (v.startsWith("/src/")) return false;
+  if (v.startsWith("src/")) return false;
+  return true;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
