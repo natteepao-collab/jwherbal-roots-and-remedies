@@ -150,6 +150,21 @@ const Index = () => {
     },
   });
 
+  // Fetch featured/recommended articles (admin starred)
+  const { data: featuredDbArticles } = useQuery({
+    queryKey: ["home-featured-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("is_featured", true)
+        .order("updated_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch latest community posts from DB (updated_at desc)
   const { data: latestCommunityPosts } = useQuery({
     queryKey: ["home-latest-community"],
