@@ -201,79 +201,81 @@ export const BrandStoryGallery = () => {
 
         {/* Gallery Carousel */}
         <div className="relative w-full max-w-6xl mx-auto">
-          {/* Main Slide Viewport */}
-          <div
-            className="relative group rounded-3xl overflow-hidden bg-white border border-border/50 shadow-[0_20px_50px_-20px_hsl(var(--foreground)/0.15)] min-h-[420px] md:min-h-[560px] lg:min-h-[640px] flex items-center justify-center"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            {galleryItems.map((item, index) => {
-              const focalX = (item as any).focal_x ?? 0.5;
-              const focalY = (item as any).focal_y ?? 0.5;
-              const isActive = index === currentIndex;
-              return (
-                <div
-                  key={item.id}
-                  className={cn(
-                    "absolute inset-0 transform-gpu transition-all duration-1000 ease-in-out",
-                    isActive ? "opacity-100 z-20 scale-100" : "opacity-0 z-0 pointer-events-none scale-95"
-                  )}
-                  style={{
-                    backgroundImage: `url(${getImageUrl(item.image_url)})`,
-                    backgroundPosition: `${focalX * 100}% ${focalY * 100}%`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundColor: "#fafaf9",
-                  }}
-                >
-                  <img
-                    src={getImageUrl(item.image_url)}
-                    alt={getLocalizedText(item, "title")}
-                    className="sr-only"
-                  />
-                </div>
-              );
-            })}
+          {/* Unified card: image viewport on top, caption below — no overlap */}
+          <div className="rounded-3xl overflow-hidden bg-white border border-border/50 shadow-[0_20px_50px_-20px_hsl(var(--foreground)/0.15)]">
+            {/* Image viewport */}
+            <div
+              className="relative group min-h-[320px] md:min-h-[480px] lg:min-h-[560px]"
+              onMouseEnter={() => setIsAutoPlaying(false)}
+              onMouseLeave={() => setIsAutoPlaying(true)}
+            >
+              {galleryItems.map((item, index) => {
+                const focalX = (item as any).focal_x ?? 0.5;
+                const focalY = (item as any).focal_y ?? 0.5;
+                const isActive = index === currentIndex;
+                return (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "absolute inset-0 transform-gpu transition-all duration-1000 ease-in-out",
+                      isActive ? "opacity-100 z-20 scale-100" : "opacity-0 z-0 pointer-events-none scale-95"
+                    )}
+                    style={{
+                      backgroundImage: `url(${getImageUrl(item.image_url)})`,
+                      backgroundPosition: `${focalX * 100}% ${focalY * 100}%`,
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundColor: "#fafaf9",
+                    }}
+                  >
+                    <img
+                      src={getImageUrl(item.image_url)}
+                      alt={getLocalizedText(item, "title")}
+                      className="sr-only"
+                    />
+                  </div>
+                );
+              })}
 
-            {/* Floating editorial caption card */}
-            <div className="absolute bottom-5 left-5 right-5 md:bottom-7 md:left-7 md:right-auto md:max-w-md z-40">
-              <div className="bg-background/95 backdrop-blur-md p-5 md:p-7 rounded-2xl shadow-xl border border-white/60">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px w-10 bg-primary" />
-                  <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary inline-flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3" />
-                    {currentLanguage === "th" ? "กิจกรรม & รางวัล" : currentLanguage === "en" ? "Activities & Awards" : "活动和奖项"}
-                  </span>
-                </div>
-                <h3 className="text-lg md:text-2xl font-semibold text-foreground leading-snug mb-2 md:mb-3">
-                  {getLocalizedText(currentItem, "title")}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed font-light line-clamp-3">
-                  {getLocalizedText(currentItem, "description")}
-                </p>
-              </div>
+              {/* Ghost navigation arrows */}
+              {galleryItems.length > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    aria-label="Previous slide"
+                    className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white border border-border/60 text-foreground opacity-70 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm shadow-md transition-all duration-300 z-40"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    aria-label="Next slide"
+                    className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white border border-border/60 text-foreground opacity-70 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm shadow-md transition-all duration-300 z-40"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
             </div>
 
-            {/* Ghost navigation arrows */}
-            {galleryItems.length > 1 && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  aria-label="Previous slide"
-                  className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/70 hover:bg-white border border-border/60 text-foreground opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-md transition-all duration-300 z-40"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  aria-label="Next slide"
-                  className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/70 hover:bg-white border border-border/60 text-foreground opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-md transition-all duration-300 z-40"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
+            {/* Caption panel — sits below the image, never covers it */}
+            <div className="border-t border-border/40 bg-background/60 backdrop-blur-sm px-5 py-5 md:px-8 md:py-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-px w-8 bg-primary" />
+                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary inline-flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3" />
+                  {currentLanguage === "th" ? "กิจกรรม & รางวัล" : currentLanguage === "en" ? "Activities & Awards" : "活动和奖项"}
+                </span>
+              </div>
+              <h3 className="text-base md:text-xl font-semibold text-foreground leading-snug mb-1.5">
+                {getLocalizedText(currentItem, "title")}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed font-light line-clamp-2 md:line-clamp-none">
+                {getLocalizedText(currentItem, "description")}
+              </p>
+            </div>
           </div>
+
 
           {/* Minimal thumbnail strip */}
           {galleryItems.length > 1 && (
