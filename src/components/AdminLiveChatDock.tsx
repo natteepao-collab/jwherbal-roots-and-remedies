@@ -390,12 +390,30 @@ const AdminLiveChatDock = () => {
       )}
 
       {open && (
-        <Card className="fixed bottom-40 left-4 z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden lg:bottom-24">
-          {/* Header */}
-          <div className="px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2">
+        <Card
+          style={pos ? { left: pos.x, top: pos.y } : undefined}
+          className={cn(
+            "fixed z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden",
+            !pos && "bottom-40 left-4 lg:bottom-24"
+          )}
+        >
+          {/* Header (drag handle) */}
+          <div
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            style={{ touchAction: "none" }}
+            className={cn(
+              "px-3 py-2.5 border-b bg-primary text-primary-foreground flex items-center gap-2 select-none",
+              dragging ? "cursor-grabbing" : "cursor-grab"
+            )}
+            title="ลากเพื่อย้ายหน้าต่าง"
+          >
             {selectedId && (
               <button
                 onClick={() => setSelectedId(null)}
+                onPointerDown={(e) => e.stopPropagation()}
                 aria-label="กลับ"
                 className="p-1 -ml-1 hover:bg-white/15 rounded"
               >
@@ -403,6 +421,7 @@ const AdminLiveChatDock = () => {
               </button>
             )}
             <Headset className="h-4 w-4" />
+
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold leading-tight">
                 {selectedId ? "ห้องแชท" : "Admin Live Chat"}
