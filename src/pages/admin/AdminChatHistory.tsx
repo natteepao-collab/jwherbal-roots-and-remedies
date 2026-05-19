@@ -389,6 +389,104 @@ const AdminChatHistory = () => {
     </AlertDialog>
   );
 
+  const exportTranscriptCsv = (conv: Conversation, msgs: ChatMessage[]) => {
+    if (msgs.length === 0) {
+      toast.error("ไม่มีข้อความให้ส่งออก");
+      return;
+    }
+    const esc = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const headers = ["เวลา", "ผู้พูด", "ข้อความ"];
+    const rows = msgs.map((m) => [
+      format(new Date(m.created_at), "yyyy-MM-dd HH:mm:ss"),
+      m.role === "user" ? "ลูกค้า" : "JW HERBAL",
+      (m.content || "").replace(/\r?\n/g, " "),
+    ]);
+    const csv =
+      headers.join(",") + "\n" +
+      rows.map((r) => r.map(esc).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `chat-${conv.id.slice(0, 8)}-${format(new Date(conv.started_at), "yyyyMMdd-HHmm")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`ส่งออก ${msgs.length} ข้อความเป็น CSV`);
+  };
+
+  const exportTranscriptPdf = (conv: Conversation, msgs: ChatMessage[]) => {
+    if (msgs.length === 0) {
+      toast.error("ไม่มีข้อความให้ส่งออก");
+      return;
+    }
+    const esc = (s: string) =>
+      String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    const meta: string[] = [];
+    meta.push(`เริ่ม: ${format(new Date(conv.started_at), "d MMM yyyy HH:mm", { locale: th })}`);
+    meta.push(`จำนวนข้อความ: ${conv.message_count}`);
+    if (conv.language) meta.push(`ภาษา: ${conv.language.toUpperCase()}`);
+    if (conv.customer_name) meta.push(`ลูกค้า: ${esc(conv.customer_name)}`);
+    if (conv.customer_phone) meta.push(`โทร: ${esc(conv.customer_phone)}`);
+    if (conv.customer_email) meta.push(`อีเมล: ${esc(conv.customer_email)}`);
+    if (conv.page_url) meta.push(`หน้า: ${esc(conv.page_url)}`);
+
+    const bubbles = msgs
+      .map((m) => {
+        const isUser = m.role === "user";
+        const who = isUser ? "ลูกค้า" : "JW HERBAL";
+        const time = format(new Date(m.created_at), "d MMM HH:mm", { locale: th });
+        return `
+          <div class="row ${isUser ? "user" : "bot"}">
+            <div class="who">${who} · <span class="time">${time}</span></div>
+            <div class="bubble">${esc(m.content)}</div>
+          </div>`;
+      })
+      .join("");
+
+    const html = `<!doctype html><html lang="th"><head><meta charset="utf-8">
+<title>Chat Transcript ${conv.id.slice(0, 8)}</title>
+<style>
+  @page { size: A4; margin: 18mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Sarabun","Noto Sans Thai","Tahoma",sans-serif; color:#111; font-size: 12pt; line-height: 1.5; margin: 0; padding: 24px; }
+  h1 { font-size: 18pt; margin: 0 0 4px; }
+  .meta { color:#555; font-size: 10pt; margin-bottom: 16px; border-bottom:1px solid #ddd; padding-bottom: 10px; }
+  .meta div { margin: 2px 0; }
+  .row { margin: 10px 0; max-width: 78%; }
+  .row.user { margin-left:auto; text-align:right; }
+  .row.bot { margin-right:auto; }
+  .who { font-size: 9pt; color:#666; margin-bottom: 2px; }
+  .time { color:#999; }
+  .bubble { display:inline-block; padding: 8px 12px; border-radius: 10px; white-space: pre-wrap; word-break: break-word; text-align:left; }
+  .user .bubble { background:#0a7d3b; color:#fff; }
+  .bot .bubble { background:#f1f3f5; color:#111; border:1px solid #e6e8eb; }
+  .footer { margin-top: 24px; font-size: 9pt; color:#888; text-align:center; border-top:1px solid #eee; padding-top: 8px; }
+  @media print { .no-print { display:none; } }
+  .no-print { position: fixed; top: 12px; right: 12px; }
+  .no-print button { padding: 8px 14px; font-size: 12pt; cursor:pointer; }
+</style></head><body>
+<div class="no-print"><button onclick="window.print()">พิมพ์ / บันทึก PDF</button></div>
+<h1>JW HERBAL — Chat Transcript</h1>
+<div class="meta">${meta.map((m) => `<div>${m}</div>`).join("")}</div>
+${bubbles}
+<div class="footer">ส่งออกเมื่อ ${format(new Date(), "d MMM yyyy HH:mm", { locale: th })} · Conversation ${conv.id}</div>
+<script>setTimeout(() => window.print(), 400);</script>
+</body></html>`;
+
+    const w = window.open("", "_blank");
+    if (!w) {
+      toast.error("เบราว์เซอร์บล็อกการเปิดหน้าต่างใหม่ — กรุณาอนุญาต popup");
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    toast.success("เปิดหน้าต่างพิมพ์ — เลือก 'บันทึกเป็น PDF'");
+  };
+
   if (selectedConversation) {
     const conv = conversations.find((c) => c.id === selectedConversation);
     return (
