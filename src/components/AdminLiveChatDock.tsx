@@ -394,8 +394,9 @@ const AdminLiveChatDock = () => {
         <Card
           style={pos ? { left: pos.x, top: pos.y } : undefined}
           className={cn(
-            "fixed z-50 w-[min(92vw,380px)] h-[min(80vh,560px)] shadow-2xl flex flex-col overflow-hidden",
-            !pos && "bottom-40 left-4 lg:bottom-24"
+            "fixed z-50 shadow-2xl flex flex-col overflow-hidden",
+            "w-[calc(100vw-1.5rem)] h-[70vh] max-h-[560px] sm:w-[min(92vw,380px)] sm:h-[min(80vh,560px)] md:w-[400px] lg:w-[420px] lg:h-[600px]",
+            !pos && "bottom-36 left-3 md:bottom-28 md:left-5 lg:bottom-6 lg:left-6"
           )}
         >
           {/* Header (drag handle) */}
