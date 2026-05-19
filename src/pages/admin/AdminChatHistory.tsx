@@ -24,6 +24,7 @@ import { toast } from "sonner";
 type Conversation = {
   id: string;
   session_id: string;
+  user_id: string | null;
   started_at: string;
   last_message_at: string;
   message_count: number;
