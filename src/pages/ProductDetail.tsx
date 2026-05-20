@@ -15,6 +15,8 @@ import PromotionModal from "@/components/PromotionModal";
 import { useState, useEffect, useMemo } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { FadeImage } from "@/components/ui/FadeImage";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
