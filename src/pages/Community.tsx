@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Calendar, MessageSquare, Eye, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import { SeoHead } from "@/components/SeoHead";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -181,6 +182,11 @@ const Community = () => {
 
   return (
     <PageTransition>
+    <SeoHead
+      title="ชุมชน JWHERBAL — แลกเปลี่ยนประสบการณ์สมุนไพรเพื่อสุขภาพ"
+      description="พื้นที่พูดคุยและแบ่งปันประสบการณ์การดูแลสุขภาพด้วยสมุนไพรไทย เรียนรู้จากผู้ใช้จริงในชุมชน JWHERBAL"
+      path="/community"
+    />
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">

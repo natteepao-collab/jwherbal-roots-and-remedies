@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PageTransition from "@/components/PageTransition";
@@ -120,6 +121,22 @@ const Shop = () => {
       title={`${t("shop.title")} | JWHERBAL`}
       description="เลือกซื้อผลิตภัณฑ์สมุนไพรไทยคุณภาพจาก JWHERBAL ทั้ง V Flow แคปซูล และเครื่องดื่มสมุนไพรเพื่อสุขภาพ"
       path="/shop"
+    />
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "JWHERBAL Shop",
+        description: "ผลิตภัณฑ์สมุนไพรเพื่อสุขภาพจาก JWHERBAL",
+        url: "https://jwherbal-roots-and-remedies.lovable.app/shop",
+        hasPart: (sortedProducts || []).slice(0, 20).map((p) => ({
+          "@type": "Product",
+          name: getProductName(p),
+          image: p.image_url,
+          url: `https://jwherbal-roots-and-remedies.lovable.app/shop/${p.id}`,
+          offers: { "@type": "Offer", priceCurrency: "THB", price: p.price },
+        })),
+      }}
     />
     <div className="min-h-screen flex flex-col">
 

@@ -1,0 +1,22 @@
+# JWHERBAL
+
+> ร้านค้าออนไลน์สมุนไพรและผลิตภัณฑ์เพื่อสุขภาพคุณภาพ พร้อมบทความความรู้และชุมชนแลกเปลี่ยนประสบการณ์ — เน้นผลิตภัณฑ์ JWHERBAL DRINK และ JWHERBAL Capsule (V FLOW)
+
+JWHERBAL is a Thai herbal wellness brand offering two core products — a herbal drink and capsule formulation (V FLOW) — alongside educational health articles, customer reviews, and a community forum.
+
+## Pages
+
+- [Home](/): Brand story, featured products, latest articles.
+- [About](/about): Company mission, values, and certifications.
+- [Shop](/shop): Full product catalog (V FLOW Drink and Capsule).
+- [V FLOW Product](/shop/vflow): Detailed product page with ingredients, usage, and FAQ.
+- [Articles](/articles): Health and herbal wisdom blog.
+- [Reviews](/reviews): Customer testimonials and star ratings.
+- [Community](/community): User forum for herbal and wellness discussion.
+- [Certifications](/certifications): Quality and safety certifications.
+- [FAQ](/faq): Frequently asked questions.
+- [Contact](/contact): Get in touch with the JWHERBAL team.
+
+## Optional
+
+- [Cart](/cart): Shopping cart (per-user).
