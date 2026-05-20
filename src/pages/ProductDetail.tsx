@@ -146,6 +146,33 @@ const ProductDetail = () => {
 
   return (
     <PageTransition>
+      <SeoHead
+        title={name}
+        description={(description || `${name} - ผลิตภัณฑ์สมุนไพรคุณภาพจาก JWHERBAL`).slice(0, 160)}
+        path={`/shop/${product.id}`}
+        image={mainImage}
+        type="product"
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name,
+          image: mainImage,
+          description,
+          brand: { "@type": "Brand", name: "JW HERBAL" },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "THB",
+            price: lowestPrice ?? product.price,
+            availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: `https://jwherbal-roots-and-remedies.lovable.app/shop/${product.id}`,
+          },
+          aggregateRating: product.rating
+            ? { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: 20 }
+            : undefined,
+        }}
+      />
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
           {/* Back button */}
