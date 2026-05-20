@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeoHead } from "@/components/SeoHead";
+import { JsonLd } from "@/components/JsonLd";
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -39,6 +40,35 @@ const Contact = () => {
       title="ติดต่อเรา - JWHERBAL"
       description="ติดต่อสอบถามผลิตภัณฑ์สมุนไพร JWHERBAL และ V Flow ผ่านโทรศัพท์ LINE Facebook หรือส่งข้อความถึงทีมงาน"
       path="/contact"
+    />
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "HealthAndBeautyBusiness",
+        name: "JWHERBAL",
+        url: "https://jwherbal-roots-and-remedies.lovable.app/contact",
+        image: "https://jwherbal-roots-and-remedies.lovable.app/og-image.jpg",
+        telephone: settings?.phone || "",
+        email: settings?.email || "",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: settings?.address || "",
+          addressCountry: "TH",
+        },
+        openingHoursSpecification: [
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            description: settings?.weekday_hours || "9:00 - 18:00",
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Saturday", "Sunday"],
+            description: settings?.weekend_hours || "10:00 - 16:00",
+          },
+        ],
+        sameAs: [settings?.facebook_url, settings?.instagram_url, settings?.line_url].filter(Boolean),
+      }}
     />
     <div className="min-h-screen flex flex-col">
 
