@@ -348,9 +348,11 @@ const ArticleDetail = () => {
           <meta name="description" content={staticArticle.metaDescription} />
           <meta name="keywords" content={staticArticle.keywords.join(", ")} />
           <meta name="author" content={staticArticle.author} />
+          <link rel="canonical" href={`https://jwherbal-roots-and-remedies.lovable.app/articles/${staticArticle.slug}`} />
           <meta property="og:title" content={staticArticle.title[currentLang]} />
           <meta property="og:description" content={staticArticle.metaDescription} />
           <meta property="og:type" content="article" />
+          <meta property="og:url" content={`https://jwherbal-roots-and-remedies.lovable.app/articles/${staticArticle.slug}`} />
           <meta property="og:image" content={staticArticle.coverImage} />
         </Helmet>
         <JsonLd
