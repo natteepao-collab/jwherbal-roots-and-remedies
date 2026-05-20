@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Calendar, MessageSquare, Eye, TrendingUp, Search, Pin, Flame, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import { SeoHead } from "@/components/SeoHead";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
