@@ -14,5 +14,11 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /profile
+Disallow: /orders
 
 Sitemap: https://jwherbal-roots-and-remedies.lovable.app/sitemap.xml
