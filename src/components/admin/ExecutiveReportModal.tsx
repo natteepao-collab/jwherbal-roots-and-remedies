@@ -256,23 +256,76 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={period} onValueChange={(v) => generate(v as Period)} className="w-full">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <TabsList>
-              <TabsTrigger value="week">รายสัปดาห์</TabsTrigger>
-              <TabsTrigger value="month">รายเดือน</TabsTrigger>
-              <TabsTrigger value="year">รายปี</TabsTrigger>
-            </TabsList>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={exportPDF} disabled={!metrics || loading}>
-                <FileText className="h-4 w-4 mr-1" /> PDF
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportExcel} disabled={!metrics || loading}>
-                <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
-              </Button>
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant={period === "week" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("week")}
+            >
+              รายสัปดาห์
+            </Button>
+            <Button
+              variant={period === "month" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("month")}
+            >
+              รายเดือน
+            </Button>
+            <Button
+              variant={period === "year" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("year")}
+            >
+              รายปี
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={period === "custom" ? "default" : "outline"}
+                  size="sm"
+                  className={cn("justify-start text-left font-normal min-w-[220px]")}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {dateRange?.from && dateRange?.to && period === "custom" ? (
+                    <>
+                      {format(dateRange.from, "d MMM yy", { locale: th })} – {format(dateRange.to, "d MMM yy", { locale: th })}
+                    </>
+                  ) : (
+                    <span>เลือกช่วงวันที่ย้อนหลัง</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  initialFocus
+                  disabled={(d) => d > new Date()}
+                  className="pointer-events-auto"
+                />
+                <div className="p-3 border-t flex justify-end gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => setDateRange(undefined)}>ล้าง</Button>
+                  <Button size="sm" onClick={applyCustomRange} disabled={!dateRange?.from || !dateRange?.to}>
+                    สร้างรายงาน
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-        </Tabs>
+
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportPDF} disabled={!metrics || loading}>
+              <FileText className="h-4 w-4 mr-1" /> PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportExcel} disabled={!metrics || loading}>
+              <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
+            </Button>
+          </div>
+        </div>
 
         {loading && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -284,8 +337,8 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         {!loading && !metrics && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Sparkles className="h-12 w-12 text-primary opacity-50" />
-            <p className="text-muted-foreground">เลือกช่วงเวลาด้านบนเพื่อเริ่มสร้างรายงาน</p>
-            <Button onClick={() => generate("month")}>เริ่มวิเคราะห์รายเดือน</Button>
+            <p className="text-muted-foreground">เลือกช่วงเวลา (Preset) หรือกำหนดวันที่เองเพื่อเริ่มสร้างรายงาน</p>
+            <Button onClick={() => selectPreset("month")}>เริ่มวิเคราะห์รายเดือน</Button>
           </div>
         )}
 
