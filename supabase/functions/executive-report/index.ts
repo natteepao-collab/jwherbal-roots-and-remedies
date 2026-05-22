@@ -38,13 +38,13 @@ Deno.serve(async (req) => {
     // Fetch data in parallel
     const [ordersRes, viewsRes, chatsRes, articlesRes, productsRes, usersRes, postsRes] =
       await Promise.all([
-        supabase.from("orders").select("id,total_amount,status,payment_status,created_at,customer_name").gte("created_at", sinceISO),
-        supabase.from("page_views").select("id,path,referrer,country,session_id,created_at").gte("created_at", sinceISO).limit(5000),
-        supabase.from("chat_conversations").select("id,started_at,last_message_at,message_count,admin_takeover,sentiment,intent,language").gte("started_at", sinceISO),
-        supabase.from("articles").select("id,title_th,created_at,likes").gte("created_at", sinceISO),
+        supabase.from("orders").select("id,total_amount,status,payment_status,created_at,customer_name").gte("created_at", sinceISO).lte("created_at", untilISO),
+        supabase.from("page_views").select("id,path,referrer,country,session_id,created_at").gte("created_at", sinceISO).lte("created_at", untilISO).limit(5000),
+        supabase.from("chat_conversations").select("id,started_at,last_message_at,message_count,admin_takeover,sentiment,intent,language").gte("started_at", sinceISO).lte("started_at", untilISO),
+        supabase.from("articles").select("id,title_th,created_at,likes").gte("created_at", sinceISO).lte("created_at", untilISO),
         supabase.from("products").select("id,name_th,price,stock,is_active"),
-        supabase.from("profiles").select("id,created_at").gte("created_at", sinceISO),
-        supabase.from("community_posts").select("id,title_th,views,comments_count,created_at").gte("created_at", sinceISO),
+        supabase.from("profiles").select("id,created_at").gte("created_at", sinceISO).lte("created_at", untilISO),
+        supabase.from("community_posts").select("id,title_th,views,comments_count,created_at").gte("created_at", sinceISO).lte("created_at", untilISO),
       ]);
 
     const orders = ordersRes.data || [];
