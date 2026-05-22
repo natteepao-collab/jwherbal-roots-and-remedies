@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
-import DOMPurify from "isomorphic-dompurify";
+import DOMPurify from "dompurify";
 import { marked } from "marked";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
