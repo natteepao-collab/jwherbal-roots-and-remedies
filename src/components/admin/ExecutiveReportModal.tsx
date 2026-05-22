@@ -147,25 +147,25 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       const logo = await loadImageDataUrl(jwLogo);
       const logoAspect = logo.h / logo.w;
 
-      const fmtDate = (iso: string) =>
-        new Date(iso).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
-      const periodLabel = PERIOD_LABEL[metrics.period];
-      const dateRangeStr = `${fmtDate(metrics.sinceISO)} – ${fmtDate(metrics.untilISO)}`;
-      const generatedStr = new Date().toLocaleString("th-TH");
+      const fmtDateEN = (iso: string) =>
+        new Date(iso).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" });
+      const periodLabelEN: Record<Period, string> = {
+        week: "Weekly", month: "Monthly", year: "Yearly", custom: "Custom Range",
+      };
+      const periodEN = periodLabelEN[metrics.period];
+      const dateRangeEN = `${fmtDateEN(metrics.sinceISO)} – ${fmtDateEN(metrics.untilISO)}`;
+      const generatedEN = new Date().toLocaleString("en-GB");
 
       // ---------- COVER PAGE ----------
-      // Brand band at top
       pdf.setFillColor(...brandOrange);
       pdf.rect(0, 0, pageWidth, 6, "F");
       pdf.setFillColor(...brandDark);
       pdf.rect(0, 6, pageWidth, 2, "F");
 
-      // Logo centered
       const coverLogoW = 70;
       const coverLogoH = coverLogoW * logoAspect;
       pdf.addImage(logo.dataUrl, "PNG", (pageWidth - coverLogoW) / 2, 40, coverLogoW, coverLogoH);
 
-      // Title
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(28);
       pdf.setTextColor(...brandDark);
@@ -174,9 +174,8 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(80);
-      pdf.text("รายงานสรุปผลการดำเนินงานสำหรับผู้บริหาร", pageWidth / 2, 40 + coverLogoH + 32, { align: "center" });
+      pdf.text("Strategic Business Performance Report", pageWidth / 2, 40 + coverLogoH + 32, { align: "center" });
 
-      // Decorative rule
       pdf.setDrawColor(...brandOrange);
       pdf.setLineWidth(0.8);
       pdf.line(pageWidth / 2 - 30, 40 + coverLogoH + 38, pageWidth / 2 + 30, 40 + coverLogoH + 38);
@@ -185,24 +184,26 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       const metaY = 40 + coverLogoH + 54;
       pdf.setDrawColor(220);
       pdf.setFillColor(248, 248, 248);
-      pdf.roundedRect(margin + 20, metaY, pageWidth - (margin + 20) * 2, 38, 3, 3, "FD");
+      pdf.roundedRect(margin + 20, metaY, pageWidth - (margin + 20) * 2, 44, 3, 3, "FD");
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...brandDark);
-      pdf.text("ประเภทรายงาน:", margin + 28, metaY + 10);
-      pdf.text("ช่วงเวลา:", margin + 28, metaY + 20);
-      pdf.text("สร้างเมื่อ:", margin + 28, metaY + 30);
+      pdf.text("Report Type:", margin + 28, metaY + 10);
+      pdf.text("Period:", margin + 28, metaY + 20);
+      pdf.text("Date Range:", margin + 28, metaY + 30);
+      pdf.text("Generated:", margin + 28, metaY + 40);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(60);
-      pdf.text(periodLabel, margin + 70, metaY + 10);
-      pdf.text(dateRangeStr, margin + 70, metaY + 20);
-      pdf.text(generatedStr, margin + 70, metaY + 30);
+      pdf.text("Executive Performance Summary", margin + 70, metaY + 10);
+      pdf.text(periodEN, margin + 70, metaY + 20);
+      pdf.text(dateRangeEN, margin + 70, metaY + 30);
+      pdf.text(generatedEN, margin + 70, metaY + 40);
 
-      // Footer of cover
+      // Cover footer
       pdf.setFont("helvetica", "italic");
       pdf.setFontSize(9);
       pdf.setTextColor(120);
-      pdf.text("CONFIDENTIAL — สำหรับใช้ภายในองค์กรเท่านั้น", pageWidth / 2, pageHeight - 20, { align: "center" });
+      pdf.text("CONFIDENTIAL — For Internal Executive Use Only", pageWidth / 2, pageHeight - 20, { align: "center" });
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...brandDark);
@@ -210,28 +211,24 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
       // ---------- HELPER: page chrome ----------
       const drawPageChrome = (sectionTitle: string) => {
-        // Header band
         pdf.setFillColor(...brandDark);
         pdf.rect(0, 0, pageWidth, headerH, "F");
         pdf.setFillColor(...brandOrange);
         pdf.rect(0, headerH, pageWidth, 1.5, "F");
 
-        // Mini logo
         const miniH = 10;
         const miniW = miniH / logoAspect;
         pdf.addImage(logo.dataUrl, "PNG", margin, (headerH - miniH) / 2, miniW, miniH);
 
-        // Section title
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(12);
+        pdf.setFontSize(11);
         pdf.setTextColor(255);
         pdf.text(sectionTitle, margin + miniW + 6, headerH / 2 + 1.5);
 
-        // Right-side meta
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(8);
         pdf.setTextColor(230);
-        pdf.text(`${periodLabel} • ${dateRangeStr}`, pageWidth - margin, headerH / 2 + 1, { align: "right" });
+        pdf.text(`${periodEN} | ${dateRangeEN}`, pageWidth - margin, headerH / 2 + 1, { align: "right" });
       };
 
       const drawFooter = (pageNum: number, totalPages: number) => {
@@ -242,7 +239,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         pdf.setFontSize(8);
         pdf.setTextColor(120);
         pdf.text("JW GROUP — Executive Report (Confidential)", margin, pageHeight - 5);
-        pdf.text(`หน้า ${pageNum} / ${totalPages}`, pageWidth - margin, pageHeight - 5, { align: "right" });
+        pdf.text(`Page ${pageNum} / ${totalPages}`, pageWidth - margin, pageHeight - 5, { align: "right" });
       };
 
       // ---------- SECTIONS ----------
@@ -255,7 +252,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
       for (let i = 0; i < sections.length; i++) {
         const el = sections[i];
-        const title = el.getAttribute("data-section-title") || `ส่วนที่ ${i + 1}`;
+        const title = el.getAttribute("data-section-title") || `Section ${i + 1}`;
 
         const canvas = await html2canvas(el, {
           scale: 2,
@@ -299,7 +296,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
           sliceTopMm += sliceMm;
           if (remaining > 0) {
             pdf.addPage();
-            drawPageChrome(`${title} (ต่อ)`);
+            drawPageChrome(`${title} (cont.)`);
             pageSectionTitles.push(title);
             yPos = contentTop;
           }
@@ -496,17 +493,52 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
         {metrics && !loading && (
           <div ref={reportRef} className="space-y-6 mt-2">
-            {/* KPI Cards */}
-            <div data-section data-section-title="ตัวชี้วัดหลัก (Key Performance Indicators)" className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
-              <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
-              <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
-              <KpiCard icon={MessageSquare} label="AI Chats" value={metrics.chats} />
+            {/* KPI Cards + Detailed Metrics Table */}
+            <div data-section data-section-title="Key Performance Indicators" className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
+                <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
+                <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
+                <KpiCard icon={MessageSquare} label="AI Chats" value={metrics.chats} />
+              </div>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">ตารางตัวชี้วัดทั้งหมด (Full Metrics Table)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <table className="w-full text-sm border-collapse">
+                    <tbody>
+                      {[
+                        ["ยอดขายรวม (Revenue)", `฿${metrics.revenue.toLocaleString()}`],
+                        ["จำนวนคำสั่งซื้อ (Orders)", metrics.orders.toLocaleString()],
+                        ["มูลค่าเฉลี่ยต่อออเดอร์ (AOV)", `฿${metrics.avgOrderValue.toLocaleString()}`],
+                        ["อัตราการแปลง (Conversion Rate)", `${metrics.conversionRate}%`],
+                        ["จำนวน Page Views", metrics.pageViews.toLocaleString()],
+                        ["ผู้เข้าชมไม่ซ้ำ (Unique Visitors)", metrics.uniqueVisitors.toLocaleString()],
+                        ["จำนวนแชท AI ทั้งหมด", metrics.chats.toLocaleString()],
+                        ["แชทช่วงดึก 00:00–06:00", metrics.afterHoursChats.toLocaleString()],
+                        ["AI ตอบเองสำเร็จ", `${metrics.aiHandled} (${metrics.aiSuccessRate}%)`],
+                        ["บทความใหม่ (New Articles)", metrics.newArticles.toLocaleString()],
+                        ["ชั่วโมงที่ AI ประหยัด", `${metrics.hoursSavedByAi} ชม.`],
+                        ["ผู้ใช้ใหม่ (New Users)", metrics.newUsers.toLocaleString()],
+                        ["โพสต์ชุมชนใหม่", metrics.newCommunityPosts.toLocaleString()],
+                        ["สินค้าที่ใช้งานอยู่", metrics.activeProducts.toLocaleString()],
+                      ].map(([k, v], i) => (
+                        <tr key={i} className={i % 2 === 0 ? "bg-muted/40" : "bg-background"}>
+                          <td className="py-2 px-3 border-b border-border">{k}</td>
+                          <td className="py-2 px-3 border-b border-border text-right font-semibold text-primary">{v}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
             </div>
 
             {/* AI Summary */}
             {aiSummary && (
-              <Card data-section data-section-title="บทสรุปสำหรับผู้บริหาร (Executive Summary)">
+              <Card data-section data-section-title="Executive Summary (AI Analysis)">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" /> สรุปโดย AI สำหรับผู้บริหาร
@@ -534,7 +566,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             )}
 
             {/* Charts */}
-            <div data-section data-section-title="การวิเคราะห์ด้วยกราฟ (Analytics & Charts)" data-charts className="space-y-4 bg-background p-2">
+            <div data-section data-section-title="Analytics & Charts" data-charts className="space-y-4 bg-background p-2">
               <Card>
                 <CardHeader><CardTitle className="text-base">แนวโน้มยอดขาย & การเข้าชม</CardTitle></CardHeader>
                 <CardContent>
@@ -586,7 +618,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             </div>
 
             {/* Business Highlights */}
-            <div data-section data-section-title="ไฮไลต์ทางธุรกิจ (Business Highlights)" className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div data-section data-section-title="Business Highlights" className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <HighlightCard
                 title="AI ช่วยรับลูกค้าช่วงดึก"
                 value={`${metrics.afterHoursChats} เคส`}
