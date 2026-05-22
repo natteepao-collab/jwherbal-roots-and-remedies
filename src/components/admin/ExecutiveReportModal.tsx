@@ -108,86 +108,35 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
 
   const exportPDF = async () => {
-    if (!metrics) return;
+    if (!metrics || !reportRef.current) return;
     try {
-      toast({ title: "กำลังสร้าง PDF...", description: "กรุณารอสักครู่" });
-      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-      const periodLabel = PERIOD_LABEL[metrics.period];
-      const now = new Date().toLocaleString("th-TH");
+      toast({ title: "กำลังสร้าง PDF...", description: "กำลังเรนเดอร์หน้ารายงาน กรุณารอสักครู่" });
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(18);
-      pdf.text(`Executive Report - ${periodLabel}`, 14, 18);
-      pdf.setFontSize(10);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Generated: ${now}`, 14, 25);
-
-      autoTable(pdf, {
-        startY: 32,
-        head: [["KPI", "Value"]],
-        body: [
-          ["Total Revenue (THB)", metrics.revenue.toLocaleString()],
-          ["Orders", String(metrics.orders)],
-          ["Page Views", String(metrics.pageViews)],
-          ["Unique Visitors", String(metrics.uniqueVisitors)],
-          ["Conversion Rate (%)", String(metrics.conversionRate)],
-          ["Avg Order Value (THB)", metrics.avgOrderValue.toLocaleString()],
-          ["AI Chats", String(metrics.chats)],
-          ["After-Hours AI Chats (00-06)", String(metrics.afterHoursChats)],
-          ["AI Success Rate (%)", String(metrics.aiSuccessRate)],
-          ["New Articles", String(metrics.newArticles)],
-          ["Hours Saved by AI", String(metrics.hoursSavedByAi)],
-          ["New Users", String(metrics.newUsers)],
-          ["New Community Posts", String(metrics.newCommunityPosts)],
-        ],
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [16, 185, 129] },
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false,
+        windowWidth: reportRef.current.scrollWidth,
       });
 
-      if (metrics.topPages.length) {
-        autoTable(pdf, {
-          head: [["Top Pages", "Views"]],
-          body: metrics.topPages.map((p) => [p.path, String(p.count)]),
-          styles: { fontSize: 9 },
-          headStyles: { fillColor: [59, 130, 246] },
-        });
-      }
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL("image/png");
 
-      if (metrics.sources.length) {
-        autoTable(pdf, {
-          head: [["Traffic Source", "Visits"]],
-          body: metrics.sources.map((s) => [s.source, String(s.count)]),
-          styles: { fontSize: 9 },
-          headStyles: { fillColor: [139, 92, 246] },
-        });
-      }
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-      // Capture charts as image
-      if (reportRef.current) {
-        const chartsEl = reportRef.current.querySelector<HTMLElement>("[data-charts]");
-        if (chartsEl) {
-          const canvas = await html2canvas(chartsEl, { scale: 2, backgroundColor: "#ffffff" });
-          const img = canvas.toDataURL("image/png");
-          pdf.addPage();
-          pdf.setFontSize(14);
-          pdf.text("Charts", 14, 18);
-          const w = 180;
-          const h = (canvas.height * w) / canvas.width;
-          pdf.addImage(img, "PNG", 14, 24, w, Math.min(h, 250));
-        }
-      }
-
-      // AI summary as plain text
-      if (aiSummary) {
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.setFontSize(14);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("AI Executive Summary", 14, 18);
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "normal");
-        const plain = aiSummary.replace(/[#*`>_-]/g, "").replace(/\n{3,}/g, "\n\n");
-        const lines = pdf.splitTextToSize(plain, 180);
-        pdf.text(lines, 14, 26);
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
 
       pdf.save(`executive-report-${metrics.period}-${Date.now()}.pdf`);
