@@ -112,31 +112,98 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
     try {
       toast({ title: "กำลังสร้าง PDF...", description: "กำลังเรนเดอร์หน้ารายงาน กรุณารอสักครู่" });
 
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        windowWidth: reportRef.current.scrollWidth,
-      });
-
       const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const imgData = canvas.toDataURL("image/png");
+      const margin = 10;
+      const contentWidth = pageWidth - margin * 2;
+      const contentHeight = pageHeight - margin * 2;
 
-      let heightLeft = imgHeight;
-      let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Header
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.text("Executive Report - JW HERBAL", margin, margin + 6);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.text(
+        `${PERIOD_LABEL[metrics.period]} | ${new Date(metrics.sinceISO).toLocaleDateString("th-TH")} - ${new Date(metrics.untilISO).toLocaleDateString("th-TH")} | Generated: ${new Date().toLocaleString("th-TH")}`,
+        margin,
+        margin + 12
+      );
+      let cursorY = margin + 18;
 
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // Collect printable sections (direct children of reportRef)
+      const sections = Array.from(reportRef.current.children) as HTMLElement[];
+
+      for (let i = 0; i < sections.length; i++) {
+        const el = sections[i];
+        const canvas = await html2canvas(el, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          logging: false,
+          windowWidth: el.scrollWidth,
+        });
+        const imgData = canvas.toDataURL("image/png");
+        const imgW = contentWidth;
+        const imgH = (canvas.height * imgW) / canvas.width;
+
+        // If the section fits, place it; otherwise paginate this section across pages
+        if (imgH <= contentHeight - (cursorY - margin)) {
+          pdf.addImage(imgData, "PNG", margin, cursorY, imgW, imgH);
+          cursorY += imgH + 4;
+        } else if (imgH <= contentHeight) {
+          // Doesn't fit on current page but fits on a fresh page → start new page
+          pdf.addPage();
+          cursorY = margin;
+          pdf.addImage(imgData, "PNG", margin, cursorY, imgW, imgH);
+          cursorY += imgH + 4;
+        } else {
+          // Section is taller than a page → slice across pages
+          pdf.addPage();
+          cursorY = margin;
+          let remaining = imgH;
+          let yPos = cursorY;
+          let sliceTop = 0;
+          // Source pixel ratio (canvas px per mm)
+          const pxPerMm = canvas.width / imgW;
+          while (remaining > 0) {
+            const availableMm = contentHeight - (yPos - margin);
+            const sliceMm = Math.min(remaining, availableMm);
+            const sliceHeightPx = sliceMm * pxPerMm;
+
+            const sliceCanvas = document.createElement("canvas");
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = sliceHeightPx;
+            const ctx = sliceCanvas.getContext("2d")!;
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            ctx.drawImage(
+              canvas,
+              0, sliceTop * pxPerMm, canvas.width, sliceHeightPx,
+              0, 0, canvas.width, sliceHeightPx
+            );
+            pdf.addImage(sliceCanvas.toDataURL("image/png"), "PNG", margin, yPos, imgW, sliceMm);
+
+            remaining -= sliceMm;
+            sliceTop += sliceMm;
+            if (remaining > 0) {
+              pdf.addPage();
+              yPos = margin;
+            } else {
+              cursorY = yPos + sliceMm + 4;
+            }
+          }
+        }
+      }
+
+      // Footer page numbers
+      const pageCount = pdf.getNumberOfPages();
+      for (let p = 1; p <= pageCount; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(8);
+        pdf.setTextColor(120);
+        pdf.text(`หน้า ${p} / ${pageCount}`, pageWidth - margin, pageHeight - 4, { align: "right" });
       }
 
       pdf.save(`executive-report-${metrics.period}-${Date.now()}.pdf`);
