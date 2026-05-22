@@ -20,6 +20,23 @@ import { format, subDays, subMonths, subYears, startOfDay, endOfDay } from "date
 import { th } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
+import jwLogo from "@/assets/jw-group-logo.png";
+
+async function loadImageDataUrl(src: string): Promise<{ dataUrl: string; w: number; h: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      c.getContext("2d")!.drawImage(img, 0, 0);
+      resolve({ dataUrl: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight });
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
 
 type Period = "week" | "month" | "year" | "custom";
 
@@ -110,33 +127,136 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
   const exportPDF = async () => {
     if (!metrics || !reportRef.current) return;
     try {
-      toast({ title: "กำลังสร้าง PDF...", description: "กำลังเรนเดอร์หน้ารายงาน กรุณารอสักครู่" });
+      toast({ title: "กำลังสร้างรายงาน PDF...", description: "กรุณารอสักครู่" });
 
       const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
+      const margin = 14;
+      const headerH = 18;
+      const footerH = 12;
+      const contentTop = margin + headerH + 4;
+      const contentBottom = pageHeight - margin - footerH;
       const contentWidth = pageWidth - margin * 2;
-      const contentHeight = pageHeight - margin * 2;
+      const usableHeight = contentBottom - contentTop;
 
-      // Header
+      // Brand colors (matches JW GROUP logo)
+      const brandOrange: [number, number, number] = [217, 119, 41];
+      const brandDark: [number, number, number] = [74, 50, 35];
+
+      const logo = await loadImageDataUrl(jwLogo);
+      const logoAspect = logo.h / logo.w;
+
+      const fmtDate = (iso: string) =>
+        new Date(iso).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
+      const periodLabel = PERIOD_LABEL[metrics.period];
+      const dateRangeStr = `${fmtDate(metrics.sinceISO)} – ${fmtDate(metrics.untilISO)}`;
+      const generatedStr = new Date().toLocaleString("th-TH");
+
+      // ---------- COVER PAGE ----------
+      // Brand band at top
+      pdf.setFillColor(...brandOrange);
+      pdf.rect(0, 0, pageWidth, 6, "F");
+      pdf.setFillColor(...brandDark);
+      pdf.rect(0, 6, pageWidth, 2, "F");
+
+      // Logo centered
+      const coverLogoW = 70;
+      const coverLogoH = coverLogoW * logoAspect;
+      pdf.addImage(logo.dataUrl, "PNG", (pageWidth - coverLogoW) / 2, 40, coverLogoW, coverLogoH);
+
+      // Title
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(16);
-      pdf.text("Executive Report - JW HERBAL", margin, margin + 6);
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(9);
-      pdf.text(
-        `${PERIOD_LABEL[metrics.period]} | ${new Date(metrics.sinceISO).toLocaleDateString("th-TH")} - ${new Date(metrics.untilISO).toLocaleDateString("th-TH")} | Generated: ${new Date().toLocaleString("th-TH")}`,
-        margin,
-        margin + 12
-      );
-      let cursorY = margin + 18;
+      pdf.setFontSize(28);
+      pdf.setTextColor(...brandDark);
+      pdf.text("EXECUTIVE REPORT", pageWidth / 2, 40 + coverLogoH + 22, { align: "center" });
 
-      // Collect printable sections (direct children of reportRef)
-      const sections = Array.from(reportRef.current.children) as HTMLElement[];
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(13);
+      pdf.setTextColor(80);
+      pdf.text("รายงานสรุปผลการดำเนินงานสำหรับผู้บริหาร", pageWidth / 2, 40 + coverLogoH + 32, { align: "center" });
+
+      // Decorative rule
+      pdf.setDrawColor(...brandOrange);
+      pdf.setLineWidth(0.8);
+      pdf.line(pageWidth / 2 - 30, 40 + coverLogoH + 38, pageWidth / 2 + 30, 40 + coverLogoH + 38);
+
+      // Meta box
+      const metaY = 40 + coverLogoH + 54;
+      pdf.setDrawColor(220);
+      pdf.setFillColor(248, 248, 248);
+      pdf.roundedRect(margin + 20, metaY, pageWidth - (margin + 20) * 2, 38, 3, 3, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(...brandDark);
+      pdf.text("ประเภทรายงาน:", margin + 28, metaY + 10);
+      pdf.text("ช่วงเวลา:", margin + 28, metaY + 20);
+      pdf.text("สร้างเมื่อ:", margin + 28, metaY + 30);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(60);
+      pdf.text(periodLabel, margin + 70, metaY + 10);
+      pdf.text(dateRangeStr, margin + 70, metaY + 20);
+      pdf.text(generatedStr, margin + 70, metaY + 30);
+
+      // Footer of cover
+      pdf.setFont("helvetica", "italic");
+      pdf.setFontSize(9);
+      pdf.setTextColor(120);
+      pdf.text("CONFIDENTIAL — สำหรับใช้ภายในองค์กรเท่านั้น", pageWidth / 2, pageHeight - 20, { align: "center" });
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(...brandDark);
+      pdf.text("JW GROUP", pageWidth / 2, pageHeight - 14, { align: "center" });
+
+      // ---------- HELPER: page chrome ----------
+      const drawPageChrome = (sectionTitle: string) => {
+        // Header band
+        pdf.setFillColor(...brandDark);
+        pdf.rect(0, 0, pageWidth, headerH, "F");
+        pdf.setFillColor(...brandOrange);
+        pdf.rect(0, headerH, pageWidth, 1.5, "F");
+
+        // Mini logo
+        const miniH = 10;
+        const miniW = miniH / logoAspect;
+        pdf.addImage(logo.dataUrl, "PNG", margin, (headerH - miniH) / 2, miniW, miniH);
+
+        // Section title
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(12);
+        pdf.setTextColor(255);
+        pdf.text(sectionTitle, margin + miniW + 6, headerH / 2 + 1.5);
+
+        // Right-side meta
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+        pdf.setTextColor(230);
+        pdf.text(`${periodLabel} • ${dateRangeStr}`, pageWidth - margin, headerH / 2 + 1, { align: "right" });
+      };
+
+      const drawFooter = (pageNum: number, totalPages: number) => {
+        pdf.setDrawColor(220);
+        pdf.setLineWidth(0.2);
+        pdf.line(margin, pageHeight - footerH + 2, pageWidth - margin, pageHeight - footerH + 2);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+        pdf.setTextColor(120);
+        pdf.text("JW GROUP — Executive Report (Confidential)", margin, pageHeight - 5);
+        pdf.text(`หน้า ${pageNum} / ${totalPages}`, pageWidth - margin, pageHeight - 5, { align: "right" });
+      };
+
+      // ---------- SECTIONS ----------
+      const sections = Array.from(
+        reportRef.current.querySelectorAll<HTMLElement>("[data-section]")
+      );
+
+      // Track sections to (page, title) for footer pass
+      const pageSectionTitles: string[] = ["COVER"];
 
       for (let i = 0; i < sections.length; i++) {
         const el = sections[i];
+        const title = el.getAttribute("data-section-title") || `ส่วนที่ ${i + 1}`;
+
         const canvas = await html2canvas(el, {
           scale: 2,
           backgroundColor: "#ffffff",
@@ -144,69 +264,56 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
           logging: false,
           windowWidth: el.scrollWidth,
         });
-        const imgData = canvas.toDataURL("image/png");
         const imgW = contentWidth;
         const imgH = (canvas.height * imgW) / canvas.width;
+        const pxPerMm = canvas.width / imgW;
 
-        // If the section fits, place it; otherwise paginate this section across pages
-        if (imgH <= contentHeight - (cursorY - margin)) {
-          pdf.addImage(imgData, "PNG", margin, cursorY, imgW, imgH);
-          cursorY += imgH + 4;
-        } else if (imgH <= contentHeight) {
-          // Doesn't fit on current page but fits on a fresh page → start new page
-          pdf.addPage();
-          cursorY = margin;
-          pdf.addImage(imgData, "PNG", margin, cursorY, imgW, imgH);
-          cursorY += imgH + 4;
-        } else {
-          // Section is taller than a page → slice across pages
-          pdf.addPage();
-          cursorY = margin;
-          let remaining = imgH;
-          let yPos = cursorY;
-          let sliceTop = 0;
-          // Source pixel ratio (canvas px per mm)
-          const pxPerMm = canvas.width / imgW;
-          while (remaining > 0) {
-            const availableMm = contentHeight - (yPos - margin);
-            const sliceMm = Math.min(remaining, availableMm);
-            const sliceHeightPx = sliceMm * pxPerMm;
+        // Start every section on a new page
+        pdf.addPage();
+        drawPageChrome(title);
+        pageSectionTitles.push(title);
 
-            const sliceCanvas = document.createElement("canvas");
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = sliceHeightPx;
-            const ctx = sliceCanvas.getContext("2d")!;
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx.drawImage(
-              canvas,
-              0, sliceTop * pxPerMm, canvas.width, sliceHeightPx,
-              0, 0, canvas.width, sliceHeightPx
-            );
-            pdf.addImage(sliceCanvas.toDataURL("image/png"), "PNG", margin, yPos, imgW, sliceMm);
+        let remaining = imgH;
+        let sliceTopMm = 0;
+        let yPos = contentTop;
 
-            remaining -= sliceMm;
-            sliceTop += sliceMm;
-            if (remaining > 0) {
-              pdf.addPage();
-              yPos = margin;
-            } else {
-              cursorY = yPos + sliceMm + 4;
-            }
+        while (remaining > 0) {
+          const available = contentBottom - yPos;
+          const sliceMm = Math.min(remaining, available);
+          const sliceHeightPx = sliceMm * pxPerMm;
+
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceHeightPx;
+          const ctx = sliceCanvas.getContext("2d")!;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+          ctx.drawImage(
+            canvas,
+            0, sliceTopMm * pxPerMm, canvas.width, sliceHeightPx,
+            0, 0, canvas.width, sliceHeightPx
+          );
+          pdf.addImage(sliceCanvas.toDataURL("image/png"), "PNG", margin, yPos, imgW, sliceMm);
+
+          remaining -= sliceMm;
+          sliceTopMm += sliceMm;
+          if (remaining > 0) {
+            pdf.addPage();
+            drawPageChrome(`${title} (ต่อ)`);
+            pageSectionTitles.push(title);
+            yPos = contentTop;
           }
         }
       }
 
-      // Footer page numbers
-      const pageCount = pdf.getNumberOfPages();
-      for (let p = 1; p <= pageCount; p++) {
+      // ---------- FOOTERS (after we know total page count) ----------
+      const total = pdf.getNumberOfPages();
+      for (let p = 2; p <= total; p++) {
         pdf.setPage(p);
-        pdf.setFontSize(8);
-        pdf.setTextColor(120);
-        pdf.text(`หน้า ${p} / ${pageCount}`, pageWidth - margin, pageHeight - 4, { align: "right" });
+        drawFooter(p, total);
       }
 
-      pdf.save(`executive-report-${metrics.period}-${Date.now()}.pdf`);
+      pdf.save(`JW-Group-Executive-Report-${metrics.period}-${Date.now()}.pdf`);
       toast({ title: "ดาวน์โหลด PDF สำเร็จ" });
     } catch (e: any) {
       toast({ title: "ส่งออก PDF ไม่สำเร็จ", description: e.message, variant: "destructive" });
@@ -390,7 +497,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         {metrics && !loading && (
           <div ref={reportRef} className="space-y-6 mt-2">
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div data-section data-section-title="ตัวชี้วัดหลัก (Key Performance Indicators)" className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
               <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
               <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
@@ -399,7 +506,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
             {/* AI Summary */}
             {aiSummary && (
-              <Card>
+              <Card data-section data-section-title="บทสรุปสำหรับผู้บริหาร (Executive Summary)">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" /> สรุปโดย AI สำหรับผู้บริหาร
@@ -427,7 +534,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             )}
 
             {/* Charts */}
-            <div data-charts className="space-y-4 bg-background p-2">
+            <div data-section data-section-title="การวิเคราะห์ด้วยกราฟ (Analytics & Charts)" data-charts className="space-y-4 bg-background p-2">
               <Card>
                 <CardHeader><CardTitle className="text-base">แนวโน้มยอดขาย & การเข้าชม</CardTitle></CardHeader>
                 <CardContent>
@@ -479,7 +586,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             </div>
 
             {/* Business Highlights */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div data-section data-section-title="ไฮไลต์ทางธุรกิจ (Business Highlights)" className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <HighlightCard
                 title="AI ช่วยรับลูกค้าช่วงดึก"
                 value={`${metrics.afterHoursChats} เคส`}
