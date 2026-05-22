@@ -296,7 +296,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
           sliceTopMm += sliceMm;
           if (remaining > 0) {
             pdf.addPage();
-            drawPageChrome(`${title} (ต่อ)`);
+            drawPageChrome(`${title} (cont.)`);
             pageSectionTitles.push(title);
             yPos = contentTop;
           }
