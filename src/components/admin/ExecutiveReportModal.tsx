@@ -618,7 +618,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             </div>
 
             {/* Business Highlights */}
-            <div data-section data-section-title="ไฮไลต์ทางธุรกิจ (Business Highlights)" className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div data-section data-section-title="Business Highlights" className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <HighlightCard
                 title="AI ช่วยรับลูกค้าช่วงดึก"
                 value={`${metrics.afterHoursChats} เคส`}
