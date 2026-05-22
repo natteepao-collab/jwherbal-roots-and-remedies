@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AdminSidebar } from "./AdminSidebar";
 import { Loader2 } from "lucide-react";
+import jwGroupLogo from "@/assets/jw-group-logo.png";
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
