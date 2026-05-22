@@ -147,25 +147,25 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       const logo = await loadImageDataUrl(jwLogo);
       const logoAspect = logo.h / logo.w;
 
-      const fmtDate = (iso: string) =>
-        new Date(iso).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
-      const periodLabel = PERIOD_LABEL[metrics.period];
-      const dateRangeStr = `${fmtDate(metrics.sinceISO)} – ${fmtDate(metrics.untilISO)}`;
-      const generatedStr = new Date().toLocaleString("th-TH");
+      const fmtDateEN = (iso: string) =>
+        new Date(iso).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" });
+      const periodLabelEN: Record<Period, string> = {
+        week: "Weekly", month: "Monthly", year: "Yearly", custom: "Custom Range",
+      };
+      const periodEN = periodLabelEN[metrics.period];
+      const dateRangeEN = `${fmtDateEN(metrics.sinceISO)} – ${fmtDateEN(metrics.untilISO)}`;
+      const generatedEN = new Date().toLocaleString("en-GB");
 
       // ---------- COVER PAGE ----------
-      // Brand band at top
       pdf.setFillColor(...brandOrange);
       pdf.rect(0, 0, pageWidth, 6, "F");
       pdf.setFillColor(...brandDark);
       pdf.rect(0, 6, pageWidth, 2, "F");
 
-      // Logo centered
       const coverLogoW = 70;
       const coverLogoH = coverLogoW * logoAspect;
       pdf.addImage(logo.dataUrl, "PNG", (pageWidth - coverLogoW) / 2, 40, coverLogoW, coverLogoH);
 
-      // Title
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(28);
       pdf.setTextColor(...brandDark);
@@ -174,9 +174,8 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(80);
-      pdf.text("รายงานสรุปผลการดำเนินงานสำหรับผู้บริหาร", pageWidth / 2, 40 + coverLogoH + 32, { align: "center" });
+      pdf.text("Strategic Business Performance Report", pageWidth / 2, 40 + coverLogoH + 32, { align: "center" });
 
-      // Decorative rule
       pdf.setDrawColor(...brandOrange);
       pdf.setLineWidth(0.8);
       pdf.line(pageWidth / 2 - 30, 40 + coverLogoH + 38, pageWidth / 2 + 30, 40 + coverLogoH + 38);
@@ -185,24 +184,26 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       const metaY = 40 + coverLogoH + 54;
       pdf.setDrawColor(220);
       pdf.setFillColor(248, 248, 248);
-      pdf.roundedRect(margin + 20, metaY, pageWidth - (margin + 20) * 2, 38, 3, 3, "FD");
+      pdf.roundedRect(margin + 20, metaY, pageWidth - (margin + 20) * 2, 44, 3, 3, "FD");
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...brandDark);
-      pdf.text("ประเภทรายงาน:", margin + 28, metaY + 10);
-      pdf.text("ช่วงเวลา:", margin + 28, metaY + 20);
-      pdf.text("สร้างเมื่อ:", margin + 28, metaY + 30);
+      pdf.text("Report Type:", margin + 28, metaY + 10);
+      pdf.text("Period:", margin + 28, metaY + 20);
+      pdf.text("Date Range:", margin + 28, metaY + 30);
+      pdf.text("Generated:", margin + 28, metaY + 40);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(60);
-      pdf.text(periodLabel, margin + 70, metaY + 10);
-      pdf.text(dateRangeStr, margin + 70, metaY + 20);
-      pdf.text(generatedStr, margin + 70, metaY + 30);
+      pdf.text("Executive Performance Summary", margin + 70, metaY + 10);
+      pdf.text(periodEN, margin + 70, metaY + 20);
+      pdf.text(dateRangeEN, margin + 70, metaY + 30);
+      pdf.text(generatedEN, margin + 70, metaY + 40);
 
-      // Footer of cover
+      // Cover footer
       pdf.setFont("helvetica", "italic");
       pdf.setFontSize(9);
       pdf.setTextColor(120);
-      pdf.text("CONFIDENTIAL — สำหรับใช้ภายในองค์กรเท่านั้น", pageWidth / 2, pageHeight - 20, { align: "center" });
+      pdf.text("CONFIDENTIAL — For Internal Executive Use Only", pageWidth / 2, pageHeight - 20, { align: "center" });
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...brandDark);
@@ -210,28 +211,24 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
       // ---------- HELPER: page chrome ----------
       const drawPageChrome = (sectionTitle: string) => {
-        // Header band
         pdf.setFillColor(...brandDark);
         pdf.rect(0, 0, pageWidth, headerH, "F");
         pdf.setFillColor(...brandOrange);
         pdf.rect(0, headerH, pageWidth, 1.5, "F");
 
-        // Mini logo
         const miniH = 10;
         const miniW = miniH / logoAspect;
         pdf.addImage(logo.dataUrl, "PNG", margin, (headerH - miniH) / 2, miniW, miniH);
 
-        // Section title
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(12);
+        pdf.setFontSize(11);
         pdf.setTextColor(255);
         pdf.text(sectionTitle, margin + miniW + 6, headerH / 2 + 1.5);
 
-        // Right-side meta
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(8);
         pdf.setTextColor(230);
-        pdf.text(`${periodLabel} • ${dateRangeStr}`, pageWidth - margin, headerH / 2 + 1, { align: "right" });
+        pdf.text(`${periodEN} | ${dateRangeEN}`, pageWidth - margin, headerH / 2 + 1, { align: "right" });
       };
 
       const drawFooter = (pageNum: number, totalPages: number) => {
