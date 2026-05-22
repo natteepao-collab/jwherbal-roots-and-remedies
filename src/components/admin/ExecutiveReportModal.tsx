@@ -20,6 +20,23 @@ import { format, subDays, subMonths, subYears, startOfDay, endOfDay } from "date
 import { th } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
+import jwLogo from "@/assets/jw-group-logo.png";
+
+async function loadImageDataUrl(src: string): Promise<{ dataUrl: string; w: number; h: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      c.getContext("2d")!.drawImage(img, 0, 0);
+      resolve({ dataUrl: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight });
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
 
 type Period = "week" | "month" | "year" | "custom";
 
