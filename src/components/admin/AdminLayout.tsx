@@ -89,9 +89,18 @@ export const AdminLayout = () => {
   return (
     <div className="min-h-screen flex bg-background">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="relative h-16 border-b bg-card/80 backdrop-blur-sm flex items-center justify-center px-4 shrink-0">
+          <img
+            src={jwGroupLogo}
+            alt="JW Group"
+            className="h-10 w-auto object-contain"
+          />
+        </header>
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
