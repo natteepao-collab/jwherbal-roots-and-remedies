@@ -311,11 +311,21 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
                     <Sparkles className="h-4 w-4 text-primary" /> สรุปโดย AI สำหรับผู้บริหาร
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div
-                    className="prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: summaryHtml }}
-                  />
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {summaryLines.map((line, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "px-4 py-2.5 text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert",
+                          i % 2 === 0 ? "bg-muted/40" : "bg-background"
+                        )}
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(marked.parseInline(line) as string),
+                        }}
+                      />
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             )}
