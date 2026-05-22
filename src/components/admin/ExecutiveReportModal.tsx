@@ -239,7 +239,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         pdf.setFontSize(8);
         pdf.setTextColor(120);
         pdf.text("JW GROUP — Executive Report (Confidential)", margin, pageHeight - 5);
-        pdf.text(`หน้า ${pageNum} / ${totalPages}`, pageWidth - margin, pageHeight - 5, { align: "right" });
+        pdf.text(`Page ${pageNum} / ${totalPages}`, pageWidth - margin, pageHeight - 5, { align: "right" });
       };
 
       // ---------- SECTIONS ----------
