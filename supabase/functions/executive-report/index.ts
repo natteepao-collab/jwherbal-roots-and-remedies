@@ -97,6 +97,7 @@ Deno.serve(async (req) => {
     const metrics = {
       period,
       sinceISO,
+      untilISO,
       revenue: totalRevenue,
       orders: activeOrders.length,
       pageViews: views.length,
@@ -121,7 +122,8 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     let aiSummary = "";
     if (LOVABLE_API_KEY) {
-      const periodLabel = period === "week" ? "7 วันที่ผ่านมา" : period === "month" ? "30 วันที่ผ่านมา" : "365 วันที่ผ่านมา";
+      const fmt = (iso: string) => new Date(iso).toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" });
+      const periodLabel = `${fmt(sinceISO)} ถึง ${fmt(untilISO)}`;
       const prompt = `คุณคือที่ปรึกษาทางธุรกิจระดับผู้บริหาร วิเคราะห์ข้อมูลเว็บไซต์ JWHERBAL ในช่วง ${periodLabel} แล้วเขียนรายงานสรุปสำหรับผู้บริหารเป็นภาษาไทย ใช้รูปแบบ Markdown ที่กระชับ ชัดเจน อ่านง่าย แบ่งเป็นหัวข้อ:
 
 ## 📊 ภาพรวมเชิงกลยุทธ์
