@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, FileText, FileSpreadsheet, Sparkles, TrendingUp, ShoppingCart, Eye, MessageSquare } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Loader2, FileText, FileSpreadsheet, Sparkles, TrendingUp, ShoppingCart, Eye, MessageSquare, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -15,12 +16,17 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
+import { format, subDays, subMonths, subYears, startOfDay, endOfDay } from "date-fns";
+import { th } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
-type Period = "week" | "month" | "year";
+type Period = "week" | "month" | "year" | "custom";
 
 interface Metrics {
   period: Period;
   sinceISO: string;
+  untilISO: string;
   revenue: number;
   orders: number;
   pageViews: number;
@@ -42,7 +48,7 @@ interface Metrics {
 }
 
 const COLORS = ["hsl(var(--primary))", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#ec4899", "#84cc16"];
-const PERIOD_LABEL: Record<Period, string> = { week: "สัปดาห์", month: "เดือน", year: "ปี" };
+const PERIOD_LABEL: Record<Period, string> = { week: "สัปดาห์", month: "เดือน", year: "ปี", custom: "กำหนดเอง" };
 
 interface Props {
   open: boolean;
@@ -51,21 +57,24 @@ interface Props {
 
 export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
   const [period, setPeriod] = useState<Period>("month");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [aiSummary, setAiSummary] = useState<string>("");
   const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const generate = async (p: Period) => {
-    setPeriod(p);
+  const runReport = async (p: Period, range?: DateRange) => {
     setLoading(true);
     setMetrics(null);
     setAiSummary("");
     try {
-      const { data, error } = await supabase.functions.invoke("executive-report", {
-        body: { period: p },
-      });
+      const body: any = { period: p };
+      if (p === "custom" && range?.from && range?.to) {
+        body.fromISO = startOfDay(range.from).toISOString();
+        body.toISO = endOfDay(range.to).toISOString();
+      }
+      const { data, error } = await supabase.functions.invoke("executive-report", { body });
       if (error) throw error;
       setMetrics(data.metrics);
       setAiSummary(data.aiSummary || "");
@@ -75,6 +84,28 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
       setLoading(false);
     }
   };
+
+  const selectPreset = (p: Period) => {
+    setPeriod(p);
+    const now = new Date();
+    let from: Date;
+    if (p === "week") from = subDays(now, 7);
+    else if (p === "month") from = subMonths(now, 1);
+    else from = subYears(now, 1);
+    setDateRange({ from, to: now });
+    runReport(p);
+  };
+
+  const applyCustomRange = () => {
+    if (!dateRange?.from || !dateRange?.to) {
+      toast({ title: "เลือกช่วงวันที่ให้ครบ", variant: "destructive" });
+      return;
+    }
+    setPeriod("custom");
+    runReport("custom", dateRange);
+  };
+
+
 
   const exportPDF = async () => {
     if (!metrics) return;
@@ -225,23 +256,76 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={period} onValueChange={(v) => generate(v as Period)} className="w-full">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <TabsList>
-              <TabsTrigger value="week">รายสัปดาห์</TabsTrigger>
-              <TabsTrigger value="month">รายเดือน</TabsTrigger>
-              <TabsTrigger value="year">รายปี</TabsTrigger>
-            </TabsList>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={exportPDF} disabled={!metrics || loading}>
-                <FileText className="h-4 w-4 mr-1" /> PDF
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportExcel} disabled={!metrics || loading}>
-                <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
-              </Button>
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant={period === "week" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("week")}
+            >
+              รายสัปดาห์
+            </Button>
+            <Button
+              variant={period === "month" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("month")}
+            >
+              รายเดือน
+            </Button>
+            <Button
+              variant={period === "year" ? "default" : "outline"}
+              size="sm"
+              onClick={() => selectPreset("year")}
+            >
+              รายปี
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={period === "custom" ? "default" : "outline"}
+                  size="sm"
+                  className={cn("justify-start text-left font-normal min-w-[220px]")}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {dateRange?.from && dateRange?.to && period === "custom" ? (
+                    <>
+                      {format(dateRange.from, "d MMM yy", { locale: th })} – {format(dateRange.to, "d MMM yy", { locale: th })}
+                    </>
+                  ) : (
+                    <span>เลือกช่วงวันที่ย้อนหลัง</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  initialFocus
+                  disabled={(d) => d > new Date()}
+                  className="pointer-events-auto"
+                />
+                <div className="p-3 border-t flex justify-end gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => setDateRange(undefined)}>ล้าง</Button>
+                  <Button size="sm" onClick={applyCustomRange} disabled={!dateRange?.from || !dateRange?.to}>
+                    สร้างรายงาน
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-        </Tabs>
+
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportPDF} disabled={!metrics || loading}>
+              <FileText className="h-4 w-4 mr-1" /> PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportExcel} disabled={!metrics || loading}>
+              <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
+            </Button>
+          </div>
+        </div>
 
         {loading && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -253,8 +337,8 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         {!loading && !metrics && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Sparkles className="h-12 w-12 text-primary opacity-50" />
-            <p className="text-muted-foreground">เลือกช่วงเวลาด้านบนเพื่อเริ่มสร้างรายงาน</p>
-            <Button onClick={() => generate("month")}>เริ่มวิเคราะห์รายเดือน</Button>
+            <p className="text-muted-foreground">เลือกช่วงเวลา (Preset) หรือกำหนดวันที่เองเพื่อเริ่มสร้างรายงาน</p>
+            <Button onClick={() => selectPreset("month")}>เริ่มวิเคราะห์รายเดือน</Button>
           </div>
         )}
 
