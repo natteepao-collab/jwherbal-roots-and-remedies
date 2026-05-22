@@ -416,7 +416,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
             {/* AI Summary */}
             {aiSummary && (
-              <Card>
+              <Card data-section data-section-title="บทสรุปสำหรับผู้บริหาร (Executive Summary)">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" /> สรุปโดย AI สำหรับผู้บริหาร
