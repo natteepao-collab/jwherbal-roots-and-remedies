@@ -190,9 +190,36 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
     toast({ title: "ดาวน์โหลด Excel สำเร็จ" });
   };
 
-  const summaryLines = aiSummary
-    ? aiSummary.split(/\n+/).map((l) => l.trim()).filter(Boolean)
-    : [];
+  // Split markdown into blocks (headings, paragraphs, bullet groups) for zebra striping
+  const summaryBlocks: { type: "heading" | "bullets" | "para"; html: string }[] = (() => {
+    if (!aiSummary) return [];
+    const blocks: { type: "heading" | "bullets" | "para"; html: string }[] = [];
+    const lines = aiSummary.split(/\r?\n/);
+    let bulletBuf: string[] = [];
+    const flushBullets = () => {
+      if (bulletBuf.length) {
+        const html = "<ul>" + bulletBuf.map((b) => `<li>${marked.parseInline(b)}</li>`).join("") + "</ul>";
+        blocks.push({ type: "bullets", html });
+        bulletBuf = [];
+      }
+    };
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) { flushBullets(); continue; }
+      const bulletMatch = line.match(/^[-*]\s+(.*)/);
+      if (bulletMatch) { bulletBuf.push(bulletMatch[1]); continue; }
+      flushBullets();
+      const h = line.match(/^(#{1,6})\s+(.*)/);
+      if (h) {
+        const level = h[1].length;
+        blocks.push({ type: "heading", html: `<h${level}>${marked.parseInline(h[2])}</h${level}>` });
+      } else {
+        blocks.push({ type: "para", html: marked.parseInline(line) as string });
+      }
+    }
+    flushBullets();
+    return blocks.map((b) => ({ ...b, html: DOMPurify.sanitize(b.html) }));
+  })();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
