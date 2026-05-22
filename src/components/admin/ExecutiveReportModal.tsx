@@ -493,17 +493,52 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
         {metrics && !loading && (
           <div ref={reportRef} className="space-y-6 mt-2">
-            {/* KPI Cards */}
-            <div data-section data-section-title="ตัวชี้วัดหลัก (Key Performance Indicators)" className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
-              <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
-              <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
-              <KpiCard icon={MessageSquare} label="AI Chats" value={metrics.chats} />
+            {/* KPI Cards + Detailed Metrics Table */}
+            <div data-section data-section-title="Key Performance Indicators" className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
+                <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
+                <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
+                <KpiCard icon={MessageSquare} label="AI Chats" value={metrics.chats} />
+              </div>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">ตารางตัวชี้วัดทั้งหมด (Full Metrics Table)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <table className="w-full text-sm border-collapse">
+                    <tbody>
+                      {[
+                        ["ยอดขายรวม (Revenue)", `฿${metrics.revenue.toLocaleString()}`],
+                        ["จำนวนคำสั่งซื้อ (Orders)", metrics.orders.toLocaleString()],
+                        ["มูลค่าเฉลี่ยต่อออเดอร์ (AOV)", `฿${metrics.avgOrderValue.toLocaleString()}`],
+                        ["อัตราการแปลง (Conversion Rate)", `${metrics.conversionRate}%`],
+                        ["จำนวน Page Views", metrics.pageViews.toLocaleString()],
+                        ["ผู้เข้าชมไม่ซ้ำ (Unique Visitors)", metrics.uniqueVisitors.toLocaleString()],
+                        ["จำนวนแชท AI ทั้งหมด", metrics.chats.toLocaleString()],
+                        ["แชทช่วงดึก 00:00–06:00", metrics.afterHoursChats.toLocaleString()],
+                        ["AI ตอบเองสำเร็จ", `${metrics.aiHandled} (${metrics.aiSuccessRate}%)`],
+                        ["บทความใหม่ (New Articles)", metrics.newArticles.toLocaleString()],
+                        ["ชั่วโมงที่ AI ประหยัด", `${metrics.hoursSavedByAi} ชม.`],
+                        ["ผู้ใช้ใหม่ (New Users)", metrics.newUsers.toLocaleString()],
+                        ["โพสต์ชุมชนใหม่", metrics.newCommunityPosts.toLocaleString()],
+                        ["สินค้าที่ใช้งานอยู่", metrics.activeProducts.toLocaleString()],
+                      ].map(([k, v], i) => (
+                        <tr key={i} className={i % 2 === 0 ? "bg-muted/40" : "bg-background"}>
+                          <td className="py-2 px-3 border-b border-border">{k}</td>
+                          <td className="py-2 px-3 border-b border-border text-right font-semibold text-primary">{v}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
             </div>
 
             {/* AI Summary */}
             {aiSummary && (
-              <Card data-section data-section-title="บทสรุปสำหรับผู้บริหาร (Executive Summary)">
+              <Card data-section data-section-title="Executive Summary (AI Analysis)">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" /> สรุปโดย AI สำหรับผู้บริหาร
