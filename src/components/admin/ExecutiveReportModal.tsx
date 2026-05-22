@@ -252,7 +252,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
 
       for (let i = 0; i < sections.length; i++) {
         const el = sections[i];
-        const title = el.getAttribute("data-section-title") || `ส่วนที่ ${i + 1}`;
+        const title = el.getAttribute("data-section-title") || `Section ${i + 1}`;
 
         const canvas = await html2canvas(el, {
           scale: 2,
