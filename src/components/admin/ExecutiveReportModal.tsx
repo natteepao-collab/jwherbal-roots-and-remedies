@@ -444,7 +444,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
             )}
 
             {/* Charts */}
-            <div data-charts className="space-y-4 bg-background p-2">
+            <div data-section data-section-title="การวิเคราะห์ด้วยกราฟ (Analytics & Charts)" data-charts className="space-y-4 bg-background p-2">
               <Card>
                 <CardHeader><CardTitle className="text-base">แนวโน้มยอดขาย & การเข้าชม</CardTitle></CardHeader>
                 <CardContent>
