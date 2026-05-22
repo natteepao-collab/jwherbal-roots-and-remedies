@@ -124,50 +124,85 @@ Deno.serve(async (req) => {
     if (LOVABLE_API_KEY) {
       const fmt = (iso: string) => new Date(iso).toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" });
       const periodLabel = `${fmt(sinceISO)} ถึง ${fmt(untilISO)}`;
-      const prompt = `คุณคือที่ปรึกษาทางธุรกิจระดับผู้บริหาร วิเคราะห์ข้อมูลเว็บไซต์ JWHERBAL ในช่วง ${periodLabel} แล้วเขียนรายงานสรุปสำหรับผู้บริหารเป็นภาษาไทย ใช้รูปแบบ Markdown ที่กระชับ ชัดเจน อ่านง่าย แบ่งเป็นหัวข้อ:
+
+      // Trim payload to keep prompt small and response fast
+      const compact = {
+        period: metrics.period,
+        revenue: metrics.revenue,
+        orders: metrics.orders,
+        avgOrderValue: metrics.avgOrderValue,
+        pageViews: metrics.pageViews,
+        uniqueVisitors: metrics.uniqueVisitors,
+        conversionRate: metrics.conversionRate,
+        chats: metrics.chats,
+        afterHoursChats: metrics.afterHoursChats,
+        aiHandled: metrics.aiHandled,
+        aiSuccessRate: metrics.aiSuccessRate,
+        newArticles: metrics.newArticles,
+        hoursSavedByAi: metrics.hoursSavedByAi,
+        newUsers: metrics.newUsers,
+        newCommunityPosts: metrics.newCommunityPosts,
+        activeProducts: metrics.activeProducts,
+        topPages: metrics.topPages.slice(0, 5),
+        sources: metrics.sources.slice(0, 5),
+        timeseriesPoints: metrics.timeseries.length,
+      };
+
+      const prompt = `วิเคราะห์ข้อมูลเว็บไซต์ JWHERBAL ในช่วง ${periodLabel} แล้วเขียนรายงานผู้บริหารเป็นภาษาไทย ใช้ Markdown สวยงาม กระชับ มีตัวเลขจริงประกอบทุกข้อ แบ่งเป็น 5 หัวข้อนี้ (ใช้ ## เป็น heading):
 
 ## 📊 ภาพรวมเชิงกลยุทธ์
-สรุป 2-3 ประโยคถึงสถานะธุรกิจ
+2-3 ประโยคสรุปสถานะธุรกิจ
 
 ## ✨ ไฮไลต์สำคัญ
-3-5 bullet ที่ผู้บริหารต้องรู้ (ใช้ตัวเลขจริง)
+3-5 bullet สั้นๆ ใช้ **ตัวหนา** ขึ้นต้นแต่ละข้อ
 
-## 📈 จุดแข็ง & โอกาส
-สิ่งที่ทำได้ดี และโอกาสเติบโต
+## 📈 จุดแข็ง & โอกาสเติบโต
+3-4 bullet
 
-## ⚠️ ความเสี่ยง & สิ่งที่ต้องระวัง
-ข้อสังเกตที่ต้องจัดการ
+## ⚠️ ความเสี่ยง & ข้อควรระวัง
+2-3 bullet
 
 ## 🎯 ข้อเสนอแนะเชิงปฏิบัติ
 3-5 action items ที่ทำได้ทันที
 
-ข้อมูลจริง:
-${JSON.stringify(metrics, null, 2)}`;
+ข้อมูล:
+${JSON.stringify(compact)}`;
 
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-pro",
-          messages: [
-            { role: "system", content: "คุณเป็นที่ปรึกษาทางธุรกิจที่เขียนรายงานผู้บริหารด้วยภาษาไทยที่กระชับ ตรงประเด็น และมีข้อมูลตัวเลขรองรับเสมอ" },
-            { role: "user", content: prompt },
-          ],
-        }),
-      });
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 90000);
+      try {
+        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "คุณเป็นที่ปรึกษาธุรกิจระดับผู้บริหาร เขียนรายงานภาษาไทยที่กระชับ สวยงาม อ่านง่าย ใช้ Markdown headings/bullets/bold พร้อมตัวเลขประกอบเสมอ ห้ามใส่คำนำหรือคำลงท้าย" },
+              { role: "user", content: prompt },
+            ],
+          }),
+        });
 
-      if (aiRes.ok) {
-        const data = await aiRes.json();
-        aiSummary = data.choices?.[0]?.message?.content || "";
-      } else if (aiRes.status === 429) {
-        aiSummary = "⚠️ ระบบ AI กำลังถูกใช้งานหนัก กรุณาลองอีกครั้งในอีกสักครู่";
-      } else if (aiRes.status === 402) {
-        aiSummary = "⚠️ เครดิต AI หมด กรุณาเติมเครดิตที่ Settings > Workspace > Usage";
-      } else {
-        aiSummary = `⚠️ ไม่สามารถสร้างรายงาน AI ได้ (${aiRes.status})`;
+        if (aiRes.ok) {
+          const data = await aiRes.json();
+          aiSummary = data.choices?.[0]?.message?.content || "";
+        } else if (aiRes.status === 429) {
+          aiSummary = "⚠️ ระบบ AI กำลังถูกใช้งานหนัก กรุณาลองอีกครั้งในอีกสักครู่";
+        } else if (aiRes.status === 402) {
+          aiSummary = "⚠️ เครดิต AI หมด กรุณาเติมเครดิตที่ Settings > Workspace > Usage";
+        } else {
+          aiSummary = `⚠️ ไม่สามารถสร้างรายงาน AI ได้ (${aiRes.status})`;
+        }
+      } catch (err: any) {
+        aiSummary = err?.name === "AbortError"
+          ? "⚠️ AI ใช้เวลานานเกินไป กรุณาลองใหม่อีกครั้ง"
+          : `⚠️ เกิดข้อผิดพลาด: ${err?.message || "unknown"}`;
+      } finally {
+        clearTimeout(timer);
       }
     }
 
