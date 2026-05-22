@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { FileText, Users, MessageSquare, Eye, ShoppingCart, Package, TrendingUp, DollarSign } from "lucide-react";
+import { FileText, Users, MessageSquare, Eye, ShoppingCart, Package, TrendingUp, DollarSign, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ExecutiveReportModal from "@/components/admin/ExecutiveReportModal";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,6 +84,7 @@ const AdminOverview = () => {
   const [dailySales, setDailySales] = useState<DailySales[]>([]);
   const [ordersByStatus, setOrdersByStatus] = useState<{ name: string; value: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -157,10 +160,21 @@ const AdminOverview = () => {
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">ภาพรวม Dashboard</h1>
-        <p className="text-muted-foreground mt-1">สรุปยอดขาย คำสั่งซื้อ และสถิติของระบบ</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">ภาพรวม Dashboard</h1>
+          <p className="text-muted-foreground mt-1">สรุปยอดขาย คำสั่งซื้อ และสถิติของระบบ</p>
+        </div>
+        <Button
+          onClick={() => setReportOpen(true)}
+          className="bg-gradient-to-r from-primary to-emerald-500 hover:opacity-90 shadow-lg"
+        >
+          <Sparkles className="h-4 w-4 mr-2" />
+          สรุปรายงานผู้บริหาร (AI)
+        </Button>
       </div>
+
+      <ExecutiveReportModal open={reportOpen} onOpenChange={setReportOpen} />
 
       {/* Sales Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
