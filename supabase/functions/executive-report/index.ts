@@ -6,26 +6,34 @@ const corsHeaders = {
 };
 
 interface ReqBody {
-  period: "week" | "month" | "year";
+  period: "week" | "month" | "year" | "custom";
+  fromISO?: string;
+  toISO?: string;
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { period = "month" } = (await req.json()) as ReqBody;
+    const { period = "month", fromISO, toISO } = (await req.json()) as ReqBody;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const now = new Date();
-    const since = new Date(now);
-    if (period === "week") since.setDate(since.getDate() - 7);
-    else if (period === "month") since.setMonth(since.getMonth() - 1);
-    else since.setFullYear(since.getFullYear() - 1);
+    const now = toISO ? new Date(toISO) : new Date();
+    let since: Date;
+    if (period === "custom" && fromISO) {
+      since = new Date(fromISO);
+    } else {
+      since = new Date(now);
+      if (period === "week") since.setDate(since.getDate() - 7);
+      else if (period === "year") since.setFullYear(since.getFullYear() - 1);
+      else since.setMonth(since.getMonth() - 1);
+    }
     const sinceISO = since.toISOString();
+    const untilISO = now.toISOString();
 
     // Fetch data in parallel
     const [ordersRes, viewsRes, chatsRes, articlesRes, productsRes, usersRes, postsRes] =
