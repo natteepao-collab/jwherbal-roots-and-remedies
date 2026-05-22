@@ -190,7 +190,9 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
     toast({ title: "ดาวน์โหลด Excel สำเร็จ" });
   };
 
-  const summaryHtml = aiSummary ? DOMPurify.sanitize(marked.parse(aiSummary) as string) : "";
+  const summaryLines = aiSummary
+    ? aiSummary.split(/\n+/).map((l) => l.trim()).filter(Boolean)
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
