@@ -407,7 +407,7 @@ export default function ExecutiveReportModal({ open, onOpenChange }: Props) {
         {metrics && !loading && (
           <div ref={reportRef} className="space-y-6 mt-2">
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div data-section data-section-title="ตัวชี้วัดหลัก (Key Performance Indicators)" className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <KpiCard icon={TrendingUp} label="ยอดขายรวม" value={`฿${metrics.revenue.toLocaleString()}`} />
               <KpiCard icon={ShoppingCart} label="คำสั่งซื้อ" value={metrics.orders} />
               <KpiCard icon={Eye} label="Page Views" value={metrics.pageViews.toLocaleString()} />
