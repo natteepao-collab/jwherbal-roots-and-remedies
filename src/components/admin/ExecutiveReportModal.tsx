@@ -13,7 +13,7 @@ import {
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
 import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
 import { format, subDays, subMonths, subYears, startOfDay, endOfDay } from "date-fns";
