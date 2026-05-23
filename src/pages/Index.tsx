@@ -637,20 +637,49 @@ const Index = () => {
               วัตถุดิบธรรมชาติ 100% ผ่านการคัดเลือกอย่างพิถีพิถัน
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
             {[
-              { emoji: "🫚", name: "ขิง (Ginger)", sci: "Zingiber officinale", desc: "ต้านการแข็งตัวของหลอดเลือด ลดไขมัน และความดันโลหิต" },
-              { emoji: "🍒", name: "พุทราจีน (Jujube)", sci: "Ziziphus jujuba", desc: "เสริมสารต้านอนุมูลอิสระ เสริมการทำงานของหัวใจ" },
-              { emoji: "🍄", name: "เห็ดหูหนูดำ (Black Wood Ear)", sci: "Auricularia auricula-judae", desc: "ลดหลอดเลือดแข็งตัว เพิ่มการไหลเวียนของเลือด" },
-            ].map((it) => (
-              <Card key={it.name} className="text-center hover:shadow-lg transition-all hover:-translate-y-1 border-primary/10">
-                <CardContent className="p-6">
-                  <div className="text-5xl mb-3">{it.emoji}</div>
-                  <h3 className="text-lg md:text-xl font-bold text-foreground">{it.name}</h3>
-                  <p className="text-xs text-muted-foreground italic mb-3">{it.sci}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{it.desc}</p>
-                </CardContent>
-              </Card>
+              { img: herbGinger, name: "ขิง (Ginger)", sci: "Zingiber officinale", desc: "ต้านการแข็งตัวของหลอดเลือด ลดไขมัน และความดันโลหิต", tint: "from-amber-100/60 to-orange-50/40", badge: "🫚" },
+              { img: herbJujube, name: "พุทราจีน (Jujube)", sci: "Ziziphus jujuba", desc: "เสริมสารต้านอนุมูลอิสระ เสริมการทำงานของหัวใจ", tint: "from-rose-100/60 to-red-50/40", badge: "🍒" },
+              { img: herbBlackWoodEar, name: "เห็ดหูหนูดำ (Black Wood Ear)", sci: "Auricularia auricula-judae", desc: "ลดหลอดเลือดแข็งตัว เพิ่มการไหลเวียนของเลือด", tint: "from-stone-200/60 to-emerald-50/40", badge: "🍄" },
+            ].map((it, idx) => (
+              <motion.div
+                key={it.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: idx * 0.12 }}
+              >
+                <Card className="group relative overflow-hidden rounded-2xl border-primary/10 bg-card hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                  {/* Image */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img
+                      src={it.img}
+                      alt={it.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${it.tint} mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent" />
+                    {/* Floating badge */}
+                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-2xl border border-white">
+                      {it.badge}
+                    </div>
+                    {/* Leaf accent */}
+                    <div className="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-semibold backdrop-blur-sm shadow-md">
+                      <Leaf className="h-3 w-3" />
+                      100% Natural
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <CardContent className="relative px-6 pt-4 pb-6 text-center -mt-10 z-10">
+                    <h3 className="text-lg md:text-xl font-bold text-foreground mb-1">{it.name}</h3>
+                    <p className="text-xs text-primary/80 italic mb-3 font-medium">{it.sci}</p>
+                    <div className="h-px w-12 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground leading-relaxed">{it.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
