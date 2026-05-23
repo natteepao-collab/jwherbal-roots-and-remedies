@@ -24,6 +24,7 @@ import trustIngredients from "@/assets/trust-ingredients.jpg";
 import herbGinger from "@/assets/herbs/ginger.png";
 import herbJujube from "@/assets/herbs/jujube.png";
 import herbBlackWoodEar from "@/assets/herbs/black-wood-ear.png";
+import herbalArtisan from "@/assets/herbs/herbal-artisan.png";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage } from "@/lib/communityImages";
@@ -637,6 +638,50 @@ const Index = () => {
               วัตถุดิบธรรมชาติ 100% ผ่านการคัดเลือกอย่างพิถีพิถัน
             </p>
           </div>
+
+          {/* Artisan storytelling banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8 }}
+            className="relative max-w-5xl mx-auto mb-12 md:mb-16 rounded-3xl overflow-hidden shadow-2xl border border-primary/10"
+          >
+            <div className="relative aspect-[16/8] md:aspect-[16/6]">
+              <img
+                src={herbalArtisan}
+                alt="ช่างฝีมือคัดสรรสมุนไพรด้วยมือ"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Cinematic gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+
+              {/* Text content */}
+              <div className="relative h-full flex items-center px-6 md:px-12 lg:px-16">
+                <div className="max-w-md md:max-w-lg">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 backdrop-blur-sm border border-primary/30 mb-3">
+                    <Leaf className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[11px] md:text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                      Handcrafted with Care
+                    </span>
+                  </div>
+                  <h3 className="text-xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-3">
+                    คัดสรรด้วยมือ<br className="hidden md:block" />
+                    จากภูมิปัญญาดั้งเดิม
+                  </h3>
+                  <div className="h-px w-16 bg-gradient-to-r from-primary to-transparent mb-3" />
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    ทุกเม็ดสมุนไพรผ่านการคัดเลือกอย่างพิถีพิถัน
+                    ตากแห้งตามธรรมชาติ เพื่อคงคุณค่าสูงสุดส่งถึงคุณ
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
             {[
               { img: herbGinger, name: "ขิง (Ginger)", sci: "Zingiber officinale", desc: "ต้านการแข็งตัวของหลอดเลือด ลดไขมัน และความดันโลหิต", tint: "from-amber-100/60 to-orange-50/40", badge: "🫚" },
