@@ -24,6 +24,7 @@ import trustIngredients from "@/assets/trust-ingredients.jpg";
 import herbGinger from "@/assets/herbs/ginger.png";
 import herbJujube from "@/assets/herbs/jujube.png";
 import herbBlackWoodEar from "@/assets/herbs/black-wood-ear.png";
+import herbalArtisan from "@/assets/herbs/herbal-artisan.png";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommunityPostImage } from "@/lib/communityImages";
