@@ -645,41 +645,63 @@ const Index = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.8 }}
-            className="relative max-w-5xl mx-auto mb-12 md:mb-16 rounded-3xl overflow-hidden shadow-2xl border border-primary/10"
+            className="relative max-w-6xl mx-auto mb-12 md:mb-16 rounded-3xl overflow-hidden shadow-2xl border border-primary/10 bg-card"
           >
-            <div className="relative aspect-[16/8] md:aspect-[16/6]">
-              <img
-                src={herbalArtisan}
-                alt="ช่างฝีมือคัดสรรสมุนไพรด้วยมือ"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {/* Cinematic gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
-
-              {/* Text content */}
-              <div className="relative h-full flex items-center px-6 md:px-12 lg:px-16">
-                <div className="max-w-md md:max-w-lg">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 backdrop-blur-sm border border-primary/30 mb-3">
-                    <Leaf className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-[11px] md:text-xs uppercase tracking-[0.18em] font-semibold text-primary">
-                      Handcrafted with Care
-                    </span>
+            <div className="grid grid-cols-1 md:grid-cols-5">
+              {/* Text panel */}
+              <div className="md:col-span-2 p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-gradient-to-br from-primary/5 via-background to-background order-2 md:order-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 border border-primary/30 mb-4 self-start">
+                  <Leaf className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-[11px] md:text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                    Handcrafted with Care
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-4">
+                  คัดสรรด้วยมือ<br />
+                  จากภูมิปัญญาดั้งเดิม
+                </h3>
+                <div className="h-px w-16 bg-gradient-to-r from-primary to-transparent mb-4" />
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-5">
+                  ทุกเม็ดสมุนไพรผ่านการคัดเลือกอย่างพิถีพิถัน
+                  ตากแห้งตามธรรมชาติ เพื่อคงคุณค่าสูงสุดส่งถึงคุณ
+                </p>
+                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border/60">
+                  <div>
+                    <div className="text-lg md:text-xl font-bold text-primary">100%</div>
+                    <div className="text-[10px] md:text-xs text-muted-foreground">ธรรมชาติ</div>
                   </div>
-                  <h3 className="text-xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-3">
-                    คัดสรรด้วยมือ<br className="hidden md:block" />
-                    จากภูมิปัญญาดั้งเดิม
-                  </h3>
-                  <div className="h-px w-16 bg-gradient-to-r from-primary to-transparent mb-3" />
-                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                    ทุกเม็ดสมุนไพรผ่านการคัดเลือกอย่างพิถีพิถัน
-                    ตากแห้งตามธรรมชาติ เพื่อคงคุณค่าสูงสุดส่งถึงคุณ
-                  </p>
+                  <div>
+                    <div className="text-lg md:text-xl font-bold text-primary">GMP</div>
+                    <div className="text-[10px] md:text-xs text-muted-foreground">มาตรฐาน</div>
+                  </div>
+                  <div>
+                    <div className="text-lg md:text-xl font-bold text-primary">3</div>
+                    <div className="text-[10px] md:text-xs text-muted-foreground">สมุนไพรหลัก</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Image panel */}
+              <div className="md:col-span-3 relative order-1 md:order-2 min-h-[280px] md:min-h-[420px]">
+                <img
+                  src={herbalArtisan}
+                  alt="ช่างฝีมือคัดสรรสมุนไพรด้วยมือ"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Subtle edge fade only on desktop left edge to blend with text panel */}
+                <div className="hidden md:block absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+                {/* Floating caption */}
+                <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/85 backdrop-blur-sm border border-border/60 shadow-md">
+                  <span className="text-[10px] md:text-xs text-foreground font-medium inline-flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-primary" />
+                    Traditional Craft
+                  </span>
                 </div>
               </div>
             </div>
           </motion.div>
+
 
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
