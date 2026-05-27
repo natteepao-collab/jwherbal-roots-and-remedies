@@ -105,7 +105,11 @@ Deno.serve(async (req) => {
     // Traffic sources
     const srcCount: Record<string, number> = {};
     views.forEach((v: any) => {
-      const ref = v.referrer ? new URL(v.referrer).hostname.replace("www.", "") : "Direct";
+      let ref = "Direct";
+      if (v.referrer) {
+        try { ref = new URL(v.referrer).hostname.replace("www.", "") || "Direct"; }
+        catch { ref = "Unknown"; }
+      }
       srcCount[ref] = (srcCount[ref] || 0) + 1;
     });
     const sources = Object.entries(srcCount).sort((a, b) => b[1] - a[1]).slice(0, 8)
