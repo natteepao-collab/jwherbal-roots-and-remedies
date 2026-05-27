@@ -44,8 +44,22 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("popular");
   const { data: allTiers } = usePromotionTiers();
 
-  // Mock admin state — replace with real auth check later
-  const [isAdmin] = useState<boolean>(true);
+  // Real admin check via user_roles table
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session || !mounted) return;
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle()
+        .then(({ data }) => { if (mounted) setIsAdmin(!!data); });
+    });
+    return () => { mounted = false; };
+  }, []);
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ["products", isAdmin],
     queryFn: async () => {
