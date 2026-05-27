@@ -15,12 +15,42 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { period = "month", fromISO, toISO } = (await req.json()) as ReqBody;
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    // --- Auth: require valid JWT + admin role ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Missing authorization header" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser(
+      authHeader.replace("Bearer ", ""),
     );
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) {
+      return new Response(JSON.stringify({ error: "Forbidden: Admin access required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { period = "month", fromISO, toISO } = (await req.json()) as ReqBody;
 
     const now = toISO ? new Date(toISO) : new Date();
     let since: Date;
@@ -75,7 +105,11 @@ Deno.serve(async (req) => {
     // Traffic sources
     const srcCount: Record<string, number> = {};
     views.forEach((v: any) => {
-      const ref = v.referrer ? new URL(v.referrer).hostname.replace("www.", "") : "Direct";
+      let ref = "Direct";
+      if (v.referrer) {
+        try { ref = new URL(v.referrer).hostname.replace("www.", "") || "Direct"; }
+        catch { ref = "Unknown"; }
+      }
       srcCount[ref] = (srcCount[ref] || 0) + 1;
     });
     const sources = Object.entries(srcCount).sort((a, b) => b[1] - a[1]).slice(0, 8)
