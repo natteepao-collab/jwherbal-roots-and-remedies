@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SeoHead } from "@/components/SeoHead";
 import { JsonLd } from "@/components/JsonLd";
 import { useQuery } from "@tanstack/react-query";
