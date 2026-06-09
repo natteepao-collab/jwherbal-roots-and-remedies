@@ -65,6 +65,9 @@ const AdminPopup = () => {
         note_text: data.note_text ?? "",
         terms_text: data.terms_text ?? "",
         link_url: data.link_url,
+        promo_enabled: (data as any).promo_enabled ?? true,
+        promo_threshold: Number((data as any).promo_threshold ?? 2000),
+        promo_discount: Number((data as any).promo_discount ?? 50),
       });
     }
     setLoading(false);
