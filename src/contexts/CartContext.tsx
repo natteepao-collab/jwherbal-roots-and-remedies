@@ -18,8 +18,12 @@ interface CartContextType {
   clearCart: () => void;
   /** Subtotal before any promotion discount */
   subtotal: number;
-  /** Hardsell promotion discount: -50 THB per bill when subtotal >= 2,000 */
+  /** Hardsell promotion discount applied to the bill */
   promoDiscount: number;
+  /** Minimum subtotal required to qualify for the promotion */
+  promoThreshold: number;
+  /** Whether the Hardsell promotion is currently active */
+  promoEnabled: boolean;
   /** Final payable total after promotion discount */
   totalPrice: number;
 }
