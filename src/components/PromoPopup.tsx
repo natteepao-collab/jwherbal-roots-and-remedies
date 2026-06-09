@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import promoImage from "@/assets/promo-popup.png.asset.json";
+import promoImage from "@/assets/promo-popup.jpg.asset.json";
 
 const PromoPopup = () => {
   const [open, setOpen] = useState(false);
