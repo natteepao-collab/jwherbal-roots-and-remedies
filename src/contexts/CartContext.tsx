@@ -24,9 +24,17 @@ interface CartContextType {
   totalPrice: number;
 }
 
-// Hardsell promotion: extra 50 THB off per bill for orders of 2,000 THB or more
+const POPUP_ID = "00000000-0000-0000-0000-000000000001";
+
+// Fallback Hardsell promotion config (used until admin settings load)
 export const PROMO_THRESHOLD = 2000;
 export const PROMO_DISCOUNT = 50;
+
+interface PromoConfig {
+  enabled: boolean;
+  threshold: number;
+  discount: number;
+}
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
