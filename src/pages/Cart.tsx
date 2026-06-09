@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 const Cart = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, totalPrice } = useCart();
+  const { items, updateQuantity, removeItem, subtotal, promoDiscount, totalPrice } = useCart();
 
   const handleCheckout = () => {
     navigate("/checkout");
@@ -102,16 +102,27 @@ const Cart = () => {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">ยอดรวมสินค้า</span>
-                    <span>฿{totalPrice}</span>
+                    <span>฿{subtotal.toLocaleString("th-TH")}</span>
                   </div>
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-destructive font-medium">ส่วนลดโปรโมชั่น (ซื้อครบ 2,000.-)</span>
+                      <span className="text-destructive font-medium">-฿{promoDiscount.toLocaleString("th-TH")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">ค่าจัดส่ง</span>
                     <span className="text-primary">ฟรี</span>
                   </div>
+                  {promoDiscount === 0 && subtotal > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      ซื้อครบ 2,000.- รับส่วนลดเพิ่มทันที 50.- (เฉพาะเว็บไซต์)
+                    </p>
+                  )}
                   <div className="border-t pt-4">
                     <div className="flex justify-between text-xl font-bold">
                       <span>ยอดรวมทั้งหมด</span>
-                      <span className="text-primary">฿{totalPrice}</span>
+                      <span className="text-primary">฿{totalPrice.toLocaleString("th-TH")}</span>
                     </div>
                   </div>
                 </div>

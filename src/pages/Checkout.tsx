@@ -59,7 +59,7 @@ const getPromptPayQRUrl = (number: string, amount: number) => {
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, subtotal, promoDiscount, totalPrice, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -624,12 +624,23 @@ const Checkout = () => {
                 <div className="pt-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">ยอดรวมสินค้า</span>
-                    <span>฿{totalPrice.toLocaleString()}</span>
+                    <span>฿{subtotal.toLocaleString()}</span>
                   </div>
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-destructive font-medium">ส่วนลดโปรโมชั่น (ซื้อครบ 2,000.-)</span>
+                      <span className="text-destructive font-medium">-฿{promoDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">ค่าจัดส่ง</span>
                     <span className="text-primary">ฟรี</span>
                   </div>
+                  {promoDiscount === 0 && subtotal > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      ซื้อครบ 2,000.- รับส่วนลดเพิ่มทันที 50.- (เฉพาะเว็บไซต์)
+                    </p>
+                  )}
                   <div className="border-t pt-2">
                     <div className="flex justify-between text-xl font-bold">
                       <span>ยอดรวมทั้งหมด</span>
