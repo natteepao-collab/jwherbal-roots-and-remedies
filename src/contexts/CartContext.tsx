@@ -104,7 +104,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
-  const promoDiscount = subtotal >= PROMO_THRESHOLD ? PROMO_DISCOUNT : 0;
+  const promoDiscount =
+    promoConfig.enabled && promoConfig.discount > 0 && subtotal >= promoConfig.threshold
+      ? promoConfig.discount
+      : 0;
   const totalPrice = Math.max(0, subtotal - promoDiscount);
 
   return (
