@@ -207,6 +207,20 @@ const AdminPopup = () => {
                 className="mt-2"
               />
             </div>
+
+            <div>
+              <Label htmlFor="terms_text">เงื่อนไขโปรโมชั่น</Label>
+              <Textarea
+                id="terms_text"
+                value={settings.terms_text ?? ""}
+                onChange={(e) => setSettings((s) => ({ ...s, terms_text: e.target.value }))}
+                placeholder="• เงื่อนไขที่ 1\n• เงื่อนไขที่ 2"
+                className="mt-2 min-h-[160px]"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                ใช้ • หรือ - นำหน้าแต่ละข้อเพื่อแสดงเป็นรายการ
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
