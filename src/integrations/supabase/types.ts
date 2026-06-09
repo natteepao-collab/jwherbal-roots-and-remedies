@@ -1054,6 +1054,9 @@ export type Database = {
           image_url: string | null
           link_url: string
           note_text: string | null
+          promo_discount: number
+          promo_enabled: boolean
+          promo_threshold: number
           terms_text: string | null
           updated_at: string
         }
@@ -1066,6 +1069,9 @@ export type Database = {
           image_url?: string | null
           link_url?: string
           note_text?: string | null
+          promo_discount?: number
+          promo_enabled?: boolean
+          promo_threshold?: number
           terms_text?: string | null
           updated_at?: string
         }
@@ -1078,6 +1084,9 @@ export type Database = {
           image_url?: string | null
           link_url?: string
           note_text?: string | null
+          promo_discount?: number
+          promo_enabled?: boolean
+          promo_threshold?: number
           terms_text?: string | null
           updated_at?: string
         }
