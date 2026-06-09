@@ -1,7 +1,7 @@
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { JsonLd } from "@/components/JsonLd";
-import { AlertCircle, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, ExternalLink, Home, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Eye, ExternalLink, Home, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
