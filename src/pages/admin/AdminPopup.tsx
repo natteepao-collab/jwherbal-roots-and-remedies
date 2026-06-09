@@ -235,6 +235,63 @@ const AdminPopup = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>ส่วนลดอัตโนมัติ (Hardsell)</CardTitle>
+            <CardDescription>
+              ตั้งค่าส่วนลดที่จะหักจากยอดสั่งซื้อโดยอัตโนมัติเมื่อลูกค้าซื้อครบตามเงื่อนไข (ต่อ 1 บิล)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div>
+                <Label htmlFor="promo_enabled" className="font-medium">เปิดใช้งานส่วนลดอัตโนมัติ</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  เปิด/ปิดการหักส่วนลดในตะกร้าและหน้าชำระเงิน
+                </p>
+              </div>
+              <Switch
+                id="promo_enabled"
+                checked={settings.promo_enabled}
+                onCheckedChange={(v) => setSettings((s) => ({ ...s, promo_enabled: v }))}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="promo_threshold">ยอดซื้อขั้นต่ำ (บาท)</Label>
+                <Input
+                  id="promo_threshold"
+                  type="number"
+                  min={0}
+                  value={settings.promo_threshold}
+                  onChange={(e) => setSettings((s) => ({ ...s, promo_threshold: Number(e.target.value) }))}
+                  placeholder="2000"
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  ลูกค้าต้องซื้อครบยอดนี้จึงจะได้รับส่วนลด
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="promo_discount">ส่วนลดต่อบิล (บาท)</Label>
+                <Input
+                  id="promo_discount"
+                  type="number"
+                  min={0}
+                  value={settings.promo_discount}
+                  onChange={(e) => setSettings((s) => ({ ...s, promo_discount: Number(e.target.value) }))}
+                  placeholder="50"
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  จำนวนเงินที่จะหักออกจากยอดรวม
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
