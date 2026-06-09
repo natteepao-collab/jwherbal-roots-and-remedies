@@ -57,6 +57,7 @@ import AdminVFlow from "./pages/admin/AdminVFlow";
 import AdminChatHistory from "./pages/admin/AdminChatHistory";
 import AdminPromotionTiers from "./pages/admin/AdminPromotionTiers";
 import AdminI18nAudit from "./pages/admin/AdminI18nAudit";
+import AdminPopup from "./pages/admin/AdminPopup";
 const queryClient = new QueryClient();
 
 // Public routes content - rendered inside MainLayout
