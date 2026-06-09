@@ -16,6 +16,12 @@ import visionProductsImg from "@/assets/about/vision-products.jpg";
 
 interface AboutSettings {
   id: string;
+  hero_title_th: string;
+  hero_title_en: string;
+  hero_title_zh: string;
+  hero_subtitle_th: string;
+  hero_subtitle_en: string;
+  hero_subtitle_zh: string;
   vision_title_th: string;
   vision_title_en: string;
   vision_title_zh: string;
@@ -179,10 +185,10 @@ const About = () => {
               JWHERBAL BY JWGROUP
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              {t("about.hero.title")}
+              {settings ? getLocalizedText(settings.hero_title_th, settings.hero_title_en, settings.hero_title_zh) : t("about.hero.title")}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {t("about.hero.subtitle")}
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
+              {settings ? getLocalizedText(settings.hero_subtitle_th, settings.hero_subtitle_en, settings.hero_subtitle_zh) : t("about.hero.subtitle")}
             </p>
           </div>
         </div>
