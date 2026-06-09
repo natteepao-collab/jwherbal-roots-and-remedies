@@ -16,6 +16,12 @@ import visionProductsImg from "@/assets/about/vision-products.jpg";
 
 interface AboutSettings {
   id: string;
+  hero_title_th: string;
+  hero_title_en: string;
+  hero_title_zh: string;
+  hero_subtitle_th: string;
+  hero_subtitle_en: string;
+  hero_subtitle_zh: string;
   vision_title_th: string;
   vision_title_en: string;
   vision_title_zh: string;
