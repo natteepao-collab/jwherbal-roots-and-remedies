@@ -293,6 +293,19 @@ const ArticleDetail = () => {
     enabled: !staticArticle,
   });
 
+  // Count a reader view once per session per article (anon-safe RPC)
+  useEffect(() => {
+    const realSlug = (dbArticle as any)?.slug;
+    if (!realSlug) return;
+    const key = `article_viewed_${realSlug}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    supabase.rpc("increment_article_views", { article_slug: realSlug }).then(
+      () => {},
+      () => {},
+    );
+  }, [dbArticle]);
+
   const getText = (th: string, en: string, zh: string) => {
     switch (currentLang) {
       case "en": return en || th;
