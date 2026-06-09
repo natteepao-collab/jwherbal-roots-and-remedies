@@ -53,12 +53,14 @@ const PromoPopup = () => {
 
             <button
               onClick={handleShopNow}
-              className="block w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-primary/20"
+              className="block w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-primary/20 bg-muted aspect-square"
             >
               <img
                 src={promoImage.url}
                 alt="โปรโมชั่นพิเศษ V FLOW ลดแรงมาก ส่วนลดเพิ่ม 50 บาท"
-                className="w-full h-auto"
+                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
               />
             </button>
 
