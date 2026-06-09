@@ -138,9 +138,15 @@ const Articles = () => {
               <User className="h-3 w-3" />
               <span className="truncate max-w-[100px]">{article.author}</span>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Heart className="h-3 w-3" />
-              <span>{article.likes || 0}</span>
+            <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Eye className="h-3 w-3" />
+                {(article.views || 0).toLocaleString()}
+              </span>
+              <span className="flex items-center gap-1">
+                <Heart className="h-3 w-3" />
+                {article.likes || 0}
+              </span>
             </div>
           </div>
         </CardContent>
