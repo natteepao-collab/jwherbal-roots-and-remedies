@@ -15,8 +15,17 @@ interface CartContextType {
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
+  /** Subtotal before any promotion discount */
+  subtotal: number;
+  /** Hardsell promotion discount: -50 THB per bill when subtotal >= 2,000 */
+  promoDiscount: number;
+  /** Final payable total after promotion discount */
   totalPrice: number;
 }
+
+// Hardsell promotion: extra 50 THB off per bill for orders of 2,000 THB or more
+export const PROMO_THRESHOLD = 2000;
+export const PROMO_DISCOUNT = 50;
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -56,14 +65,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems([]);
   };
 
-  const totalPrice = items.reduce(
+  const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
+  const promoDiscount = subtotal >= PROMO_THRESHOLD ? PROMO_DISCOUNT : 0;
+  const totalPrice = Math.max(0, subtotal - promoDiscount);
+
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, totalPrice }}
+      value={{
+        items,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+        subtotal,
+        promoDiscount,
+        totalPrice,
+      }}
     >
       {children}
     </CartContext.Provider>
