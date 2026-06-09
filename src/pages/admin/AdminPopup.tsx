@@ -86,7 +86,10 @@ const AdminPopup = () => {
           note_text: settings.note_text,
           terms_text: settings.terms_text,
           link_url: settings.link_url,
-        })
+          promo_enabled: settings.promo_enabled,
+          promo_threshold: settings.promo_threshold,
+          promo_discount: settings.promo_discount,
+        } as any)
         .eq("id", POPUP_ID);
 
       if (error) throw error;
