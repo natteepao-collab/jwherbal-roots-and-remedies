@@ -106,7 +106,7 @@ const Cart = () => {
                   </div>
                   {promoDiscount > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-destructive font-medium">ส่วนลดโปรโมชั่น (ซื้อครบ 2,000.-)</span>
+                      <span className="text-destructive font-medium">ส่วนลดโปรโมชั่น (ซื้อครบ {promoThreshold.toLocaleString("th-TH")}.-)</span>
                       <span className="text-destructive font-medium">-฿{promoDiscount.toLocaleString("th-TH")}</span>
                     </div>
                   )}
@@ -114,9 +114,9 @@ const Cart = () => {
                     <span className="text-muted-foreground">ค่าจัดส่ง</span>
                     <span className="text-primary">ฟรี</span>
                   </div>
-                  {promoDiscount === 0 && subtotal > 0 && (
+                  {promoEnabled && promoDiscount === 0 && subtotal > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      ซื้อครบ 2,000.- รับส่วนลดเพิ่มทันที 50.- (เฉพาะเว็บไซต์)
+                      ซื้อครบ {promoThreshold.toLocaleString("th-TH")}.- รับส่วนลดเพิ่มทันที (เฉพาะเว็บไซต์)
                     </p>
                   )}
                   <div className="border-t pt-4">
