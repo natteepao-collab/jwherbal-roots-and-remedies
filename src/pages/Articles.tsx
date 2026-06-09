@@ -28,6 +28,7 @@ interface Article {
   category: string;
   author: string;
   likes: number | null;
+  views: number | null;
   published_date: string | null;
   is_featured: boolean;
 }
