@@ -18,6 +18,7 @@ interface PopupSettings {
   image_alt: string | null;
   button_text: string;
   note_text: string | null;
+  terms_text: string | null;
   link_url: string;
 }
 
