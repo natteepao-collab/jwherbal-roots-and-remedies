@@ -45,7 +45,7 @@ const checkoutSchema = z.object({
     .max(15)
     .regex(/^[0-9]+$/, "เบอร์โทรต้องเป็นตัวเลขเท่านั้น"),
   customer_address: z.string().min(10, "กรุณากรอกที่อยู่"),
-  payment_method: z.enum(["promptpay", "bank_transfer"]),
+  payment_method: z.enum(["promptpay", "bank_transfer", "stripe"]),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -213,6 +213,19 @@ const Checkout = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Stripe online payment: redirect to Stripe Checkout with the discounted total
+      if (data.payment_method === "stripe") {
+        const { data: payData, error: payError } = await supabase.functions.invoke(
+          "create-payment",
+          { body: { order_id: orderData.id } },
+        );
+        if (payError) throw payError;
+        if (!payData?.url) throw new Error("ไม่สามารถสร้างลิงก์ชำระเงินได้");
+        clearCart();
+        window.location.href = payData.url;
+        return;
+      }
 
       // Send admin notification
       try {
