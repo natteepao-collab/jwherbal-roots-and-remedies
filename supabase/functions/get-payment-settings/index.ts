@@ -15,10 +15,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Use the anon key so RLS applies — no service-role bypass.
+    // Use the service role to read ONLY the whitelisted public display fields.
+    // Direct table access is now admin-only; this function is the sole public path
+    // and never returns internal/admin columns.
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     const { data, error } = await supabase
