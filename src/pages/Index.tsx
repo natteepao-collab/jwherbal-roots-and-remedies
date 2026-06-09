@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award, Flame, Sparkles, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award, Flame, Sparkles, MessageCircle, Phone, Eye } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { motion } from "framer-motion";
