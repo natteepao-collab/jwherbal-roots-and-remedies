@@ -124,6 +124,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         subtotal,
         promoDiscount,
+        promoThreshold: promoConfig.threshold,
+        promoEnabled: promoConfig.enabled,
         totalPrice,
       }}
     >
