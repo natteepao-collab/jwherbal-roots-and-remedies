@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
+import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2, CreditCard } from "lucide-react";
 import ShippingPolicy from "@/components/ShippingPolicy";
 
 interface PaymentSettings {
@@ -45,7 +45,7 @@ const checkoutSchema = z.object({
     .max(15)
     .regex(/^[0-9]+$/, "เบอร์โทรต้องเป็นตัวเลขเท่านั้น"),
   customer_address: z.string().min(10, "กรุณากรอกที่อยู่"),
-  payment_method: z.enum(["promptpay", "bank_transfer"]),
+  payment_method: z.enum(["promptpay", "bank_transfer", "stripe"]),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -213,6 +213,19 @@ const Checkout = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Stripe online payment: redirect to Stripe Checkout with the discounted total
+      if (data.payment_method === "stripe") {
+        const { data: payData, error: payError } = await supabase.functions.invoke(
+          "create-payment",
+          { body: { order_id: orderData.id } },
+        );
+        if (payError) throw payError;
+        if (!payData?.url) throw new Error("ไม่สามารถสร้างลิงก์ชำระเงินได้");
+        clearCart();
+        window.location.href = payData.url;
+        return;
+      }
 
       // Send admin notification
       try {
@@ -566,6 +579,22 @@ const Checkout = () => {
                                   </Label>
                                 </div>
                               )}
+
+                              <div className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-secondary">
+                                <RadioGroupItem value="stripe" id="stripe" />
+                                <Label
+                                  htmlFor="stripe"
+                                  className="flex items-center gap-3 cursor-pointer flex-1"
+                                >
+                                  <CreditCard className="h-8 w-8 text-primary" />
+                                  <div>
+                                    <p className="font-medium">บัตรเครดิต/เดบิต (Stripe)</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      ชำระเงินออนไลน์ผ่านบัตรอย่างปลอดภัย
+                                    </p>
+                                  </div>
+                                </Label>
+                              </div>
                             </RadioGroup>
                           </FormControl>
                           <FormMessage />
