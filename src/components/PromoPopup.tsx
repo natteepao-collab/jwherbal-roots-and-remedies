@@ -2,10 +2,23 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import promoImage from "@/assets/promo-popup.jpg.asset.json";
+import { supabase } from "@/integrations/supabase/client";
+import fallbackImage from "@/assets/promo-popup.jpg.asset.json";
+
+const POPUP_ID = "00000000-0000-0000-0000-000000000001";
+
+interface PopupSettings {
+  enabled: boolean;
+  image_url: string | null;
+  image_alt: string | null;
+  button_text: string;
+  note_text: string | null;
+  link_url: string;
+}
 
 const PromoPopup = () => {
   const [open, setOpen] = useState(false);
+  const [settings, setSettings] = useState<PopupSettings | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -13,8 +26,25 @@ const PromoPopup = () => {
     // Show only on public pages, not in admin dashboard
     if (location.pathname.startsWith("/admin")) return;
 
-    const timer = setTimeout(() => setOpen(true), 600);
-    return () => clearTimeout(timer);
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("popup_settings")
+        .select("*")
+        .eq("id", POPUP_ID)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (data && data.enabled) {
+        setSettings(data);
+        setTimeout(() => active && setOpen(true), 600);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -22,8 +52,17 @@ const PromoPopup = () => {
 
   const handleShopNow = () => {
     setOpen(false);
-    navigate("/shop");
+    const url = settings?.link_url || "/shop";
+    if (url.startsWith("http")) {
+      window.open(url, "_blank");
+    } else {
+      navigate(url);
+    }
   };
+
+  if (!settings) return null;
+
+  const imageSrc = settings.image_url || fallbackImage.url;
 
   return (
     <AnimatePresence>
@@ -56,27 +95,31 @@ const PromoPopup = () => {
               className="block w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-primary/20 bg-muted aspect-square"
             >
               <img
-                src={promoImage.url}
-                alt="โปรโมชั่นพิเศษ V FLOW ลดแรงมาก ส่วนลดเพิ่ม 50 บาท"
+                src={imageSrc}
+                alt={settings.image_alt || "โปรโมชั่นพิเศษ"}
                 className="w-full h-full object-cover"
                 loading="eager"
                 decoding="async"
               />
             </button>
 
-            <motion.button
-              onClick={handleShopNow}
-              className="mt-4 mx-auto block rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105"
-              initial={{ y: 8, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              ช้อปเลย รับส่วนลด →
-            </motion.button>
+            {settings.button_text && (
+              <motion.button
+                onClick={handleShopNow}
+                className="mt-4 mx-auto block rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                initial={{ y: 8, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                {settings.button_text}
+              </motion.button>
+            )}
 
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              *ส่วนลดนี้มีเฉพาะที่เว็บไซต์นี้เท่านั้น
-            </p>
+            {settings.note_text && (
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                {settings.note_text}
+              </p>
+            )}
           </motion.div>
         </motion.div>
       )}

@@ -21,6 +21,7 @@ import {
   Flame,
   Droplets,
   ScanSearch,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -109,6 +110,11 @@ const menuItems = [
     title: "โปรโมชั่น", 
     icon: Flame, 
     path: "/admin/dashboard/promotions" 
+  },
+  { 
+    title: "Popup โปรโมชั่น", 
+    icon: Megaphone, 
+    path: "/admin/dashboard/popup" 
   },
   { 
     title: "แพ็กเกจราคา", 

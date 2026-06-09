@@ -57,6 +57,7 @@ import AdminVFlow from "./pages/admin/AdminVFlow";
 import AdminChatHistory from "./pages/admin/AdminChatHistory";
 import AdminPromotionTiers from "./pages/admin/AdminPromotionTiers";
 import AdminI18nAudit from "./pages/admin/AdminI18nAudit";
+import AdminPopup from "./pages/admin/AdminPopup";
 const queryClient = new QueryClient();
 
 // Public routes content - rendered inside MainLayout
@@ -115,6 +116,7 @@ const AdminRoutes = () => {
         <Route path="logo" element={<AdminLogo />} />
         <Route path="about" element={<AdminAbout />} />
         <Route path="promotions" element={<AdminPromotions />} />
+        <Route path="popup" element={<AdminPopup />} />
         <Route path="promotion-tiers" element={<AdminPromotionTiers />} />
         <Route path="vflow" element={<AdminVFlow />} />
         <Route path="chat-history" element={<AdminChatHistory />} />

@@ -1044,6 +1044,42 @@ export type Database = {
         }
         Relationships: []
       }
+      popup_settings: {
+        Row: {
+          button_text: string
+          created_at: string
+          enabled: boolean
+          id: string
+          image_alt: string | null
+          image_url: string | null
+          link_url: string
+          note_text: string | null
+          updated_at: string
+        }
+        Insert: {
+          button_text?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          link_url?: string
+          note_text?: string | null
+          updated_at?: string
+        }
+        Update: {
+          button_text?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          link_url?: string
+          note_text?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           created_at: string
