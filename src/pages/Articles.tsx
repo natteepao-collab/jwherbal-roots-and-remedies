@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SeoHead } from "@/components/SeoHead";
-import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter } from "lucide-react";
+import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
