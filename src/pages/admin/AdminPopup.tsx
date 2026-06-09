@@ -57,6 +57,7 @@ const AdminPopup = () => {
         image_alt: data.image_alt ?? "",
         button_text: data.button_text,
         note_text: data.note_text ?? "",
+        terms_text: data.terms_text ?? "",
         link_url: data.link_url,
       });
     }
