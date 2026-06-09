@@ -40,6 +40,31 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [promoConfig, setPromoConfig] = useState<PromoConfig>({
+    enabled: true,
+    threshold: PROMO_THRESHOLD,
+    discount: PROMO_DISCOUNT,
+  });
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("popup_settings")
+        .select("promo_enabled, promo_threshold, promo_discount")
+        .eq("id", POPUP_ID)
+        .maybeSingle();
+      if (!active || !data) return;
+      setPromoConfig({
+        enabled: (data as any).promo_enabled ?? true,
+        threshold: Number((data as any).promo_threshold ?? PROMO_THRESHOLD),
+        discount: Number((data as any).promo_discount ?? PROMO_DISCOUNT),
+      });
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const addItem = (item: Omit<CartItem, "quantity">) => {
     setItems((prevItems) => {
