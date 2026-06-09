@@ -20,6 +20,9 @@ interface PopupSettings {
   note_text: string | null;
   terms_text: string | null;
   link_url: string;
+  promo_enabled: boolean;
+  promo_threshold: number;
+  promo_discount: number;
 }
 
 const AdminPopup = () => {
@@ -35,6 +38,9 @@ const AdminPopup = () => {
     terms_text:
       "• โปรโมชั่นสำหรับลูกค้าที่สั่งซื้อผ่านทางเว็ปไซต์ www.jwherbal.com เท่านั้น\n• ซื้อสินค้า V Flow ครบ 2,000 บาทขึ้นไปต่อ 1 ใบเสร็จ\n• รับส่วนลดเพิ่ม 50 บาทต่อคำสั่งซื้อ\n• ไม่สามารถรับส่วนลดเพิ่มตามยอดซื้อที่สูงขึ้นได้\n• โปรโมชั่นตั้งแต่วันนี้ – 30 มิถุนายน 2569\n• สินค้ามีจำนวนจำกัด\n• บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยไม่ต้องแจ้งให้ทราบล่วงหน้า",
     link_url: "/shop",
+    promo_enabled: true,
+    promo_threshold: 2000,
+    promo_discount: 50,
   });
 
   useEffect(() => {
