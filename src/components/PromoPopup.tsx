@@ -71,6 +71,10 @@ const PromoPopup = () => {
             >
               ช้อปเลย รับส่วนลด →
             </motion.button>
+
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              *ส่วนลดนี้มีเฉพาะที่เว็บไซต์นี้เท่านั้น
+            </p>
           </motion.div>
         </motion.div>
       )}
