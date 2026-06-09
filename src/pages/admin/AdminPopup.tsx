@@ -20,6 +20,9 @@ interface PopupSettings {
   note_text: string | null;
   terms_text: string | null;
   link_url: string;
+  promo_enabled: boolean;
+  promo_threshold: number;
+  promo_discount: number;
 }
 
 const AdminPopup = () => {
@@ -35,6 +38,9 @@ const AdminPopup = () => {
     terms_text:
       "• โปรโมชั่นสำหรับลูกค้าที่สั่งซื้อผ่านทางเว็ปไซต์ www.jwherbal.com เท่านั้น\n• ซื้อสินค้า V Flow ครบ 2,000 บาทขึ้นไปต่อ 1 ใบเสร็จ\n• รับส่วนลดเพิ่ม 50 บาทต่อคำสั่งซื้อ\n• ไม่สามารถรับส่วนลดเพิ่มตามยอดซื้อที่สูงขึ้นได้\n• โปรโมชั่นตั้งแต่วันนี้ – 30 มิถุนายน 2569\n• สินค้ามีจำนวนจำกัด\n• บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยไม่ต้องแจ้งให้ทราบล่วงหน้า",
     link_url: "/shop",
+    promo_enabled: true,
+    promo_threshold: 2000,
+    promo_discount: 50,
   });
 
   useEffect(() => {
@@ -59,6 +65,9 @@ const AdminPopup = () => {
         note_text: data.note_text ?? "",
         terms_text: data.terms_text ?? "",
         link_url: data.link_url,
+        promo_enabled: (data as any).promo_enabled ?? true,
+        promo_threshold: Number((data as any).promo_threshold ?? 2000),
+        promo_discount: Number((data as any).promo_discount ?? 50),
       });
     }
     setLoading(false);
@@ -77,7 +86,10 @@ const AdminPopup = () => {
           note_text: settings.note_text,
           terms_text: settings.terms_text,
           link_url: settings.link_url,
-        })
+          promo_enabled: settings.promo_enabled,
+          promo_threshold: settings.promo_threshold,
+          promo_discount: settings.promo_discount,
+        } as any)
         .eq("id", POPUP_ID);
 
       if (error) throw error;
@@ -220,6 +232,63 @@ const AdminPopup = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 ใช้ • หรือ - นำหน้าแต่ละข้อเพื่อแสดงเป็นรายการ
               </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>ส่วนลดอัตโนมัติ (Hardsell)</CardTitle>
+            <CardDescription>
+              ตั้งค่าส่วนลดที่จะหักจากยอดสั่งซื้อโดยอัตโนมัติเมื่อลูกค้าซื้อครบตามเงื่อนไข (ต่อ 1 บิล)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div>
+                <Label htmlFor="promo_enabled" className="font-medium">เปิดใช้งานส่วนลดอัตโนมัติ</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  เปิด/ปิดการหักส่วนลดในตะกร้าและหน้าชำระเงิน
+                </p>
+              </div>
+              <Switch
+                id="promo_enabled"
+                checked={settings.promo_enabled}
+                onCheckedChange={(v) => setSettings((s) => ({ ...s, promo_enabled: v }))}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="promo_threshold">ยอดซื้อขั้นต่ำ (บาท)</Label>
+                <Input
+                  id="promo_threshold"
+                  type="number"
+                  min={0}
+                  value={settings.promo_threshold}
+                  onChange={(e) => setSettings((s) => ({ ...s, promo_threshold: Number(e.target.value) }))}
+                  placeholder="2000"
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  ลูกค้าต้องซื้อครบยอดนี้จึงจะได้รับส่วนลด
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="promo_discount">ส่วนลดต่อบิล (บาท)</Label>
+                <Input
+                  id="promo_discount"
+                  type="number"
+                  min={0}
+                  value={settings.promo_discount}
+                  onChange={(e) => setSettings((s) => ({ ...s, promo_discount: Number(e.target.value) }))}
+                  placeholder="50"
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  จำนวนเงินที่จะหักออกจากยอดรวม
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

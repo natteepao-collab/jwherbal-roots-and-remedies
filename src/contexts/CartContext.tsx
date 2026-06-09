@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   id: number;
@@ -17,20 +18,57 @@ interface CartContextType {
   clearCart: () => void;
   /** Subtotal before any promotion discount */
   subtotal: number;
-  /** Hardsell promotion discount: -50 THB per bill when subtotal >= 2,000 */
+  /** Hardsell promotion discount applied to the bill */
   promoDiscount: number;
+  /** Minimum subtotal required to qualify for the promotion */
+  promoThreshold: number;
+  /** Whether the Hardsell promotion is currently active */
+  promoEnabled: boolean;
   /** Final payable total after promotion discount */
   totalPrice: number;
 }
 
-// Hardsell promotion: extra 50 THB off per bill for orders of 2,000 THB or more
+const POPUP_ID = "00000000-0000-0000-0000-000000000001";
+
+// Fallback Hardsell promotion config (used until admin settings load)
 export const PROMO_THRESHOLD = 2000;
 export const PROMO_DISCOUNT = 50;
+
+interface PromoConfig {
+  enabled: boolean;
+  threshold: number;
+  discount: number;
+}
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [promoConfig, setPromoConfig] = useState<PromoConfig>({
+    enabled: true,
+    threshold: PROMO_THRESHOLD,
+    discount: PROMO_DISCOUNT,
+  });
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("popup_settings")
+        .select("promo_enabled, promo_threshold, promo_discount")
+        .eq("id", POPUP_ID)
+        .maybeSingle();
+      if (!active || !data) return;
+      setPromoConfig({
+        enabled: (data as any).promo_enabled ?? true,
+        threshold: Number((data as any).promo_threshold ?? PROMO_THRESHOLD),
+        discount: Number((data as any).promo_discount ?? PROMO_DISCOUNT),
+      });
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const addItem = (item: Omit<CartItem, "quantity">) => {
     setItems((prevItems) => {
@@ -70,7 +108,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
-  const promoDiscount = subtotal >= PROMO_THRESHOLD ? PROMO_DISCOUNT : 0;
+  const promoDiscount =
+    promoConfig.enabled && promoConfig.discount > 0 && subtotal >= promoConfig.threshold
+      ? promoConfig.discount
+      : 0;
   const totalPrice = Math.max(0, subtotal - promoDiscount);
 
   return (
@@ -83,6 +124,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         subtotal,
         promoDiscount,
+        promoThreshold: promoConfig.threshold,
+        promoEnabled: promoConfig.enabled,
         totalPrice,
       }}
     >
