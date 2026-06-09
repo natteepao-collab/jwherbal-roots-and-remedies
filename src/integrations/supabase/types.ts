@@ -1054,6 +1054,7 @@ export type Database = {
           image_url: string | null
           link_url: string
           note_text: string | null
+          terms_text: string | null
           updated_at: string
         }
         Insert: {
@@ -1065,6 +1066,7 @@ export type Database = {
           image_url?: string | null
           link_url?: string
           note_text?: string | null
+          terms_text?: string | null
           updated_at?: string
         }
         Update: {
@@ -1076,6 +1078,7 @@ export type Database = {
           image_url?: string | null
           link_url?: string
           note_text?: string | null
+          terms_text?: string | null
           updated_at?: string
         }
         Relationships: []

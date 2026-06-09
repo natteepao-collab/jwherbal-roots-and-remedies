@@ -13,6 +13,7 @@ interface PopupSettings {
   image_alt: string | null;
   button_text: string;
   note_text: string | null;
+  terms_text: string | null;
   link_url: string;
 }
 
@@ -103,23 +104,41 @@ const PromoPopup = () => {
               />
             </button>
 
-            {settings.button_text && (
-              <motion.button
-                onClick={handleShopNow}
-                className="mt-4 mx-auto block rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105"
-                initial={{ y: 8, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                {settings.button_text}
-              </motion.button>
-            )}
+            <motion.div
+              className="mt-3 rounded-xl bg-card/95 p-4 shadow-xl ring-1 ring-border backdrop-blur-sm"
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.25 }}
+            >
+              {settings.button_text && (
+                <motion.button
+                  onClick={handleShopNow}
+                  className="mx-auto block rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                  initial={{ y: 8, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.35 }}
+                >
+                  {settings.button_text}
+                </motion.button>
+              )}
 
-            {settings.note_text && (
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                {settings.note_text}
-              </p>
-            )}
+              {settings.note_text && (
+                <p className="mt-3 text-center text-xs font-medium text-foreground">
+                  {settings.note_text}
+                </p>
+              )}
+
+              {settings.terms_text && (
+                <div className="mt-3 border-t border-border pt-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground mb-2">
+                    เงื่อนไขโปรโมชั่น
+                  </p>
+                  <div className="text-[11px] leading-relaxed text-foreground whitespace-pre-wrap">
+                    {settings.terms_text}
+                  </div>
+                </div>
+              )}
+            </motion.div>
           </motion.div>
         </motion.div>
       )}

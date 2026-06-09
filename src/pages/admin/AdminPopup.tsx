@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +18,7 @@ interface PopupSettings {
   image_alt: string | null;
   button_text: string;
   note_text: string | null;
+  terms_text: string | null;
   link_url: string;
 }
 
@@ -30,6 +32,8 @@ const AdminPopup = () => {
     image_alt: "",
     button_text: "ช้อปเลย รับส่วนลด →",
     note_text: "*ส่วนลดนี้มีเฉพาะที่เว็บไซต์นี้เท่านั้น",
+    terms_text:
+      "• โปรโมชั่นสำหรับลูกค้าที่สั่งซื้อผ่านทางเว็ปไซต์ www.jwherbal.com เท่านั้น\n• ซื้อสินค้า V Flow ครบ 2,000 บาทขึ้นไปต่อ 1 ใบเสร็จ\n• รับส่วนลดเพิ่ม 50 บาทต่อคำสั่งซื้อ\n• ไม่สามารถรับส่วนลดเพิ่มตามยอดซื้อที่สูงขึ้นได้\n• โปรโมชั่นตั้งแต่วันนี้ – 30 มิถุนายน 2569\n• สินค้ามีจำนวนจำกัด\n• บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยไม่ต้องแจ้งให้ทราบล่วงหน้า",
     link_url: "/shop",
   });
 
@@ -53,6 +57,7 @@ const AdminPopup = () => {
         image_alt: data.image_alt ?? "",
         button_text: data.button_text,
         note_text: data.note_text ?? "",
+        terms_text: data.terms_text ?? "",
         link_url: data.link_url,
       });
     }
@@ -70,6 +75,7 @@ const AdminPopup = () => {
           image_alt: settings.image_alt,
           button_text: settings.button_text,
           note_text: settings.note_text,
+          terms_text: settings.terms_text,
           link_url: settings.link_url,
         })
         .eq("id", POPUP_ID);
@@ -200,6 +206,20 @@ const AdminPopup = () => {
                 placeholder="*ส่วนลดนี้มีเฉพาะที่เว็บไซต์นี้เท่านั้น"
                 className="mt-2"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="terms_text">เงื่อนไขโปรโมชั่น</Label>
+              <Textarea
+                id="terms_text"
+                value={settings.terms_text ?? ""}
+                onChange={(e) => setSettings((s) => ({ ...s, terms_text: e.target.value }))}
+                placeholder="• เงื่อนไขที่ 1\n• เงื่อนไขที่ 2"
+                className="mt-2 min-h-[160px]"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                ใช้ • หรือ - นำหน้าแต่ละข้อเพื่อแสดงเป็นรายการ
+              </p>
             </div>
           </CardContent>
         </Card>
