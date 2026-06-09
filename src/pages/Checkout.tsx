@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2 } from "lucide-react";
+import { QrCode, ArrowLeft, CheckCircle, Building2, Copy, Upload, Loader2, CreditCard } from "lucide-react";
 import ShippingPolicy from "@/components/ShippingPolicy";
 
 interface PaymentSettings {
@@ -579,6 +579,22 @@ const Checkout = () => {
                                   </Label>
                                 </div>
                               )}
+
+                              <div className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-secondary">
+                                <RadioGroupItem value="stripe" id="stripe" />
+                                <Label
+                                  htmlFor="stripe"
+                                  className="flex items-center gap-3 cursor-pointer flex-1"
+                                >
+                                  <CreditCard className="h-8 w-8 text-primary" />
+                                  <div>
+                                    <p className="font-medium">บัตรเครดิต/เดบิต (Stripe)</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      ชำระเงินออนไลน์ผ่านบัตรอย่างปลอดภัย
+                                    </p>
+                                  </div>
+                                </Label>
+                              </div>
                             </RadioGroup>
                           </FormControl>
                           <FormMessage />
