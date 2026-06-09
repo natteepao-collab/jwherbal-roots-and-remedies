@@ -116,6 +116,7 @@ const AdminRoutes = () => {
         <Route path="logo" element={<AdminLogo />} />
         <Route path="about" element={<AdminAbout />} />
         <Route path="promotions" element={<AdminPromotions />} />
+        <Route path="popup" element={<AdminPopup />} />
         <Route path="promotion-tiers" element={<AdminPromotionTiers />} />
         <Route path="vflow" element={<AdminVFlow />} />
         <Route path="chat-history" element={<AdminChatHistory />} />
