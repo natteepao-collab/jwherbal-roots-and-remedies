@@ -59,7 +59,7 @@ const getPromptPayQRUrl = (number: string, amount: number) => {
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, subtotal, promoDiscount, totalPrice, clearCart } = useCart();
+  const { items, subtotal, promoDiscount, promoThreshold, promoEnabled, totalPrice, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
