@@ -1,7 +1,7 @@
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { JsonLd } from "@/components/JsonLd";
-import { AlertCircle, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, ExternalLink, Home, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Eye, ExternalLink, Home, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
@@ -293,6 +293,19 @@ const ArticleDetail = () => {
     enabled: !staticArticle,
   });
 
+  // Count a reader view once per session per article (anon-safe RPC)
+  useEffect(() => {
+    const realSlug = (dbArticle as any)?.slug;
+    if (!realSlug) return;
+    const key = `article_viewed_${realSlug}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    supabase.rpc("increment_article_views", { article_slug: realSlug }).then(
+      () => {},
+      () => {},
+    );
+  }, [dbArticle]);
+
   const getText = (th: string, en: string, zh: string) => {
     switch (currentLang) {
       case "en": return en || th;
@@ -564,6 +577,12 @@ const ArticleDetail = () => {
                     </span>
                   </>
                 )}
+                <span>•</span>
+                <span className="inline-flex items-center gap-1">
+                  <Eye className="h-3.5 w-3.5" />
+                  {(((article.views || 0) + 1)).toLocaleString(locale)}{" "}
+                  {currentLang === "en" ? "reads" : currentLang === "zh" ? "阅读" : "ครั้งที่อ่าน"}
+                </span>
               </div>
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>

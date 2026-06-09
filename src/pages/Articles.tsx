@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SeoHead } from "@/components/SeoHead";
-import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter } from "lucide-react";
+import { Clock, User, Loader2, Heart, Star, TrendingUp, Sparkles, ChevronRight, Filter, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -28,6 +28,7 @@ interface Article {
   category: string;
   author: string;
   likes: number | null;
+  views: number | null;
   published_date: string | null;
   is_featured: boolean;
 }
@@ -137,9 +138,15 @@ const Articles = () => {
               <User className="h-3 w-3" />
               <span className="truncate max-w-[100px]">{article.author}</span>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Heart className="h-3 w-3" />
-              <span>{article.likes || 0}</span>
+            <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Eye className="h-3 w-3" />
+                {(article.views || 0).toLocaleString()}
+              </span>
+              <span className="flex items-center gap-1">
+                <Heart className="h-3 w-3" />
+                {article.likes || 0}
+              </span>
             </div>
           </div>
         </CardContent>

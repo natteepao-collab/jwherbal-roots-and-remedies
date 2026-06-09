@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award, Flame, Sparkles, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, Star, ShieldCheck, Leaf, UserCheck, Award, Flame, Sparkles, MessageCircle, Phone, Eye } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { motion } from "framer-motion";
@@ -869,7 +869,10 @@ const Index = () => {
                     {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
                   </h3>
                   <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
-                    <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
+                    <span className="text-muted-foreground line-clamp-1 flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      {(article.views || 0).toLocaleString()}
+                    </span>
                     <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
                       <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
                     </Button>
@@ -919,7 +922,10 @@ const Index = () => {
                       {article.title_th ? getText(article.title_th, article.title_en, article.title_zh) : article.title}
                     </h3>
                     <div className="flex items-center justify-between text-2xs sm:text-xs mt-auto">
-                      <span className="text-muted-foreground line-clamp-1">{article.author || ""}</span>
+                      <span className="text-muted-foreground line-clamp-1 flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {(article.views || 0).toLocaleString()}
+                      </span>
                       <Button variant="link" asChild className="p-0 h-auto text-2xs sm:text-xs">
                         <Link to={`/articles/${article.slug || article.id}`}>{t("articles.readMore")}</Link>
                       </Button>
