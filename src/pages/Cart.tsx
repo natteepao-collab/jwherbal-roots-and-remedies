@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 const Cart = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, totalPrice } = useCart();
+  const { items, updateQuantity, removeItem, subtotal, promoDiscount, totalPrice } = useCart();
 
   const handleCheckout = () => {
     navigate("/checkout");
