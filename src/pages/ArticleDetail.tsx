@@ -576,7 +576,12 @@ const ArticleDetail = () => {
                       {new Date(updatedDate).toLocaleDateString(locale)}
                     </span>
                   </>
-                )}
+                <span>•</span>
+                <span className="inline-flex items-center gap-1">
+                  <Eye className="h-3.5 w-3.5" />
+                  {(((article.views || 0) + 1)).toLocaleString(locale)}{" "}
+                  {currentLang === "en" ? "reads" : currentLang === "zh" ? "阅读" : "ครั้งที่อ่าน"}
+                </span>
               </div>
               <ArticleLikeShare articleId={article.id} articleTitle={title} articleUrl={`${window.location.origin}/articles/${article.slug}`} initialLikes={article.likes || 0} />
             </div>
