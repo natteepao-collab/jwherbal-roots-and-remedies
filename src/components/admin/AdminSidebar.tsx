@@ -111,6 +111,11 @@ const menuItems = [
     path: "/admin/dashboard/promotions" 
   },
   { 
+    title: "Popup โปรโมชั่น", 
+    icon: Megaphone, 
+    path: "/admin/dashboard/popup" 
+  },
+  { 
     title: "แพ็กเกจราคา", 
     icon: Package, 
     path: "/admin/dashboard/promotion-tiers" 
