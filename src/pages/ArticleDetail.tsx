@@ -576,6 +576,7 @@ const ArticleDetail = () => {
                       {new Date(updatedDate).toLocaleDateString(locale)}
                     </span>
                   </>
+                )}
                 <span>•</span>
                 <span className="inline-flex items-center gap-1">
                   <Eye className="h-3.5 w-3.5" />
