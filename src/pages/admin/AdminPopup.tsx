@@ -75,6 +75,7 @@ const AdminPopup = () => {
           image_alt: settings.image_alt,
           button_text: settings.button_text,
           note_text: settings.note_text,
+          terms_text: settings.terms_text,
           link_url: settings.link_url,
         })
         .eq("id", POPUP_ID);
