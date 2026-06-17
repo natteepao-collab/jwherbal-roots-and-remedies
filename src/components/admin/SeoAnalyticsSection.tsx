@@ -51,9 +51,10 @@ function refererSource(ref: string | null): string {
 }
 
 function pctChange(curr: number, prev: number) {
-  if (prev === 0) return { value: curr > 0 ? 100 : 0, positive: curr >= 0 };
+  // No baseline in the previous period — growth from 0 is undefined, report as "new"
+  if (prev === 0) return { value: 0, positive: curr >= 0, isNew: curr > 0 };
   const diff = ((curr - prev) / prev) * 100;
-  return { value: Math.round(Math.abs(diff)), positive: diff >= 0 };
+  return { value: Math.round(Math.abs(diff)), positive: diff >= 0, isNew: false };
 }
 
 const PERIOD_META: Record<Period, { label: string; days: number; bucketDays: number; bucketsLabel: string }> = {
