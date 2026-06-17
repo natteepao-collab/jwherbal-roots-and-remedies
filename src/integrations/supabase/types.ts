@@ -332,6 +332,36 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_baselines: {
+        Row: {
+          baseline_value: number
+          created_at: string
+          id: string
+          label: string
+          metric_key: string
+          period: string
+          updated_at: string
+        }
+        Insert: {
+          baseline_value?: number
+          created_at?: string
+          id?: string
+          label: string
+          metric_key: string
+          period?: string
+          updated_at?: string
+        }
+        Update: {
+          baseline_value?: number
+          created_at?: string
+          id?: string
+          label?: string
+          metric_key?: string
+          period?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string

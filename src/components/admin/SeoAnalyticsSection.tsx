@@ -21,6 +21,7 @@ interface PageView { id: string; path: string; referrer: string | null; session_
 interface SeoTarget { id: string; label: string; metric_key: string; target_value: number; period: string; }
 interface Conversation { id: string; started_at: string; admin_takeover: boolean; message_count: number; }
 interface ArticleRow { id: string; created_at: string; }
+interface Baseline { metric_key: string; baseline_value: number; }
 
 const PATH_LABELS: Record<string, string> = {
   "/": "หน้าแรก", "/shop": "ร้านค้า", "/articles": "บทความ", "/community": "คอมมูนิตี้",
@@ -68,6 +69,7 @@ const SeoAnalyticsSection = () => {
   const [targets, setTargets] = useState<SeoTarget[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [articles, setArticles] = useState<ArticleRow[]>([]);
+  const [baselines, setBaselines] = useState<Baseline[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<Period>("month");
 
@@ -75,17 +77,19 @@ const SeoAnalyticsSection = () => {
     const load = async () => {
       setLoading(true);
       const sinceViews = subDays(new Date(), 400).toISOString();
-      const [vRes, tRes, cRes, aRes] = await Promise.all([
+      const [vRes, tRes, cRes, aRes, bRes] = await Promise.all([
         supabase.from("page_views").select("id, path, referrer, session_id, created_at")
           .gte("created_at", sinceViews).order("created_at", { ascending: false }).limit(20000),
         supabase.from("seo_targets").select("*"),
         supabase.from("chat_conversations").select("id, started_at, admin_takeover, message_count"),
         supabase.from("articles").select("id, created_at"),
+        supabase.from("analytics_baselines").select("metric_key, baseline_value"),
       ]);
       setViews(vRes.data || []);
       setTargets(tRes.data || []);
       setConversations((cRes.data as Conversation[]) || []);
       setArticles((aRes.data as ArticleRow[]) || []);
+      setBaselines((bRes.data as Baseline[]) || []);
       setLoading(false);
     };
     load();
@@ -164,9 +168,12 @@ const SeoAnalyticsSection = () => {
     chats: convCurr.filter((c) => new Date(c.started_at).getHours() === h).length,
   }));
 
-  // KPI deltas
-  const dViews = pctChange(viewsCurr.length, viewsPrev.length);
-  const dUniq = pctChange(uniqCurr, uniqPrev);
+  // KPI deltas — fall back to configured baseline (month period) when no tracked previous period exists
+  const baselineFor = (key: string) => baselines.find((b) => b.metric_key === key)?.baseline_value ?? 0;
+  const viewsPrevEff = viewsPrev.length > 0 ? viewsPrev.length : (period === "month" ? baselineFor("monthly_views") : 0);
+  const uniqPrevEff = uniqPrev > 0 ? uniqPrev : (period === "month" ? baselineFor("monthly_unique") : 0);
+  const dViews = pctChange(viewsCurr.length, viewsPrevEff);
+  const dUniq = pctChange(uniqCurr, uniqPrevEff);
   const dConv = pctChange(convCurr.length, convPrev.length);
 
   // SEO Health Checklist
