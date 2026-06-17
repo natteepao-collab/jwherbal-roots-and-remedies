@@ -417,7 +417,7 @@ const SeoAnalyticsSection = () => {
             <p className="text-sm text-muted-foreground">ยังไม่มีการตั้งเป้าหมาย</p>
           ) : targets.map((t) => {
             const actual = actualValues[t.metric_key] ?? 0;
-            const pct = t.target_value > 0 ? Math.min(100, Math.round((actual / Number(t.target_value)) * 100)) : 0;
+            const pct = t.target_value > 0 ? Math.round((actual / Number(t.target_value)) * 100) : 0;
             const onTrack = pct >= 80;
             return (
               <div key={t.id} className="space-y-2">
