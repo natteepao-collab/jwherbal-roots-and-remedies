@@ -21,6 +21,7 @@ interface PageView { id: string; path: string; referrer: string | null; session_
 interface SeoTarget { id: string; label: string; metric_key: string; target_value: number; period: string; }
 interface Conversation { id: string; started_at: string; admin_takeover: boolean; message_count: number; }
 interface ArticleRow { id: string; created_at: string; }
+interface Baseline { metric_key: string; baseline_value: number; }
 
 const PATH_LABELS: Record<string, string> = {
   "/": "หน้าแรก", "/shop": "ร้านค้า", "/articles": "บทความ", "/community": "คอมมูนิตี้",
