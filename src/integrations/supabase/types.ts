@@ -1821,6 +1821,7 @@ export type Database = {
         Args: { article_slug: string }
         Returns: undefined
       }
+      payment_slip_order_valid: { Args: { _path: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
