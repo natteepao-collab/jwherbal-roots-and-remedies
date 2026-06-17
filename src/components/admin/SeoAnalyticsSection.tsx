@@ -69,6 +69,7 @@ const SeoAnalyticsSection = () => {
   const [targets, setTargets] = useState<SeoTarget[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [articles, setArticles] = useState<ArticleRow[]>([]);
+  const [baselines, setBaselines] = useState<Baseline[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<Period>("month");
 
@@ -76,17 +77,19 @@ const SeoAnalyticsSection = () => {
     const load = async () => {
       setLoading(true);
       const sinceViews = subDays(new Date(), 400).toISOString();
-      const [vRes, tRes, cRes, aRes] = await Promise.all([
+      const [vRes, tRes, cRes, aRes, bRes] = await Promise.all([
         supabase.from("page_views").select("id, path, referrer, session_id, created_at")
           .gte("created_at", sinceViews).order("created_at", { ascending: false }).limit(20000),
         supabase.from("seo_targets").select("*"),
         supabase.from("chat_conversations").select("id, started_at, admin_takeover, message_count"),
         supabase.from("articles").select("id, created_at"),
+        supabase.from("analytics_baselines").select("metric_key, baseline_value"),
       ]);
       setViews(vRes.data || []);
       setTargets(tRes.data || []);
       setConversations((cRes.data as Conversation[]) || []);
       setArticles((aRes.data as ArticleRow[]) || []);
+      setBaselines((bRes.data as Baseline[]) || []);
       setLoading(false);
     };
     load();
