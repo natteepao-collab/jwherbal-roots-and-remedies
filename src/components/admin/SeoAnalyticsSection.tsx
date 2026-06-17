@@ -168,9 +168,12 @@ const SeoAnalyticsSection = () => {
     chats: convCurr.filter((c) => new Date(c.started_at).getHours() === h).length,
   }));
 
-  // KPI deltas
-  const dViews = pctChange(viewsCurr.length, viewsPrev.length);
-  const dUniq = pctChange(uniqCurr, uniqPrev);
+  // KPI deltas — fall back to configured baseline (month period) when no tracked previous period exists
+  const baselineFor = (key: string) => baselines.find((b) => b.metric_key === key)?.baseline_value ?? 0;
+  const viewsPrevEff = viewsPrev.length > 0 ? viewsPrev.length : (period === "month" ? baselineFor("monthly_views") : 0);
+  const uniqPrevEff = uniqPrev > 0 ? uniqPrev : (period === "month" ? baselineFor("monthly_unique") : 0);
+  const dViews = pctChange(viewsCurr.length, viewsPrevEff);
+  const dUniq = pctChange(uniqCurr, uniqPrevEff);
   const dConv = pctChange(convCurr.length, convPrev.length);
 
   // SEO Health Checklist
