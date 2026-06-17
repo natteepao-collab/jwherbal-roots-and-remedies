@@ -51,9 +51,10 @@ function refererSource(ref: string | null): string {
 }
 
 function pctChange(curr: number, prev: number) {
-  if (prev === 0) return { value: curr > 0 ? 100 : 0, positive: curr >= 0 };
+  // No baseline in the previous period — growth from 0 is undefined, report as "new"
+  if (prev === 0) return { value: 0, positive: curr >= 0, isNew: curr > 0 };
   const diff = ((curr - prev) / prev) * 100;
-  return { value: Math.round(Math.abs(diff)), positive: diff >= 0 };
+  return { value: Math.round(Math.abs(diff)), positive: diff >= 0, isNew: false };
 }
 
 const PERIOD_META: Record<Period, { label: string; days: number; bucketDays: number; bucketsLabel: string }> = {
@@ -305,21 +306,21 @@ const SeoAnalyticsSection = () => {
           value={viewsCurr.length.toLocaleString()}
           icon={Eye}
           description={`Unique ${uniqCurr.toLocaleString()} คน`}
-          trend={{ value: dViews.value, isPositive: dViews.positive }}
+          trend={{ value: dViews.value, isPositive: dViews.positive, isNew: dViews.isNew }}
         />
         <StatsCard
           title="ผู้เข้าชมไม่ซ้ำ"
           value={uniqCurr.toLocaleString()}
           icon={Users}
           description={`เทียบกับช่วงก่อนหน้า`}
-          trend={{ value: dUniq.value, isPositive: dUniq.positive }}
+          trend={{ value: dUniq.value, isPositive: dUniq.positive, isNew: dUniq.isNew }}
         />
         <StatsCard
           title="บทสนทนา AI"
           value={convCurr.length.toLocaleString()}
           icon={MessageCircle}
           description={`AI ตอบเองได้ ${aiSoloRate}%`}
-          trend={{ value: dConv.value, isPositive: dConv.positive }}
+          trend={{ value: dConv.value, isPositive: dConv.positive, isNew: dConv.isNew }}
         />
         <StatsCard
           title="System Uptime"
@@ -416,7 +417,7 @@ const SeoAnalyticsSection = () => {
             <p className="text-sm text-muted-foreground">ยังไม่มีการตั้งเป้าหมาย</p>
           ) : targets.map((t) => {
             const actual = actualValues[t.metric_key] ?? 0;
-            const pct = t.target_value > 0 ? Math.min(100, Math.round((actual / Number(t.target_value)) * 100)) : 0;
+            const pct = t.target_value > 0 ? Math.round((actual / Number(t.target_value)) * 100) : 0;
             const onTrack = pct >= 80;
             return (
               <div key={t.id} className="space-y-2">

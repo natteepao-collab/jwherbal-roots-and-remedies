@@ -9,6 +9,7 @@ interface StatsCardProps {
   trend?: {
     value: number;
     isPositive: boolean;
+    isNew?: boolean;
   };
   className?: string;
 }
@@ -34,13 +35,20 @@ export const StatsCard = ({
             <p className="text-xs text-muted-foreground">{description}</p>
           )}
           {trend && (
-            <div className={cn(
-              "inline-flex items-center text-xs font-medium",
-              trend.isPositive ? "text-green-600" : "text-red-600"
-            )}>
-              {trend.isPositive ? "+" : ""}{trend.value}%
-              <span className="ml-1 text-muted-foreground">จากเดือนที่แล้ว</span>
-            </div>
+            trend.isNew ? (
+              <div className="inline-flex items-center text-xs font-medium text-primary">
+                ใหม่
+                <span className="ml-1 text-muted-foreground">ยังไม่มีข้อมูลก่อนหน้า</span>
+              </div>
+            ) : (
+              <div className={cn(
+                "inline-flex items-center text-xs font-medium",
+                trend.isPositive ? "text-green-600" : "text-red-600"
+              )}>
+                {trend.isPositive ? "+" : "-"}{trend.value}%
+                <span className="ml-1 text-muted-foreground">จากเดือนที่แล้ว</span>
+              </div>
+            )
           )}
         </div>
         <div className="p-3 rounded-lg bg-primary/10">
