@@ -9,6 +9,7 @@ interface StatsCardProps {
   trend?: {
     value: number;
     isPositive: boolean;
+    isNew?: boolean;
   };
   className?: string;
 }
