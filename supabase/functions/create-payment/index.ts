@@ -46,13 +46,83 @@ serve(async (req) => {
       .select("product_name, quantity, price")
       .eq("order_id", order_id);
 
+    // --- Server-side price integrity check ---
+    // Never trust the client-supplied order.total_amount or order_items.price.
+    // Build the set of legitimate per-line prices straight from the DB:
+    //  - products.price (base catalogue price)
+    //  - promotion_tiers.price (bulk/package prices)
+    // and verify every order line matches one of them, then recompute the total
+    // ourselves (subtotal minus the active Hardsell promotion discount).
+    const [{ data: products }, { data: tiers }, { data: promoRow }] =
+      await Promise.all([
+        supabase.from("products").select("price"),
+        supabase.from("promotion_tiers").select("price").eq("is_active", true),
+        supabase
+          .from("popup_settings")
+          .select("promo_enabled, promo_threshold, promo_discount")
+          .eq("id", "00000000-0000-0000-0000-000000000001")
+          .maybeSingle(),
+      ]);
+
+    const allowedPrices = new Set<number>();
+    for (const p of products ?? []) allowedPrices.add(Math.round(Number(p.price) * 100));
+    for (const t of tiers ?? []) allowedPrices.add(Math.round(Number(t.price) * 100));
+
+    const lines = orderItems ?? [];
+    if (lines.length === 0) {
+      return new Response(JSON.stringify({ error: "Order has no items" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    let subtotalSatang = 0;
+    for (const item of lines) {
+      const lineSatang = Math.round(Number(item.price) * 100);
+      const qty = Number(item.quantity);
+      if (!Number.isFinite(lineSatang) || lineSatang <= 0 || !Number.isInteger(qty) || qty <= 0) {
+        return new Response(JSON.stringify({ error: "Invalid order line" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+      if (!allowedPrices.has(lineSatang)) {
+        console.error("Price mismatch on order", order_id, "line price", item.price);
+        return new Response(
+          JSON.stringify({ error: "Order pricing failed validation" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 },
+        );
+      }
+      subtotalSatang += lineSatang * qty;
+    }
+
+    // Apply the authoritative Hardsell promotion discount (server-side config).
+    const promoEnabled = (promoRow as any)?.promo_enabled ?? true;
+    const promoThresholdSatang = Math.round(Number((promoRow as any)?.promo_threshold ?? 2000) * 100);
+    const promoDiscountSatang = Math.round(Number((promoRow as any)?.promo_discount ?? 50) * 100);
+    const discountSatang =
+      promoEnabled && promoDiscountSatang > 0 && subtotalSatang >= promoThresholdSatang
+        ? promoDiscountSatang
+        : 0;
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    const totalAmount = Number(order.total_amount) || 0;
     // THB uses satang (1/100). Stripe expects the amount in the smallest currency unit.
-    const amountSatang = Math.round(totalAmount * 100);
+    const amountSatang = Math.max(0, subtotalSatang - discountSatang);
+    if (amountSatang <= 0) {
+      return new Response(JSON.stringify({ error: "Invalid order total" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Persist the authoritative total so downstream records can't show a forged amount.
+    const recomputedTotal = amountSatang / 100;
+    if (Math.round(Number(order.total_amount) * 100) !== amountSatang) {
+      await supabase.from("orders").update({ total_amount: recomputedTotal }).eq("id", order_id);
+    }
 
     // Single dynamic line item so the Hardsell-discounted bill total is charged exactly.
     const itemSummary = (orderItems ?? [])
