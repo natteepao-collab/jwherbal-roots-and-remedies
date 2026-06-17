@@ -306,21 +306,21 @@ const SeoAnalyticsSection = () => {
           value={viewsCurr.length.toLocaleString()}
           icon={Eye}
           description={`Unique ${uniqCurr.toLocaleString()} คน`}
-          trend={{ value: dViews.value, isPositive: dViews.positive }}
+          trend={{ value: dViews.value, isPositive: dViews.positive, isNew: dViews.isNew }}
         />
         <StatsCard
           title="ผู้เข้าชมไม่ซ้ำ"
           value={uniqCurr.toLocaleString()}
           icon={Users}
           description={`เทียบกับช่วงก่อนหน้า`}
-          trend={{ value: dUniq.value, isPositive: dUniq.positive }}
+          trend={{ value: dUniq.value, isPositive: dUniq.positive, isNew: dUniq.isNew }}
         />
         <StatsCard
           title="บทสนทนา AI"
           value={convCurr.length.toLocaleString()}
           icon={MessageCircle}
           description={`AI ตอบเองได้ ${aiSoloRate}%`}
-          trend={{ value: dConv.value, isPositive: dConv.positive }}
+          trend={{ value: dConv.value, isPositive: dConv.positive, isNew: dConv.isNew }}
         />
         <StatsCard
           title="System Uptime"
