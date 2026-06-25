@@ -1182,6 +1182,7 @@ export type Database = {
           name_th: string
           name_zh: string
           price: number
+          promo_image_url: string | null
           rating: number | null
           stock: number | null
           suitable_for_en: string
@@ -1210,6 +1211,7 @@ export type Database = {
           name_th: string
           name_zh: string
           price: number
+          promo_image_url?: string | null
           rating?: number | null
           stock?: number | null
           suitable_for_en?: string
@@ -1238,6 +1240,7 @@ export type Database = {
           name_th?: string
           name_zh?: string
           price?: number
+          promo_image_url?: string | null
           rating?: number | null
           stock?: number | null
           suitable_for_en?: string
