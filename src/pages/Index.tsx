@@ -439,7 +439,7 @@ const Index = () => {
                         {/* Image Section */}
                         <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
                           <img
-                            src={product.image_url || productImages[product.id]}
+                            src={product.promo_image_url || product.image_url || productImages[product.id]}
                             alt={getText(product.name_th, product.name_en, product.name_zh)}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
