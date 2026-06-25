@@ -389,6 +389,25 @@ const AdminProducts = () => {
                 )}
               </div>
 
+              <div>
+                <Label>รูปโปรโมชั่น (เฉพาะ Section โปรโมชั่นประจำเดือน)</Label>
+                <p className="text-xs text-muted-foreground mb-1">
+                  ถ้าไม่ระบุ จะใช้รูปภาพสินค้าหลักโดยอัตโนมัติ
+                </p>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPromoImageFile(e.target.files?.[0] || null)}
+                />
+                {formData.promo_image_url && !promoImageFile && (
+                  <img
+                    src={formData.promo_image_url}
+                    alt="Promo Preview"
+                    className="mt-2 h-20 w-20 object-cover rounded"
+                  />
+                )}
+              </div>
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_active}
