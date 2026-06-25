@@ -99,8 +99,12 @@ const AdminProducts = () => {
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
       }
+      let promoImageUrl = data.promo_image_url;
+      if (promoImageFile) {
+        promoImageUrl = await uploadImage(promoImageFile);
+      }
 
-      const { id: _id, ...productData } = { ...data, image_url: imageUrl };
+      const { id: _id, ...productData } = { ...data, image_url: imageUrl, promo_image_url: promoImageUrl };
 
       if (data.id) {
         const { error } = await supabase
