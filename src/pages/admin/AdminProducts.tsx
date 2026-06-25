@@ -182,10 +182,11 @@ const AdminProducts = () => {
       detail_content_th: "", detail_content_en: "", detail_content_zh: "",
       suitable_for_th: "", suitable_for_en: "", suitable_for_zh: "",
       usage_instructions_th: "", usage_instructions_en: "", usage_instructions_zh: "",
-      price: 0, image_url: "", category: "", stock: 0, is_active: true,
+      price: 0, image_url: "", promo_image_url: "", category: "", stock: 0, is_active: true,
     });
     setEditingProduct(null);
     setImageFile(null);
+    setPromoImageFile(null);
     setIsDialogOpen(false);
   };
 
