@@ -198,7 +198,7 @@ const AdminProducts = () => {
       detail_content_th: product.detail_content_th || "", detail_content_en: product.detail_content_en || "", detail_content_zh: product.detail_content_zh || "",
       suitable_for_th: product.suitable_for_th || "", suitable_for_en: product.suitable_for_en || "", suitable_for_zh: product.suitable_for_zh || "",
       usage_instructions_th: product.usage_instructions_th || "", usage_instructions_en: product.usage_instructions_en || "", usage_instructions_zh: product.usage_instructions_zh || "",
-      price: product.price, image_url: product.image_url, category: product.category,
+      price: product.price, image_url: product.image_url, promo_image_url: (product as any).promo_image_url || "", category: product.category,
       stock: product.stock, is_active: product.is_active,
     });
     setIsDialogOpen(true);
