@@ -46,6 +46,7 @@ interface Product {
   usage_instructions_zh: string;
   price: number;
   image_url: string;
+  promo_image_url: string;
   category: string;
   rating: number;
   stock: number;
