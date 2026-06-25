@@ -59,6 +59,7 @@ const AdminProducts = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [promoImageFile, setPromoImageFile] = useState<File | null>(null);
   const [mediaProductId, setMediaProductId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name_th: "", name_en: "", name_zh: "",
@@ -66,7 +67,7 @@ const AdminProducts = () => {
     detail_content_th: "", detail_content_en: "", detail_content_zh: "",
     suitable_for_th: "", suitable_for_en: "", suitable_for_zh: "",
     usage_instructions_th: "", usage_instructions_en: "", usage_instructions_zh: "",
-    price: 0, image_url: "", category: "", stock: 0, is_active: true,
+    price: 0, image_url: "", promo_image_url: "", category: "", stock: 0, is_active: true,
   });
 
   const { data: products, isLoading } = useQuery({
