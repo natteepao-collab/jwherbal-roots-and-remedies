@@ -406,7 +406,8 @@ const Index = () => {
             </div>
 
             {/* Promoted Products Grid - Deal-focused layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+
               {promotedProducts.map((product: any, idx: number) => {
                 const productTiers = allTiers ? getTiersByProduct(allTiers, product.id) : [];
                 const lowestPrice = getLowestTierPrice(allTiers || [], product.id);
