@@ -438,13 +438,14 @@ const Index = () => {
                         </motion.div>
 
                         {/* Image Section */}
-                        <div className="relative overflow-hidden bg-secondary w-full aspect-square sm:aspect-auto sm:h-48 lg:h-56">
+                        <div className="relative overflow-hidden bg-white w-full">
                           <img
                             src={product.promo_image_url || product.image_url || productImages[product.id]}
                             alt={getText(product.name_th, product.name_en, product.name_zh)}
-                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                           />
                         </div>
+
 
 
                         {/* Content Section */}
