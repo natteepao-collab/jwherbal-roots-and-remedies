@@ -441,26 +441,10 @@ const Index = () => {
                           <img
                             src={product.promo_image_url || product.image_url || productImages[product.id]}
                             alt={getText(product.name_th, product.name_en, product.name_zh)}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                           />
-                          {/* Price Tag Overlay */}
-                          <div className="absolute bottom-0 right-0 bg-gradient-to-l from-black/80 to-transparent px-3 sm:px-4 py-2 sm:py-3 text-right">
-                            {lowestPrice && bestTier ? (
-                              <div className="space-y-0.5">
-                                <div className="text-2xs sm:text-xs text-white/70 line-through">
-                                  ฿{bestTier.normal_price?.toLocaleString("th-TH")}
-                                </div>
-                                <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
-                                  ฿{lowestPrice.toLocaleString("th-TH")}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-lg sm:text-xl md:text-2xl font-black text-primary">
-                                ฿{product.price?.toLocaleString("th-TH")}
-                              </div>
-                            )}
-                          </div>
                         </div>
+
 
                         {/* Content Section */}
                         <CardContent className="p-3 sm:p-4 flex-1 flex flex-col">
